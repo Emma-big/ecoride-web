@@ -79,7 +79,10 @@ if (empty($_SESSION['csrf_token'])) {
 // 3.3) Charger l’autoloader Composer et Dotenv AVANT la config
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
-    Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
+    // Ne charger le .env qu’en local / si présent
+    if (file_exists(BASE_PATH . '/.env')) {
+        Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
+    }
 }
 
 // 4) Charger la configuration (PDO, MongoDB…)
