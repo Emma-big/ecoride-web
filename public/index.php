@@ -46,11 +46,15 @@ if (! defined('BASE_PATH')) {
 require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Helpers\renderError;
 
-// Gestionnaire des exceptions non capturées → page 500
+// Gestionnaire des exceptions non capturées → dump de l’exception pour debug
 set_exception_handler(function(\Throwable $e) {
-    // Optionnel : log($e);
-    renderError(500);
+    echo '<pre>';
+    echo get_class($e) . ': ' . $e->getMessage() . "\n";
+    echo $e->getTraceAsString();
+    echo '</pre>';
+    exit;
 });
+
 
 // Gestionnaire des erreurs PHP → transforme en Exception
 set_error_handler(function($severity, $message, $file, $line) {
