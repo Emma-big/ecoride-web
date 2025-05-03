@@ -1,29 +1,19 @@
-# Ignorer les fichiers sensibles
-/.env
-
-# Dossiers générés automatiquement
+# Environnement PHP / Composer
 /vendor/
-/node_modules/
-/coverage/
-/public/build/
-/server/node_modules/
+/.env
+composer.lock
 
-# Fichiers système
+# Coverage
+/coverage/
+
+# IDE / OS
 .DS_Store
 Thumbs.db
-
-# Fichiers de logs et temporaires
 *.log
-*.cache
-*.tmp
 
-# IDE & OS config files
-.vscode/
-.idea/
-*.swp
+# Node
+/node_modules/
+npm-debug.log*
 
-# Ignorer les fichiers de sauvegarde
-*.bak
-*.old
-*.orig
-*.save
+# XAMPP / Apache
+/htdocs/EcoRide/public/assets/images/accueil1.png # adapte si nécessaire
