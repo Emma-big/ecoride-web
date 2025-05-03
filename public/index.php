@@ -1,25 +1,26 @@
 <?php
 // public/index.php
 
-// === SERVICE DES PDF EN PHP PUR ===
-$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// === SERVICE 100% PHP DES PDF ===
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// On gère deux préfixes : /documents_pdf et /assets/documents
+// On considère deux emplacements possibles
 foreach (['/documents_pdf/', '/assets/documents/'] as $prefix) {
-    if (strpos($requestUri, $prefix) === 0) {
-        $filePath = __DIR__ . $requestUri;
-        if (file_exists($filePath) && is_file($filePath)) {
+    if (strpos($uri, $prefix) === 0) {
+        $file = __DIR__ . $uri;
+        if (is_file($file)) {
             header('Content-Type: application/pdf');
-            header('Content-Disposition: inline; filename="'.basename($filePath).'"');
-            readfile($filePath);
-            exit; // on sort, le fichier est servi
+            header('Content-Disposition: inline; filename="' . basename($file) . '"');
+            readfile($file);
+            exit;
         }
-        // sinon on renvoie un vrai 404
         http_response_code(404);
         echo "404 PDF Not Found";
         exit;
     }
 }
+
+// === FIN SERVICE PDF — on continue avec le front-controller ===
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
