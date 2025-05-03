@@ -1,0 +1,82 @@
+@import url('/assets/style/variables.css');
+
+/* === Conteneur global du footer === */
+footer {
+  background-color: var(--bleu-principal);
+  padding: 20px 0;
+  color: var(--bleu-fond);
+  font-size: 1rem;
+  border-top: 2px solid var(--vert-accent);
+  font-family: var(--font-principale);
+  text-align: center;           /* Centre tout le contenu */
+}
+
+/* Branding */
+footer .navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: block;
+  color: var(--bleu-fond);
+}
+
+/* Liens */
+footer a {
+  color: var(--bleu-fond);
+  text-decoration: none;
+  font-weight: bold;
+  transition: color var(--transition-rapide);
+}
+footer a:hover,
+footer a:focus {
+  color: var(--vert-accent);
+  text-decoration: underline;
+}
+
+/* Conteneur interne */
+footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Ligne et colonnes */
+footer .row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  row-gap: 10px;
+}
+
+/* Chaque colonne 100% sur mobile, 48% sur desktop */
+footer .col-12,
+footer .col-12.col-md-6 {
+  flex: 1 1 100%;
+  max-width: 100%;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  footer .col-12.col-md-6 {
+    flex: 0 0 48%;
+    max-width: 48%;
+  }
+}
+
+/* === Responsive Mobile : Empilement centré === */
+@media (max-width: 768px) {
+  /* Empile la row en bloc */
+  footer .row {
+    display: block !important;
+  }
+  /* Chaque colonne pleine largeur, centrée */
+  footer .row > div {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 auto 1rem !important;
+    text-align: center !important;
+    float: none !important;
+  }
+}

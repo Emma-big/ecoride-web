@@ -1,0 +1,19 @@
+:root {
+    /* --- Couleurs principales --- */
+    --bleu-principal: #427AA1;
+    --bleu-fond: #EBF2FA;
+    --vert-accent: #679436;
+    --texte-foncé: #2c3e50;
+    --blanc: #FFFFFF;
+    --noir: #000000;
+
+    /* --- Typographie --- */
+    --font-principale: 'Arial', sans-serif;
+
+    /* --- Bordures --- */
+    --rayon-bordure: 5px;
+
+    /* --- Transitions --- */
+    --transition-rapide: 0.3s ease;
+    --transition-lente: 0.8s ease;
+}

@@ -1,0 +1,72 @@
+@import url('/assets/style/variables.css');
+
+/* === BARRE DE RECHERCHE === */
+.barre-recherche {
+    background-color: #2a9d8f;
+    padding: 20px 15px;
+    border-radius: var(--rayon-bordure);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* === TITRE === */
+.barre-recherche h4 {
+    color: var(--blanc);
+    text-decoration: underline;
+    padding-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+/* === CHAMPS DE FORMULAIRE === */
+.barre-recherche input[type="text"],
+.barre-recherche input[type="date"],
+.barre-recherche select {
+    height: 45px;
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+    padding: 5px 10px;
+    font-size: 1rem;
+    background-color: var(--blanc);
+    color: var(--noir);
+    box-sizing: border-box;
+}
+
+/* === FOCUS ACCESSIBLE === */
+.barre-recherche input[type="text"]:focus,
+.barre-recherche input[type="date"]:focus,
+.barre-recherche select:focus,
+.barre-recherche button:focus {
+    outline: 3px solid #FFD700;
+    outline-offset: 2px;
+    background-color: #f1ffe8;
+}
+
+/* === BOUTON PERSONNALISÉ === */
+.barre-recherche .btn-custom {
+    height: 45px;
+    background-color: var(--bleu-fond);
+    color: var(--blanc);
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color var(--transition-rapide), color var(--transition-rapide);
+    cursor: pointer;
+}
+
+.barre-recherche .btn-custom:hover,
+.barre-recherche .btn-custom:focus-visible {
+    background-color: var(--vert-accent);
+    color: var(--blanc);
+}
+
+/* === ACCESSIBILITÉ MOBILE === */
+@media (max-width: 768px) {
+    .barre-recherche .form-label {
+        font-size: 0.9rem;
+        color: var(--blanc);
+    }
+
+    .barre-recherche .col-md-2 {
+        margin-bottom: 10px;
+    }
+}

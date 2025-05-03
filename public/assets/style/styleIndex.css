@@ -1,0 +1,268 @@
+@import url('/assets/style/variables.css');
+
+/* ===========================
+   BASE
+=========================== */
+body {
+    background-color: var(--bleu-fond);
+    font-family: var(--font-principale);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===========================
+   TITRES PRINCIPAUX
+=========================== */
+h2 {
+    color: var(--bleu-fond) !important;
+    text-align: center;
+    background-color: var(--bleu-principal);
+    padding: 10px 0;
+    margin: 20px auto;
+    border-radius: var(--rayon-bordure);
+    font-size: 1.8rem;
+}
+
+/* Classe standard pour les titres de sections statutaires */
+.h2statut {
+    color: var(--bleu-principal) !important;
+    text-align: center;
+    background-color: var(--bleu-fond);
+    border: 2px solid var(--bleu-principal);
+    border-radius: var(--rayon-bordure);
+    padding: 10px;
+    width: 75%;
+    margin: 20px auto;
+    font-weight: bold;
+}
+
+/* Classe pour le titre des voitures */
+.vehicule-header {
+    width: 100% !important;
+    background-color: var(--bleu-principal) !important;
+    color: #ffffff !important;
+    padding: 10px 0;
+    margin: 20px auto;
+    border-radius: var(--rayon-bordure);
+    text-align: center;
+}
+
+/* ===========================
+   PARAGRAPHES & TITRES SECONDAIRES
+=========================== */
+p {
+    text-align: center;
+    color: var(--texte-foncé);
+    margin: 10px 40px;
+}
+
+h3 {
+    margin-block-start: 1.25rem;
+    margin-block-end:   1rem;
+    margin-inline:      auto;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    text-align: center;
+    font-weight: 700;
+    color: var(--vert-accent, #006400);
+    text-decoration: underline solid currentColor;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25rem;
+}
+
+/* ===========================
+   IMAGES
+=========================== */
+.custom-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--rayon-bordure);
+}
+
+/* ===========================
+   CARDS
+=========================== */
+.card {
+    background-color: var(--bleu-principal) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--vert-accent);
+    border-radius: calc(var(--rayon-bordure) + 3px);
+    margin-bottom: 20px;
+    padding: 15px;
+    transition: transform var(--transition-rapide);
+}
+.card .card-title,
+.card .card-text {
+    color: #ffffff !important;
+}
+.card:hover {
+    transform: translateY(-3px);
+}
+
+/* ===========================
+   NAVBARS
+=========================== */
+.site-navbar,
+.admin-navbar,
+.employe-navbar,
+.suspendu-navbar,
+.utilisateur-navbar {
+    background-color: var(--bleu-principal)!important;
+}
+
+/* Force le bleu principal sur TOUTES les navbars “site-navbar” */
+nav.navbar.site-navbar {
+  background-color: var(--bleu-principal) !important;
+}
+
+/* ===========================
+   RESPONSIVE GLOBAL
+=========================== */
+@media (max-width: 768px) {
+    h2,
+    .h2statut {
+        font-size: 1.5rem;
+        padding: 8px;
+    }
+
+    .custom-img {
+        height: 150px;
+    }
+
+    p {
+        margin: 10px 20px;
+        font-size: 0.95rem;
+    }
+
+    /* Adapter containers pleine largeur */
+    .container {
+      width: 100%;
+      padding: 0 1rem;
+      max-width: none;
+    }
+
+    /* Grille mono-colonne */
+    .grid {
+      display: block;
+    }
+    .col-desktop-6, .col-md-6 {
+      width: 100%;
+      float: none;
+      margin-bottom: 1rem;
+    }
+
+    /* Nav mobile basique */
+    .navbar {
+      display: block;
+    }
+    .navbar ul {
+      display: none;
+    }
+    .navbar .hamburger {
+      display: block;
+    }
+
+    /* Images et vidéos fluides */
+    img, video {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Typographie mobile */
+    body {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    /* Masquages éventuels */
+    .sidebar, .footer-widgets {
+      display: none;
+    }
+  }
+    
+
+/* ===========================
+   CONFIRMER TRAJET (report-problem)
+=========================== */
+.report-problem {
+  font-family: sans-serif;
+  padding: 2rem;
+}
+.report-problem .error {
+  color: red;
+  margin-bottom: 1rem;
+}
+.report-problem textarea {
+  width: 100%;
+  height: 8em;
+  resize: vertical;
+}
+.report-problem .cancel-link {
+  margin-left: 1rem;
+}
+
+/* ===========================
+   COMPTEUR DE CRÉDITS
+=========================== */
+.compteur-title {
+  color: #EBF2FA;
+  text-decoration: underline;
+}
+.compteur-value {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--bleu-principal);
+  color: #fff;
+  font-size: 30px;
+  text-align: center;
+  margin-top: 10px;
+  border: 2px solid white;
+  border-radius: var(--rayon-bordure);
+  transition: background 0.3s ease, color 0.3s ease;
+  cursor: default;        /* pointeur normal, pas de focus */
+  user-select: none;      /* empêche la sélection de texte si souhaité */
+}
+
+.compteur-value:hover {
+  background: var(--vert-accent);
+  color: var(--bleu-fond);
+}
+
+/* ===========================
+   PROFIL UTILISATEUR
+=========================== */
+.profile-img {
+  max-width: 150px;
+  margin: 0 auto 1rem;
+}
+
+/* ===========================
+   IMAGES D’ACCUEIL
+=========================== */
+.card-img-empreinte {
+  width: 90%;
+  margin: 20px auto;
+}
+.card-img-impact {
+  width: 75%;
+  margin: 20px auto;
+}
+
+/* ===========================
+   Espace sous le bouton déconnexion
+=========================== */
+.text-end .btn {
+  margin-top: 0.5rem;
+}
+
+/* ===========================
+   FORMULAIRE DE NOTATION
+=========================== */
+.note-form {
+  max-width: 500px;
+}

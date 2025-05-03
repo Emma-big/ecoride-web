@@ -1,0 +1,29 @@
+# Ignorer les fichiers sensibles
+/.env
+
+# Dossiers générés automatiquement
+/vendor/
+/node_modules/
+/coverage/
+/public/build/
+/server/node_modules/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de logs et temporaires
+*.log
+*.cache
+*.tmp
+
+# IDE & OS config files
+.vscode/
+.idea/
+*.swp
+
+# Ignorer les fichiers de sauvegarde
+*.bak
+*.old
+*.orig
+*.save

@@ -1,0 +1,152 @@
+@import url('/assets/style/variables.css');
+
+body {
+    background-color: var(--bleu-fond);
+    margin: 0;
+    font-family: var(--font-principale);
+}
+
+h2 {
+    color: var(--bleu-principal);
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.body {
+    display: block;
+    background-color: var(--bleu-principal);
+    color: var(--bleu-fond);
+    font-weight: bold;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+    width: 90%;
+    max-width: 600px;
+    margin: 30px auto;
+}
+
+.button,
+.btn,
+form .btn {
+    background-color: var(--bleu-principal);
+    color: var(--bleu-fond) !important;
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+    font-weight: bold;
+    padding: 10px 20px;
+    transition: var(--transition-rapide);
+    cursor: pointer;
+}
+
+.button:hover,
+.btn:hover,
+form .btn:hover {
+    background-color: var(--bleu-fond);
+    color: var(--bleu-principal) !important;
+}
+
+.card {
+    background-color: var(--bleu-principal);
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    color: var(--bleu-fond);
+}
+
+.card h2 {
+    color: var(--bleu-fond);
+    margin-bottom: 15px;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.bienvenue {
+    background-color: var(--bleu-principal);
+    color: var(--bleu-fond);
+    padding: 20px;
+    text-align: center;
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+    width: 90%;
+    max-width: 600px;
+    margin: 30px auto;
+    font-weight: bold;
+}
+
+.formLogin2 {
+    background-color: var(--bleu-principal);
+    color: var(--bleu-fond);
+    padding: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    margin: 30px auto;
+    border: 2px solid var(--vert-accent);
+    border-radius: var(--rayon-bordure);
+}
+
+.label {
+    display: block;
+    color: var(--bleu-fond);
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.inputBasic2 {
+    width: 80%;
+    max-width: 400px;
+    padding: 8px;
+    border: 3px solid var(--bleu-principal);
+    border-radius: var(--rayon-bordure);
+    transition: border-color var(--transition-rapide);
+}
+
+.inputBasic2:focus {
+    border-color: var(--vert-accent);
+    outline: none;
+}
+
+.lieuCard {
+    font-size: 1.5rem;
+    color: var(--bleu-fond);
+    text-decoration: underline;
+}
+
+.souligneCard {
+    text-decoration: underline;
+    color: var(--bleu-fond);
+}
+
+.pseudoCard {
+    color: var(--bleu-fond);
+    font-weight: bold;
+}
+
+/* ✅ Responsive */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card,
+    .formLogin2,
+    .body {
+        width: 95%;
+    }
+
+    .inputBasic2 {
+        width: 95%;
+    }
+}

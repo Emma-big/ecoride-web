@@ -1,0 +1,59 @@
+@import url('/assets/style/variables.css');
+
+/* ===== Liens globaux ===== */
+a {
+    text-decoration: none;
+    color: var(--bleu-fond) !important;
+}
+
+a:hover,
+a:focus {
+    color: #d1f1a4 !important;
+    text-decoration: underline;
+    outline: none;
+}
+
+/* ===== Marque / Logo ===== */
+.navbar-brand {
+    font-size: 35px !important;
+    font-weight: bold;
+    color: var(--bleu-fond) !important;
+}
+
+/* ===== Navigation principale ===== */
+.navbar-nav {
+    margin-left: auto;
+}
+
+/* ===== Liens de navigation ===== */
+.nav-link {
+    font-weight: bold;
+    color: var(--bleu-fond) !important;
+    transition: color var(--transition-rapide);
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: var(--vert-accent) !important;
+    text-decoration: underline;
+}
+
+/* ===== Focus visible pour l'accessibilité clavier ===== */
+.nav-link:focus-visible {
+    outline: 2px dashed var(--vert-accent);
+    outline-offset: 2px;
+}
+
+/* ===== Navbar responsive toggle ===== */
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+/* ===== Couleur de fond de la navbar ===== */
+.navbar {
+    background-color: var(--bleu-principal) !important;
+}
