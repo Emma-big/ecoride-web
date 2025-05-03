@@ -168,14 +168,13 @@ MONGODB_DB_NAME=avisDB
 
 - **Développeur principal** : CADILHAC E.  
 - **Directeur Technique** : José  
-- **Contact** : contact@ecoride.fr
+- **Contact** : contact@ecoride.com
 
 ---
 
 ## Déploiement
 
-- Application en ligne : https://ecoride.fly.io  
-- (ou configure sur Heroku / serveur dédié)
+- Application en ligne : https://  
 
 ---
 
