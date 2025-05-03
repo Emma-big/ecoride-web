@@ -1,6 +1,21 @@
 <?php
 // public/index.php
 
+// Interception et service direct des PDF
+$requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+if (strpos($requestUri, '/documents_pdf/') === 0) {
+    $filePath = __DIR__ . $requestUri;
+    if (file_exists($filePath) && is_file($filePath)) {
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="'.basename($filePath).'"');
+        readfile($filePath);
+        exit;
+    } else {
+        http_response_code(404);
+        echo "404 Not Found";
+        exit;
+    }
+}
 // Construire le chemin sur disque de la requête
 $requested = $_SERVER['REQUEST_URI'];
 $path = __DIR__ . parse_url($requested, PHP_URL_PATH);
