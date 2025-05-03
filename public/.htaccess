@@ -1,9 +1,10 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  # Ne pas réécrire les URLs sous /documents_pdf
+
+  # Exclure le dossier documents_pdf des réécritures
   RewriteRule ^documents_pdf/ - [L]
 
-  # Toutes les autres requêtes continuent vers index.php
+  # Tout autre chemin non-fichier passe par index.php
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule . index.php [L]
 </IfModule>
