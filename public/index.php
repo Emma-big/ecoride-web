@@ -1,32 +1,25 @@
 <?php
 // public/index.php
 
-// Interception et service direct des PDF
+// === SERVICE DES PDF EN PHP PUR ===
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-if (strpos($requestUri, '/documents_pdf/') === 0) {
-    $filePath = __DIR__ . $requestUri;
-    if (file_exists($filePath) && is_file($filePath)) {
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: inline; filename="'.basename($filePath).'"');
-        readfile($filePath);
-        exit;
-    } else {
+
+// On gère deux préfixes : /documents_pdf et /assets/documents
+foreach (['/documents_pdf/', '/assets/documents/'] as $prefix) {
+    if (strpos($requestUri, $prefix) === 0) {
+        $filePath = __DIR__ . $requestUri;
+        if (file_exists($filePath) && is_file($filePath)) {
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="'.basename($filePath).'"');
+            readfile($filePath);
+            exit; // on sort, le fichier est servi
+        }
+        // sinon on renvoie un vrai 404
         http_response_code(404);
-        echo "404 Not Found";
+        echo "404 PDF Not Found";
         exit;
     }
 }
-// Construire le chemin sur disque de la requête
-$requested = $_SERVER['REQUEST_URI'];
-$path = __DIR__ . parse_url($requested, PHP_URL_PATH);
-
-// Si un fichier existe à cet emplacement, laisser Apache/Nginx le servir directement
-if (file_exists($path) && is_file($path)) {
-    return false; // passe la main au serveur web pour le servir
-}
-
-// Si on arrive ici, on n’est pas sur un fichier statique : on continue vers le routeur PHP
-
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
