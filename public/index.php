@@ -1,5 +1,17 @@
 <?php
-// public/index.php — Front Controller
+// public/index.php
+
+// Construire le chemin sur disque de la requête
+$requested = $_SERVER['REQUEST_URI'];
+$path = __DIR__ . parse_url($requested, PHP_URL_PATH);
+
+// Si un fichier existe à cet emplacement, laisser Apache/Nginx le servir directement
+if (file_exists($path) && is_file($path)) {
+    return false; // passe la main au serveur web pour le servir
+}
+
+// Si on arrive ici, on n’est pas sur un fichier statique : on continue vers le routeur PHP
+
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
