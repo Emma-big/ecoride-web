@@ -1,185 +1,114 @@
-# EcoRide - Plateforme de Covoiturage Écologique
+## EcoRide
 
-Bienvenue sur le dépôt GitHub du projet **EcoRide**, une plateforme de covoiturage conçue pour encourager les déplacements écologiques et économiques.
+EcoRide est une application collaborative de covoiturage écologique via des voitures électriques plus particulièrement permettant aux utilisateurs de rechercher, réserver et proposer des trajets facilement.
 
 ---
 
 ## Table des matières
 
-1. [Objectif du projet](#objectif-du-projet)
-2. [Fonctionnalités principales](#fonctionnalités-principales)
-3. [Technologies utilisées](#technologies-utilisées)
-4. [Prérequis](#prérequis)
-5. [Installation en local](#installation-en-local)
-6. [Configuration](#configuration)
-7. [Usage & Routes principales](#usage--routes-principales)
-8. [Comptes de test](#comptes-de-test)
-9. [Bonnes pratiques Git](#bonnes-pratiques-git)
-10. [Sécurité](#sécurité)
-11. [Équipe projet](#équipe-projet)
-12. [Déploiement](#déploiement)
-13. [Licence](#licence)
+1. [Description du projet](#description-du-projet)
+2. [Prérequis](#prérequis)
+3. [Installation](#installation)
+4. [Usage en local](#usage-en-local)
+5. [Documentation](#documentation)
+6. [Stratégie de branches Git](#stratégie-de-branches-git)
+7. [Docker & Environnement](#docker--environnement)
+8. [CI/CD](#cicd)
+9. [Déploiement](#déploiement)
 
 ---
 
-## Objectif du projet
+## Description du projet
 
-EcoRide est une startup française dont l’objectif est de réduire l’impact environnemental des déplacements en voiture en favorisant le covoiturage, avec une attention particulière pour les trajets effectués avec des véhicules électriques.
-
----
-
-## Fonctionnalités principales
-
-- Page d’accueil avec recherche d’itinéraires
-- Gestion des comptes (utilisateurs, chauffeurs, passagers)
-- Vue des covoiturages disponibles et détail de chaque trajet
-- Participation à un covoiturage et gestion des crédits
-- Espace personnel pour chauffeurs et passagers
-- Saisie et historique des voyages
-- Interface dédiée pour employés et administrateurs
-- Filtres écologiques (véhicule électrique), prix, durée, note, etc.
-
----
-
-## Technologies utilisées
-
-### Frontend
-- HTML5 / CSS3 (Bootstrap 5)  
-- JavaScript (vanilla)
-
-### Backend
-- PHP 8.3 (PDO)  
-- Gestion d’erreurs centralisée (HTTP 403/404/405/500)
-
-### Bases de données
-- MySQL (relationnelle)  
-- MongoDB (non relationnelle) pour les réclamations
-
-### Tests & CI
-- PHPUnit (tests unitaires, couverture)  
-- (À venir) GitHub Actions pour CI/CD
-
-### Versioning & Déploiement
-- Versionné avec Git / GitHub  
-- Hébergement possible sur Fly.io, Heroku, ou serveur Apache (XAMPP)
-
----
+EcoRide offre une plateforme intuitive pour gérer les trajets en covoiturage avec des voitures électriques à privilégier. Le front-end est développé en JavaScript/React, et le back-end en PHP-FPM avec une API REST et MySQL.
 
 ## Prérequis
 
-- PHP ≥ 8.3 avec extensions `pdo_mysql`, `mbstring`  
-- MySQL  
-- MongoDB  
-- Composer  
-- Git  
+* PHP >= 8.2
+* Composer
+* Node.js & npm
+* Docker & Docker Compose (pour le développement)
+* Git
 
----
+## Installation
 
-## Installation en local
+1. Clonez le dépôt :
 
-1. Cloner le dépôt :
    ```bash
-   git clone https://github.com/TON-COMPTE/EcoRide.git
+   git clone https://github.com/Emma-big/ecoride-web.git
    cd EcoRide
    ```
-2. Installer les dépendances PHP :
+2. Installez les dépendances PHP :
+
    ```bash
    composer install
    ```
-3. Importer la base de données :
+3. Installez les dépendances JavaScript :
+
    ```bash
-   mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ecoride;"
-   mysql -u root -p ecoride < ecoride.sql
+   npm install
    ```
-4. Lancer le serveur web :
-   - **PHP intégré** :
-     ```bash
-     php -S ecoride.local:80 -t public public/index.php
-     ```
-   - **Apache (XAMPP/vHost)** : configure un VirtualHost pointant sur `public/`
+4. Préparez vos variables d'environnement :
 
-Ouvre ensuite [http://ecoride.local](http://ecoride.local) dans ton navigateur.
+   ```bash
+   cp .env.example .env
+   
+   ```
 
----
+## Usage en local
 
-## Configuration
+Lancez l'application avec Docker Compose :
 
-Crée un fichier `.env` à la racine du projet (ou copie `.env.example`) :
-
-```dotenv
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=ecoride
-DB_USER=root
-DB_PASS=
-MONGODB_URI=mongodb://localhost:27017
-MONGODB_DB_NAME=avisDB
-# Autres variables (mail, clé API, etc.)
+```bash
+docker-compose up --build -d
 ```
 
----
+* L'application est ensuite accessible sur l'URL http://ecoride.local (pensez à configurer votre fichier hosts ou DNS localement).
 
-## Usage & Routes principales
 
-| Route                 | Description                              |
-|-----------------------|------------------------------------------|
-| `/`, `/index`         | Accueil                                  |
-| `/login`              | Page de connexion                        |
-| `/registerForm`       | Formulaire d’inscription                 |
-| `/covoiturageForm`    | Créer un nouveau covoiturage             |
-| `/covoiturage`        | Rechercher un covoiturage                |
-| `/detail-covoiturage` | Détail d’un covoiturage                  |
-| `/delete-covoiturage` | Supprimer un covoiturage                 |
-| `/utilisateur`        | Espace personnel                         |
-| `/stats`              | Statistiques & graphiques                |
-| …                     | (voir `public/index.php` pour la liste)  |
+## Documentation
 
----
+Tous les guides et chartes sont disponibles au format PDF dans le dossier `DOCUMENTS PDF/` :
 
-## Comptes de test
+* CHARTE GRAPHIQUE
+* MANUEL D’UTILISATION
+* DOCUMENTATION GESTION DE PROJET
+* DOCUMENTATION TECHNIQUE
 
-| Rôle           | Email               | Mot de passe    |
-|----------------|---------------------|-----------------|
-| Utilisateur    | user@test.com       | Test1234!       |
-| Employé        | employe@test.com    | Test1234!       |
-| Administrateur | admin@test.com      | Admin1234!      |
+## Stratégie de branches Git
 
----
+Nous utilisons un workflow Gitflow simplifié :
 
-## Bonnes pratiques Git
+* **main** : branche principale, version stable déployée en production.
+* **develop** : branche de développement, rassemble les fonctionnalités validées.
+* **feature/**\* : branches de fonctionnalités issues de `develop` pour chaque nouvelle tâche.
 
-- Branche `main` : version stable  
-- Branche `develop` : intégration continue  
-- Créer une branche feature/… pour chaque nouvelle fonctionnalité  
-- Merges : feature → develop → main (après validation)
+**Cycle de vie** :
 
----
+1. Créez `feature/xxx` depuis `develop`.
+2. Travaillez et committez vos modifications.
+3. Ouvrez une PR `feature/xxx` → `develop`, faites passer les CI/tests, puis mergez.
+4. Une fois toutes les fonctionnalités validées, mergez `develop` → `main` pour la production.
 
-## Sécurité
+## Docker & Environnement
 
-- Mots de passe hachés avec bcrypt  
-- Vérification des rôles et permissions  
-- Protection CSRF centralisée  
-- Modération des avis et double confirmation pour l’usage des crédits
+Le projet intègre un `Dockerfile` multi-stage et un `docker-compose.yml` :
 
----
+* **Dockerfile** : image PHP-FPM optimisée pour l’API.
+* **docker-compose.yml** : orchestre l’API, la base MySQL et Traefik en reverse-proxy.
 
-## Équipe projet
+## CI/CD
 
-- **Développeur principal** : CADILHAC E.  
-- **Directeur Technique** : José  
-- **Contact** : contact@ecoride.fr
+Le pipeline CI/CD est entièrement géré par GitHub Actions :
 
----
+1. Analyse statique du code avec PHP\_CodeSniffer (PSR-12) et PHPStan
+2. Exécution des tests unitaires PHPUnit avec génération du rapport de couverture
+3. Construction d’une image Docker multi-stage
+4. Publication des artefacts (`coverage.xml`) et de l’image sur GitHub Container Registry
+5. Déploiement automatique sur Heroku via la Heroku CLI intégrée au workflow
+
+Des badges de statut et de couverture sont ajoutés en tête du README.
 
 ## Déploiement
 
-- Application en ligne : https://ecoride.fly.io  
-- (ou configure sur Heroku / serveur dédié)
-
----
-
-## Licence
-
-Ce projet est distribué sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus d’informations.
-
+En production, tant le front-end que le back-end sont déployés sur des dynos Heroku. Cette configuration assure un hébergement entièrement managé, la mise à l’échelle automatique des instances et la gestion transparente des certificats SSL.
