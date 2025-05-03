@@ -1,13 +1,9 @@
 <?php
 // public/index.php
 
-// Si on demande un PDF, on le sert toujours en PHP, sans se soucier d'Apache/Heroku
+// 1) SERVICE 100% PHP DES PDF
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Liste des dossiers où se trouvent vos PDF
-$allowedPrefixes = ['/documents_pdf/', '/assets/documents/'];
-
-foreach ($allowedPrefixes as $prefix) {
+foreach (['/documents_pdf/', '/assets/documents/'] as $prefix) {
     if (strpos($uri, $prefix) === 0) {
         $file = __DIR__ . $uri;
         if (is_file($file)) {
@@ -22,7 +18,13 @@ foreach ($allowedPrefixes as $prefix) {
     }
 }
 
-// === FIN SERVICE PDF — on continue avec le front-controller ===
+// 2) HANDLER DES FICHIERS STATIQUES (CSS, JS, ICO, images…)
+$static = __DIR__ . $uri;
+if (is_file($static)) {
+    return false;  // on rend la main à Apache pour servir le fichier
+}
+
+// === LE FRONT-CONTROLLER PHP reprend ici pour toutes les autres routes ===
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
