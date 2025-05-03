@@ -1,7 +1,9 @@
-# Environnement PHP / Composer
+# PHP / Composer
 /vendor/
-/.env
-composer.lock
+.env
+
+# ne PAS ignorer composer.lock
+# composer.lock
 
 # Coverage
 /coverage/
@@ -13,7 +15,8 @@ Thumbs.db
 
 # Node
 /node_modules/
+/server/node_modules/
 npm-debug.log*
 
-# XAMPP / Apache
-/htdocs/EcoRide/public/assets/images/accueil1.png # adapte si nécessaire
+# XAMPP / assets
+/public/assets/images/
