@@ -1,11 +1,13 @@
 <?php
 // public/index.php
 
-// === SERVICE 100% PHP DES PDF ===
+// Si on demande un PDF, on le sert toujours en PHP, sans se soucier d'Apache/Heroku
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// On considère deux emplacements possibles
-foreach (['/documents_pdf/', '/assets/documents/'] as $prefix) {
+// Liste des dossiers où se trouvent vos PDF
+$allowedPrefixes = ['/documents_pdf/', '/assets/documents/'];
+
+foreach ($allowedPrefixes as $prefix) {
     if (strpos($uri, $prefix) === 0) {
         $file = __DIR__ . $uri;
         if (is_file($file)) {
