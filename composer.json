@@ -18,6 +18,11 @@
     },
     "scripts": {
   "test": "phpunit --configuration phpunit.xml"
-}
+},
+"extra": {
+    "heroku": {
+      "document-root": "public"
+    }
+  }
 }
 
