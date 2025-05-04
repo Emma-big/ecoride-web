@@ -1,6 +1,9 @@
+[![Build Status](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg)](https://codecov.io/gh/Emma-big/ecoride-web)
+
 ## EcoRide
 
-EcoRide est une application collaborative de covoiturage écologique via des voitures électriques plus particulièrement permettant aux utilisateurs de rechercher, réserver et proposer des trajets facilement.
+EcoRide est une application collaborative de covoiturage écologique via des voitures électriques permettant aux utilisateurs de rechercher, réserver et proposer des trajets facilement.
 
 ---
 
@@ -20,7 +23,7 @@ EcoRide est une application collaborative de covoiturage écologique via des voi
 
 ## Description du projet
 
-EcoRide offre une plateforme intuitive pour gérer les trajets en covoiturage avec des voitures électriques à privilégier. Le front-end est développé en JavaScript/React, et le back-end en PHP-FPM avec une API REST et MySQL.
+EcoRide offre une plateforme intuitive pour gérer les trajets en covoiturage avec des voitures électriques. Le front-end est développé en JavaScript/React, et le back-end en PHP-FPM avec une API REST et MySQL.
 
 ## Prérequis
 
@@ -52,7 +55,6 @@ EcoRide offre une plateforme intuitive pour gérer les trajets en covoiturage av
 
    ```bash
    cp .env.example .env
-   
    ```
 
 ## Usage en local
@@ -63,17 +65,16 @@ Lancez l'application avec Docker Compose :
 docker-compose up --build -d
 ```
 
-* L'application est ensuite accessible sur l'URL http://ecoride.local (pensez à configurer votre fichier hosts ou DNS localement).
-
+* L'application est ensuite accessible sur [http://ecoride.local](http://ecoride.local) (pensez à configurer votre fichier hosts ou DNS localement).
 
 ## Documentation
 
-Tous les guides et chartes sont disponibles au format PDF dans le dossier `DOCUMENTS PDF/` :
+Tous les guides et chartes sont disponibles au format PDF via les liens suivants hébergés en production :
 
-* CHARTE GRAPHIQUE
-* MANUEL D’UTILISATION
-* DOCUMENTATION GESTION DE PROJET
-* DOCUMENTATION TECHNIQUE
+* [CHARTE GRAPHIQUE](https://ecoride-web-2fb86cbe3fd4.herokuapp.com/assets/documents/charte_graphique.pdf)
+* [MANUEL D’UTILISATION](https://ecoride-web-2fb86cbe3fd4.herokuapp.com/assets/documents/manuel_utilisation.pdf)
+* [DOCUMENTATION GESTION DE PROJET](https://ecoride-web-2fb86cbe3fd4.herokuapp.com/assets/documents/gestion_projet.pdf)
+* [DOCUMENTATION TECHNIQUE](https://ecoride-web-2fb86cbe3fd4.herokuapp.com/assets/documents/documentation_technique.pdf)
 
 ## Stratégie de branches Git
 
@@ -99,15 +100,14 @@ Le projet intègre un `Dockerfile` multi-stage et un `docker-compose.yml` :
 
 ## CI/CD
 
-Le pipeline CI/CD est entièrement géré par GitHub Actions :
+Nous utilisons GitHub Actions pour l’intégration continue. À chaque push ou pull-request sur `main` et `develop`, le workflow :
 
-1. Analyse statique du code avec PHP\_CodeSniffer (PSR-12) et PHPStan
-2. Exécution des tests unitaires PHPUnit avec génération du rapport de couverture
-3. Construction d’une image Docker multi-stage
-4. Publication des artefacts (`coverage.xml`) et de l’image sur GitHub Container Registry
-5. Déploiement automatique sur Heroku via la Heroku CLI intégrée au workflow
+```bash
+composer install
+composer test
+```
 
-Des badges de statut et de couverture sont ajoutés en tête du README.
+Le fichier de configuration est situé dans `.github/workflows/ci.yml`.
 
 ## Déploiement
 
