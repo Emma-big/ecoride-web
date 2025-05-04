@@ -1,5 +1,7 @@
-[![Build Status](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg)](https://codecov.io/gh/Emma-big/ecoride-web)
+# EcoRide
+
+[![Build Status](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml)  
+[![Coverage Status](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg?token=TON_CODECOV_TOKEN)](https://codecov.io/gh/Emma-big/ecoride-web)
 
 ## EcoRide
 
@@ -100,14 +102,14 @@ Le projet intègre un `Dockerfile` multi-stage et un `docker-compose.yml` :
 
 ## CI/CD
 
-Nous utilisons GitHub Actions pour l’intégration continue. À chaque push ou pull-request sur `main` et `develop`, le workflow :
+Le pipeline CI/CD est entièrement géré par GitHub Actions :
 
-```bash
-composer install
-composer test
-```
+1. Analyse statique du code (PHP_CodeSniffer, PHPStan).  
+2. Exécution des tests unitaires PHPUnit (`composer test`) et génération de la couverture.  
+3. Publication de la couverture sur Codecov.  
+4. Déploiement automatique sur Heroku via la Heroku CLI intégrée au workflow.
 
-Le fichier de configuration est situé dans `.github/workflows/ci.yml`.
+Voir le [fichier de workflow](.github/workflows/ci.yml) pour tous les détails.
 
 ## Déploiement
 

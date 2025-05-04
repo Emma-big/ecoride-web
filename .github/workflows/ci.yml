@@ -1,45 +1,35 @@
+# .github/workflows/ci.yml
 name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ main, develop ]
 
 jobs:
-  build-and-test:
+  tests:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          extensions: mbstring, pdo_mysql
+          php-version: '8.3'
+          coverage: xdebug
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --no-progress --no-suggest --prefer-dist
 
-      - name: Run tests
+      - name: Run tests & generate coverage
         run: composer test
 
-      - name: Upload coverage report
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           files: coverage.xml
+          fail_ci_if_error: true
