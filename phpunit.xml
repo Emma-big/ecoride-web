@@ -6,9 +6,14 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
-        <include>
-            <directory>src</directory>
-        </include>
+    <coverage processUncoveredFiles="false">
+        <filter>
+            <whitelist>
+                <directory suffix=".php">src</directory>
+            </whitelist>
+        </filter>
+        <logging>
+            <log type="clover" target="coverage.xml"/>
+        </logging>
     </coverage>
 </phpunit>
