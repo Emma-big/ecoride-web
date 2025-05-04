@@ -1,41 +1,45 @@
-# .github/workflows/ci.yml
-
 name: CI
 
 on:
-push:
-branches: \[ main, develop ]
-pull\_request:
-branches: \[ main, develop ]
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: ubuntu-latest
 
-```
-steps:
-- name: Checkout code
-  uses: actions/checkout@v3
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-- name: Set up PHP
-  uses: shivammathur/setup-php@v2
-  with:
-    php-version: '8.2'
+    steps:
+      - uses: actions/checkout@v4
 
-- name: Install dependencies
-  run: |
-    composer install --prefer-dist --no-progress --no-suggest
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql
 
-- name: Run tests
-  run: |
-    composer test
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
 
-- name: Generate coverage report
-  run: |
-    phpunit --coverage-text --configuration phpunit.xml
+      - name: Run tests
+        run: composer test
 
-- name: Upload coverage to Codecov
-  uses: codecov/codecov-action@v3
-  with:
-    files: coverage.xml
-```
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
