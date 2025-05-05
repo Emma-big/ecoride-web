@@ -4,10 +4,6 @@
 [![Coverage Status](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg)](https://codecov.io/gh/Emma-big/ecoride-web)
 
 
-
-
-## EcoRide
-
 EcoRide est une application collaborative de covoiturage écologique via des voitures électriques permettant aux utilisateurs de rechercher, réserver et proposer des trajets facilement.
 
 ---
