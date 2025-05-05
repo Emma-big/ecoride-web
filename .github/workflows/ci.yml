@@ -23,9 +23,11 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Run tests & generate coverage
-        run: composer test  # ton script test doit générer coverage.xml
+      # 1) Lance les tests ET génère coverage.xml
+      - name: Run tests & generate coverage.xml
+        run: composer test -- --coverage-clover=coverage.xml --coverage-filter src
 
+      # 2) Upload vers Codecov (sans token pour un repo public)
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
