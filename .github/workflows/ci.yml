@@ -2,11 +2,9 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   test-and-coverage:
@@ -25,11 +23,8 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Run tests
-        run: composer test
-
-      - name: Generate coverage report
-        run: composer coverage
+      - name: Run tests & generate coverage
+        run: composer test  # ton script test doit générer coverage.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
