@@ -1,7 +1,8 @@
 # EcoRide
 
 [![Build Status](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml)
-[![Coverage Status](https://codecov.io/gh/Emma-big/ecoride-web/graph/badge.svg)](https://codecov.io/gh/Emma-big/ecoride-web)
+[![Coverage Status](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg)](https://app.codecov.io/gh/Emma-big/ecoride-web)
+
 
 
 
