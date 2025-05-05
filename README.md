@@ -1,7 +1,7 @@
 # EcoRide
 
 [![Build Status](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Emma-big/ecoride-web/actions/workflows/ci.yml)  
-[![Coverage Status](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg)](https://codecov.io/gh/Emma-big/ecoride-web)
+[![Coverage Status](https://codecov.io/gh/Emma-big/ecoride-web/branch/main/graph/badge.svg?token=0234f86f-6289-4f1f-b982-e5c993dcf2a4)](https://codecov.io/gh/Emma-big/ecoride-web)
 
 
 EcoRide est une application collaborative de covoiturage écologique via des voitures électriques permettant aux utilisateurs de rechercher, réserver et proposer des trajets facilement.
