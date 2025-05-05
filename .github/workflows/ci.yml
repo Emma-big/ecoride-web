@@ -23,10 +23,13 @@ jobs:
           extensions: mbstring, xml, xdebug
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist
+        run: composer install --no-interaction --prefer-dist
 
-      - name: Run tests and generate coverage
-        run: composer test -- --coverage-clover=coverage.xml --coverage-filter src
+      - name: Run tests
+        run: composer test
+
+      - name: Generate coverage report
+        run: composer coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
