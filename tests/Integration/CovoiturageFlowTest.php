@@ -15,33 +15,35 @@ final class CovoiturageFlowTest extends TestCase
     {
         // Simuler les variables d'environnement que index.php attend
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['REQUEST_URI']    = '/createCovoiturage';
+        $_SERVER['REQUEST_URI']    = '/covoiturage/create';  // <-- ajuste selon ta route réelle
         $_SERVER['HTTP_HOST']      = 'localhost';
-        $_GET = []; $_POST = [];
+        $_GET = [];
+        $_POST = [];
 
-        // Démarre la capture de la sortie
-        ob_start();
-        // Remplace error/exception handlers avec des no-ops
+        // Intercepter les erreurs/exceptions pour ne pas interrompre le test
         set_error_handler(fn() => true);
         set_exception_handler(fn() => true);
     }
 
     protected function tearDown(): void
     {
-        // Nettoie tous les buffers ouverts
-        while (ob_get_level() > 0) {
-            ob_end_clean();
-        }
+        // Restaurer l’environnement
         restore_error_handler();
         restore_exception_handler();
     }
 
     public function testCreateCovoituragePageLoads(): void
     {
+        // Démarrer la capture de la sortie
+        ob_start();
+
+        // Charger le front-controller
         require __DIR__ . '/../../public/index.php';
 
-        $output = ob_get_clean(); // on récupère et ferme le buffer
+        // Récupérer le HTML rendu
+        $output = ob_get_clean();
 
+        // Vérifications basiques
         $this->assertStringContainsString('<form', $output);
         $this->assertStringContainsString('Création d\'un covoiturage', $output);
     }
