@@ -141,7 +141,7 @@ ob_start();
 <section class="my-5">
   <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
   <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDc3McaygJjPxHuOygMh4CUIUN4ZcKMYyg&libraries=places&callback=initSearchAutocomplete">
+    src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initSearchAutocomplete">
   </script>
   <?php require_once BASE_PATH . '/src/views/barreRecherche.php'; ?>
 
