@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   test-and-coverage:
@@ -18,17 +20,16 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
-          extensions: mbstring, xml, xdebug
+          extensions: mbstring, xml, xdebug, sqlite3, pdo_sqlite
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
-      # 1) Lance les tests ET génère coverage.xml
-      - name: Run tests & generate coverage.xml
+      - name: Run tests and generate coverage
         run: composer test -- --coverage-clover=coverage.xml --coverage-filter src
 
-      # 2) Upload vers Codecov (sans token pour un repo public)
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
