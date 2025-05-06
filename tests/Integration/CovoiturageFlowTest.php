@@ -5,24 +5,30 @@ namespace Adminlocal\EcoRide\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 final class CovoiturageFlowTest extends TestCase
 {
     protected function setUp(): void
     {
-        // 1) Simule un environnement HTTP
+        // Simuler les variables d'environnement que index.php attend
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI']    = '/createCovoiturage';
+        $_SERVER['HTTP_HOST']      = 'localhost';
         $_GET = []; $_POST = [];
-        
-        // 2) Démarre la capture de la sortie et mets un error handler neutre
+
+        // Démarre la capture de la sortie
         ob_start();
-        set_error_handler(function() { /* rien */ });
-        set_exception_handler(function() { /* rien */ });
+        // Remplace error/exception handlers avec des no-ops
+        set_error_handler(fn() => true);
+        set_exception_handler(fn() => true);
     }
 
     protected function tearDown(): void
     {
-        // 3) Restaure tout proprement
+        // Nettoie tous les buffers ouverts
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
@@ -32,13 +38,10 @@ final class CovoiturageFlowTest extends TestCase
 
     public function testCreateCovoituragePageLoads(): void
     {
-        // 4) Inclut le front-controller
         require __DIR__ . '/../../public/index.php';
 
-        // 5) Récupère le contenu généré
-        $output = ob_get_contents();
+        $output = ob_get_clean(); // on récupère et ferme le buffer
 
-        // 6) Assertion minimale : on a bien une balise <form> de création
         $this->assertStringContainsString('<form', $output);
         $this->assertStringContainsString('Création d\'un covoiturage', $output);
     }
