@@ -1,22 +1,33 @@
-# PHP / Composer
-/vendor/
+# Ignore environment file
+
 .env
 
-# ne PAS ignorer composer.lock
-# composer.lock
+# Composer dependencies/vendor/
 
-# Coverage
+# PHPUnit coverage reports
+
+/coverage.xml
 /coverage/
 
-# IDE / OS
-.DS_Store
+# Logs
+
+/logs/
+
+# IDE and OS files
+
+.idea/
+.vscode/
+.DS\_Store
 Thumbs.db
-*.log
 
-# Node
-/node_modules/
-/server/node_modules/
-npm-debug.log*
+# Node modules
 
-# XAMPP / assets
-/public/assets/images/
+/node\_modules/
+
+# Build artifacts
+
+/dist/
+
+# Optional: Xdebug cache
+
+/.phpunit.result.cache
