@@ -24,17 +24,21 @@
   <!-- 4) Footer (en dernier, pour n’écraser que le footer) -->
   <link rel="stylesheet" href="/assets/style/styleFooter.css">
 
-  <!-- puis vos éventuels extraStyles et scripts Maps -->
+  <!-- puis vos éventuels extraStyles et script Maps -->
   <?php if (!empty($extraStyles)): foreach ($extraStyles as $css): ?>
     <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
   <?php endforeach; endif; ?>
-  <?php if (!empty($barreRecherche)): ?>
+
+  <?php if (!empty($barreRecherche)): 
+    // On récupère la clé depuis l'env (ne jamais committer .env)
+    $gKey = $_ENV['GOOGLE_API_KEY'] ?? getenv('GOOGLE_API_KEY') ?? '';
+  ?>
     <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=TA_CLE_API&libraries=places&callback=initSearchAutocomplete">
+      src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($gKey) ?>&libraries=places&callback=initSearchAutocomplete">
     </script>
   <?php endif; ?>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="d-flex flex-column min-vh-100">

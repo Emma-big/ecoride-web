@@ -51,7 +51,7 @@
 
 <!-- Charger Google Places API pour autocomplétion -->
 <script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDc3McaygJjPxHuOygMh4CUIUN4ZcKMYyg&libraries=places&callback=initSearchAutocomplete">
+  src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($_ENV['GOOGLE_API_KEY'] ?? getenv('GOOGLE_API_KEY')) ?>&callback=initMap">
 </script>
 
 <script>
