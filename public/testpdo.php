@@ -9,8 +9,9 @@ error_reporting(E_ALL);
 // Charge la config PDO
 try {
     $pdo = require __DIR__ . '/../src/config.php';
-    echo "✅ Connecté à MySQL : " . $_ENV['DB_NAME'] . "<br>";
-    echo "Hôte : " . $_ENV['DB_HOST'] . ":" . $_ENV['DB_PORT'];
+    echo "✅ Connecté à MySQL : ".getenv('DB_NAME')."\n";
+    echo "Hôte : ".getenv('DB_HOST').":".getenv('DB_PORT')."\n";
+    
 } catch (\PDOException $e) {
     echo "❌ Échec de la connexion : " . $e->getMessage();
 }
