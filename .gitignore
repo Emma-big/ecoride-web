@@ -11,7 +11,7 @@
 # IDE / OS
 .DS_Store
 Thumbs.db
-*.log
+#*.log
 
 # Node
 /node_modules/
