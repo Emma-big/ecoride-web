@@ -1,5 +1,5 @@
 <?php
-// STEP 1
+// STEP 1 : affichage des erreurs
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
@@ -18,43 +18,44 @@ if (! defined('BASE_PATH')) {
 require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Helpers\renderError;
 
-// Gestionnaire des exceptions non capturées → page 500
-// (On commente temporairement pendant le debug)
-// set_exception_handler(function(\Throwable $e) {
-//     renderError(500);
-// });
+// (gestionnaires d’erreur/commentaires mis de côté pendant le debug)
 
-// Gestionnaire des erreurs PHP → transforme en Exception
-// set_error_handler(function($severity, $message, $file, $line) {
-//     throw new \ErrorException($message, 0, $severity, $file, $line);
-// });
-
-// 3.1) Protection CSRF pour toutes les requêtes POST
+// 3.1) Protection CSRF pour POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_POST['csrf_token']) || ! hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         renderError(403);
     }
 }
-// 3.2) Générer un token unique si nécessaire
+// 3.2) Générer un token CSRF si besoin
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 3.3) Charger l’autoloader Composer et Dotenv AVANT la config
+// 3.3) Charger Composer + Dotenv
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
     Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
 }
 
-// 4) Charger la configuration (PDO, MongoDB…)
+// 4) Charger la config (retourne $pdo)
 $pdo = require BASE_PATH . '/src/config.php';
 
 // STEP 2 : test de la connexion PDO
-die('STEP 2 — $pdo is a '. get_class($pdo));
+die('STEP 2 — $pdo est un '. get_class($pdo));
 
-// 5) Gestion de l'inactivité (10 minutes)
+// 5) Test MongoDB
+try {
+    $mongoUri    = getenv('MONGODB_URI')     ?: 'mongodb://localhost:27017';
+    $mongoClient = new MongoDB\Client($mongoUri);
+    $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
+    die("STEP 3 — MongoDB connecté, DB nommée « {$mongoDB->getDatabaseName()} »");
+} catch (\Throwable $e) {
+    die("Erreur MongoDB : " . $e->getMessage());
+}
+
+// 6) Gestion de l'inactivité (10 min)
 $inactive_duration = 600;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_duration)) {
+if (isset($_SESSION['last_activity']) && time() - $_SESSION['last_activity'] > $inactive_duration) {
     session_unset();
     session_destroy();
     header('Location: /inactivite');
@@ -66,7 +67,7 @@ $_SESSION['last_activity'] = time();
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
 // DEBUG temporaire
-file_put_contents(__DIR__.'/../logs/route.log', date('c').' → '.$_SERVER['HTTP_HOST'].' '.$_SERVER['REQUEST_URI'].PHP_EOL, FILE_APPEND);
+file_put_contents(__DIR__.'/../logs/route.log', date('c').' → '.$SERVER['HTTP_HOST'].' '.$_SERVER['REQUEST_URI'].PHP_EOL, FILE_APPEND);
 
 switch ($uri) {
     case '/':
