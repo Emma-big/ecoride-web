@@ -1,6 +1,5 @@
 <?php
-die('STEP 1');
-// Force l’affichage des erreurs si APP_DEBUG=true
+// STEP 1
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
@@ -20,23 +19,19 @@ require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Helpers\renderError;
 
 // Gestionnaire des exceptions non capturées → page 500
-//set_exception_handler(function(\Throwable $e) {
-//    // Optionnel : log($e);
-//   renderError(500);
-//});
+// (On commente temporairement pendant le debug)
+// set_exception_handler(function(\Throwable $e) {
+//     renderError(500);
+// });
 
 // Gestionnaire des erreurs PHP → transforme en Exception
-//set_error_handler(function($severity, $message, $file, $line) {
-//    throw new \ErrorException($message, 0, $severity, $file, $line);
-//});
-
+// set_error_handler(function($severity, $message, $file, $line) {
+//     throw new \ErrorException($message, 0, $severity, $file, $line);
+// });
 
 // 3.1) Protection CSRF pour toutes les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (
-        empty($_POST['csrf_token'])
-        || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-    ) {
+    if (empty($_POST['csrf_token']) || ! hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         renderError(403);
     }
 }
@@ -52,7 +47,10 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
 }
 
 // 4) Charger la configuration (PDO, MongoDB…)
-require_once BASE_PATH . '/src/config.php';
+$pdo = require BASE_PATH . '/src/config.php';
+
+// STEP 2 : test de la connexion PDO
+die('STEP 2 — $pdo is a '. get_class($pdo));
 
 // 5) Gestion de l'inactivité (10 minutes)
 $inactive_duration = 600;
