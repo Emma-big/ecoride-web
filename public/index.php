@@ -1,10 +1,8 @@
 <?php
 // Force l’affichage des erreurs si APP_DEBUG=true
-if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] === 'true') {
-    ini_set('display_errors', '1');
-    ini_set('display_startup_errors', '1');
-    error_reporting(E_ALL);
-}
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
 // 1) Démarrage de la session
 if (session_status() === PHP_SESSION_NONE) {
