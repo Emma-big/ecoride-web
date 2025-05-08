@@ -19,15 +19,15 @@ require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Helpers\renderError;
 
 // Gestionnaire des exceptions non capturées → page 500
-set_exception_handler(function(\Throwable $e) {
-    // Optionnel : log($e);
-    renderError(500);
-});
+//set_exception_handler(function(\Throwable $e) {
+//    // Optionnel : log($e);
+//   renderError(500);
+//});
 
 // Gestionnaire des erreurs PHP → transforme en Exception
-set_error_handler(function($severity, $message, $file, $line) {
-    throw new \ErrorException($message, 0, $severity, $file, $line);
-});
+//set_error_handler(function($severity, $message, $file, $line) {
+//    throw new \ErrorException($message, 0, $severity, $file, $line);
+//});
 
 
 // 3.1) Protection CSRF pour toutes les requêtes POST
