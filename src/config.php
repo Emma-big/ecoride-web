@@ -27,7 +27,7 @@ if ($jawsdbUrl) {
     $dbPass = '';
 }
 
-// 4) Connexion MySQL via PDO (uniquement si on a au moins un host non vide)
+// 4) Connexion MySQL via PDO (uniquement si on a un host et que, en prod Heroku, JAWSDB est configuré)
 $pdo = null;
 if ($dbHost && (!$isHeroku || $jawsdbUrl)) {
     $dsn = sprintf(
@@ -43,7 +43,7 @@ if ($dbHost && (!$isHeroku || $jawsdbUrl)) {
             PDO::ATTR_EMULATE_PREPARES   => false,
         ]);
     } catch (\PDOException $e) {
-        // En debug on relance, sinon on laisse tomber et $pdo reste null
+        // En debug on relance, sinon on ignore et $pdo reste null
         if (getenv('APP_DEBUG')) {
             throw $e;
         }
@@ -65,7 +65,7 @@ if ($mongoUri && class_exists(\MongoDB\Client::class)) {
     }
 }
 
-// 6) Retourne un array des connexions (ou null si non dispo)
+// 6) On retourne un tableau contenant nos connexions
 return [
     'pdo'     => $pdo,
     'mongoDB' => $mongoDB,
