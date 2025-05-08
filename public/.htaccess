@@ -1,5 +1,7 @@
 # public/.htaccess
 
+DirectoryIndex index.php
+
 # ─── 0) Interdire l’indexation des dossiers ─────────────────────────────────
 <IfModule mod_autoindex.c>
     Options -Indexes
