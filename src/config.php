@@ -6,55 +6,67 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2) Configuration DB locale ou via JAWSDB_URL (Heroku)
-$jawsdbUrl = getenv('JAWSDB_URL');
+// 2) Détection Heroku dyno
+$isHeroku = getenv('DYNO') !== false;
+
+// 3) Récupération des credentials MySQL
+$jawsdbUrl = getenv('JAWSDB_URL') ?: '';
 if ($jawsdbUrl) {
     $dbparts = parse_url($jawsdbUrl);
-    $_ENV['DB_HOST'] = $dbparts['host']   ?? '';
-    $_ENV['DB_NAME'] = ltrim($dbparts['path'] ?? '', '/');
-    $_ENV['DB_USER'] = $dbparts['user']   ?? '';
-    $_ENV['DB_PASS'] = $dbparts['pass']   ?? '';
-    $_ENV['DB_PORT'] = $dbparts['port']   ?? 3306;
+    $dbHost = $dbparts['host']   ?? '';
+    $dbPort = $dbparts['port']   ?? 3306;
+    $dbName = ltrim($dbparts['path'] ?? '', '/');
+    $dbUser = $dbparts['user']   ?? '';
+    $dbPass = $dbparts['pass']   ?? '';
 } else {
-    $_ENV['DB_HOST'] = 'localhost';
-    $_ENV['DB_NAME'] = 'ecoride';
-    $_ENV['DB_USER'] = 'root';
-    $_ENV['DB_PASS'] = '';
-    $_ENV['DB_PORT'] = 3306;
+    // Si on est en local : valeurs par défaut
+    $dbHost = '127.0.0.1';
+    $dbPort = 3306;
+    $dbName = 'ecoride';
+    $dbUser = 'root';
+    $dbPass = '';
 }
 
-// 3) Charger l’autoloader Composer (PDO, MongoDB, etc.)
-if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
-    require_once BASE_PATH . '/vendor/autoload.php';
+// 4) Connexion MySQL via PDO (uniquement si on a au moins un host non vide)
+$pdo = null;
+if ($dbHost && (!$isHeroku || $jawsdbUrl)) {
+    $dsn = sprintf(
+        'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+        $dbHost,
+        $dbPort,
+        $dbName
+    );
+    try {
+        $pdo = new PDO($dsn, $dbUser, $dbPass, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+    } catch (\PDOException $e) {
+        // En debug on relance, sinon on laisse tomber et $pdo reste null
+        if (getenv('APP_DEBUG')) {
+            throw $e;
+        }
+    }
 }
 
-// 4) Connexion MySQL via PDO
-$dsn = sprintf(
-    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-    $_ENV['DB_HOST'],
-    $_ENV['DB_PORT'],
-    $_ENV['DB_NAME']
-);
-try {
-    $pdo = new PDO($dsn, $_ENV['DB_USER'], $_ENV['DB_PASS'], [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-} catch (\PDOException $e) {
-    // Votre handler global attrapera l’exception et renverra la 500
-    throw $e;
+// 5) Connexion MongoDB (uniquement si MONGODB_URI fourni)
+$mongoDB = null;
+$mongoUri    = getenv('MONGODB_URI')     ?: '';
+$mongoDBName = getenv('MONGODB_DB_NAME') ?: '';
+if ($mongoUri && class_exists(\MongoDB\Client::class)) {
+    try {
+        $mongoClient = new MongoDB\Client($mongoUri);
+        $mongoDB     = $mongoClient->selectDatabase($mongoDBName);
+    } catch (\Exception $e) {
+        if (getenv('APP_DEBUG')) {
+            throw $e;
+        }
+    }
 }
 
-// 5) Connexion MongoDB
-$mongoUri    = getenv('MONGODB_URI')       ?: 'mongodb://localhost:27017';
-$mongoDBName = getenv('MONGODB_DB_NAME')   ?: 'avisDB';
-try {
-    $mongoClient = new MongoDB\Client($mongoUri);
-    $mongoDB     = $mongoClient->selectDatabase($mongoDBName);
-} catch (\Exception $e) {
-    // Transformer ça en exception non cachée pour renvoyer la 500
-    throw $e;
-}
-
-// 6) Retourner l’objet PDO
-return $pdo;
+// 6) Retourne un array des connexions (ou null si non dispo)
+return [
+    'pdo'     => $pdo,
+    'mongoDB' => $mongoDB,
+];
