@@ -41,7 +41,7 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
 $pdo = require BASE_PATH . '/src/config.php';
 
 // STEP 2 : test de la connexion PDO
-die('STEP 2 — $pdo est un '. get_class($pdo));
+// die('STEP 2 — $pdo est un '. get_class($pdo));
 
 // 5) Test MongoDB
 try {
