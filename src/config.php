@@ -19,7 +19,7 @@ if ($jawsdbUrl) {
     $dbUser = $dbparts['user']   ?? '';
     $dbPass = $dbparts['pass']   ?? '';
 } else {
-    // Si on est en local : valeurs par défaut
+    // Local : ajustez si besoin
     $dbHost = '127.0.0.1';
     $dbPort = 3306;
     $dbName = 'ecoride';
@@ -27,7 +27,7 @@ if ($jawsdbUrl) {
     $dbPass = '';
 }
 
-// 4) Connexion MySQL via PDO (uniquement si on a un host et que, en prod Heroku, JAWSDB est configuré)
+// 4) Connexion MySQL via PDO si configuré
 $pdo = null;
 if ($dbHost && (!$isHeroku || $jawsdbUrl)) {
     $dsn = sprintf(
@@ -43,14 +43,13 @@ if ($dbHost && (!$isHeroku || $jawsdbUrl)) {
             PDO::ATTR_EMULATE_PREPARES   => false,
         ]);
     } catch (\PDOException $e) {
-        // En debug on relance, sinon on ignore et $pdo reste null
         if (getenv('APP_DEBUG')) {
             throw $e;
         }
     }
 }
 
-// 5) Connexion MongoDB (uniquement si MONGODB_URI fourni)
+// 5) Connexion MongoDB si URI fournie
 $mongoDB = null;
 $mongoUri    = getenv('MONGODB_URI')     ?: '';
 $mongoDBName = getenv('MONGODB_DB_NAME') ?: '';
@@ -65,7 +64,7 @@ if ($mongoUri && class_exists(\MongoDB\Client::class)) {
     }
 }
 
-// 6) On retourne un tableau contenant nos connexions
+// 6) On retourne les connexions
 return [
     'pdo'     => $pdo,
     'mongoDB' => $mongoDB,
