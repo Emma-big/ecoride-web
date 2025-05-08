@@ -8,9 +8,9 @@ DirectoryIndex index.php
 </IfModule>
 
 # ─── 1) Centralisation des erreurs via index.php ───────────────────────────
-# ErrorDocument 403 /index.php
-# ErrorDocument 404 /index.php
-# ErrorDocument 405 /index.php
+#ErrorDocument 403 /index.php
+#ErrorDocument 404 /index.php
+#ErrorDocument 405 /index.php
 
 # ─── 2) Security headers ────────────────────────────────────────────────────
 <IfModule mod_headers.c>
