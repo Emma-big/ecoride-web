@@ -4,9 +4,6 @@
 // 1) Récupération de l’URL JAWSDB
 $jawsdbUrl = getenv('JAWSDB_URL') ?: ($_ENV['JAWSDB_URL'] ?? null);
 
-// **DEBUG TEMPORAIRE**
-file_put_contents('php://stderr', "[DEBUG] JAWSDB_URL={$jawsdbUrl}\n");
-
 // 2) Parsing
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
@@ -16,15 +13,13 @@ if ($jawsdbUrl) {
     $dbUser = $parts['user']   ?? '';
     $dbPass = $parts['pass']   ?? '';
 } else {
+    // fallback local
     $dbHost = 'localhost';
     $dbPort = 3306;
     $dbName = 'ecoride';
     $dbUser = 'root';
     $dbPass = '';
 }
-
-// **DEBUG TEMPORAIRE**
-file_put_contents('php://stderr', "[DEBUG] DB_HOST={$dbHost}; DB_PORT={$dbPort}; DB_NAME={$dbName}; DB_USER={$dbUser}\n");
 
 // 3) Autoload
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
