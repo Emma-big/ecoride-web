@@ -1,7 +1,7 @@
 <?php
 // public/utilisateur.php — Mon espace utilisateur
 
-// 1) Affichage des erreurs
+// 1) Afficher les erreurs en debug
 ini_set('display_errors','1');
 ini_set('display_startup_errors','1');
 error_reporting(E_ALL);
@@ -15,7 +15,7 @@ if (! defined('BASE_PATH')) {
 require_once BASE_PATH . '/vendor/autoload.php';
 Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
 
-// 4) Charger le PDO
+// 4) Charger le PDO (configuration Heroku / local)
 try {
     /** @var \PDO $pdo */
     $pdo = require BASE_PATH . '/src/config.php';
@@ -25,7 +25,7 @@ try {
     exit;
 }
 
-// 5) Session + inactivité
+// 5) Démarrer la session et gérer l’inactivité
 session_start();
 if (isset($_SESSION['last_activity'])
     && time() - $_SESSION['last_activity'] > 600
@@ -46,7 +46,7 @@ $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 7) Récupérer ses infos
+// 7) Charger les données utilisateur
 try {
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
@@ -65,7 +65,7 @@ $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css','/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 9) Construire le contenu
+// 9) Contenu principal
 ob_start();
 ?>
 <main class="container mt-4">
@@ -94,7 +94,9 @@ ob_start();
     <?php if ($isChauffeur): ?>
         <?php require BASE_PATH . '/src/controllers/principal/mesvoitures.php'; ?>
     <?php else: ?>
-        <p class="text-muted">Vous devez être chauffeur pour gérer vos voitures.</p>
+        <p class="text-muted">
+            Vous devez être chauffeur pour gérer vos voitures.
+        </p>
     <?php endif; ?>
 
     <!-- Mes covoiturages (Chauffeur) -->
@@ -105,7 +107,9 @@ ob_start();
         </div>
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>
     <?php else: ?>
-        <p class="text-muted">Vous devez être chauffeur pour gérer vos covoiturages.</p>
+        <p class="text-muted">
+            Vous devez être chauffeur pour gérer vos covoiturages.
+        </p>
     <?php endif; ?>
 
     <!-- Mes covoiturages (Passager) -->
@@ -114,12 +118,14 @@ ob_start();
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php'; ?>
         <?php require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php'; ?>
     <?php else: ?>
-        <p class="text-muted">Vous devez être passager pour voir vos trajets.</p>
+        <p class="text-muted">
+            Vous devez être passager pour voir vos trajets.
+        </p>
     <?php endif; ?>
 </main>
 <?php
 $mainContent = ob_get_clean();
 
-// 10) Afficher le layout
+// 10) Afficher via le layout
 require BASE_PATH . '/src/layout.php';
 exit;
