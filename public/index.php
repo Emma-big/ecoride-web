@@ -369,7 +369,17 @@ switch ($uri) {
             // Le CSRF est déjà vérifié en amont pour toute requête POST
             require_once BASE_PATH . '/src/controllers/principal/deleteVoiture.php';
             exit;
-    
+
+        // juste après le switch :
+        case '/utilisateur':
+        // on récupère le PDO et Mongo comme d’habitude
+            $pdo = require BASE_PATH . '/src/config.php';
+            $mongoClient = new MongoDB\Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017');
+            $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
+            // puis on inclut votre logique “Mon espace utilisateur”
+            require BASE_PATH . '/src/controllers/principal/utilisateur.php';
+            exit;
+            
     default:
         renderError(404);
     }
