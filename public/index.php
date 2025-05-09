@@ -1,4 +1,7 @@
 <?php
+// DEBUG rapide : afficher la variable JAWSDB_URL
+die('DBG JAWSDB_URL='. getenv('JAWSDB_URL'));
+
 // Affichage des erreurs si APP_DEBUG=true
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
