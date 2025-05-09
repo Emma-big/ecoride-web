@@ -11,11 +11,11 @@ if (! defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-// 3) Composer + Dotenv
+// 3) Composer + Dotenv (ne masque pas JAWSDB_URL)
 require_once BASE_PATH . '/vendor/autoload.php';
 Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
 
-// 4) Charger le PDO (configuration Heroku / local)
+// 4) Charger le PDO (via src/config.php)
 try {
     /** @var \PDO $pdo */
     $pdo = require BASE_PATH . '/src/config.php';
@@ -25,7 +25,7 @@ try {
     exit;
 }
 
-// 5) Démarrer la session et gérer l’inactivité
+// 5) Démarrer la session + inactivité
 session_start();
 if (isset($_SESSION['last_activity'])
     && time() - $_SESSION['last_activity'] > 600
@@ -37,7 +37,7 @@ if (isset($_SESSION['last_activity'])
 }
 $_SESSION['last_activity'] = time();
 
-// 6) Authentification
+// 6) Vérifier l’authentification
 if (empty($_SESSION['user']['utilisateur_id'])) {
     header('Location: /accessDenied');
     exit;
@@ -46,7 +46,7 @@ $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 7) Charger les données utilisateur
+// 7) Charger les infos de l’utilisateur
 try {
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
@@ -60,12 +60,12 @@ try {
     exit;
 }
 
-// 8) Variables layout
+// 8) Config du layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css','/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 9) Contenu principal
+// 9) Contenu
 ob_start();
 ?>
 <main class="container mt-4">
@@ -103,7 +103,9 @@ ob_start();
     <h2>Mes covoiturages (Chauffeur)</h2>
     <?php if ($isChauffeur): ?>
         <div class="text-center my-4">
-            <a href="/covoiturageForm" class="btn btn-primary">Créer un covoiturage</a>
+            <a href="/covoiturageForm" class="btn btn-primary">
+                Créer un covoiturage
+            </a>
         </div>
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>
     <?php else: ?>
@@ -126,6 +128,6 @@ ob_start();
 <?php
 $mainContent = ob_get_clean();
 
-// 10) Afficher via le layout
+// 10) On affiche via le layout
 require BASE_PATH . '/src/layout.php';
 exit;

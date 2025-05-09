@@ -1,8 +1,9 @@
 <?php
 // src/config.php
 
-// 1) Récupérer l’URL JAWSDB (Heroku) via getenv()
-$jawsdbUrl = getenv('JAWSDB_URL');
+// 1) On récupère JAWSDB_URL depuis getenv, puis $_ENV
+$jawsdbUrl = getenv('JAWSDB_URL')
+          ?: ($_ENV['JAWSDB_URL'] ?? null);
 
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
@@ -20,12 +21,12 @@ if ($jawsdbUrl) {
     $dbPass = '';
 }
 
-// 2) Autoloader Composer
+// 2) Autoload Composer
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
 }
 
-// 3) Connexion PDO (forcée en TCP grâce au port)
+// 3) Connexion PDO en TCP grâce au port
 $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
     $dbHost, $dbPort, $dbName
 );
@@ -35,11 +36,10 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (\PDOException $e) {
-    // on laisse remonter pour le handler global
     throw $e;
 }
 
-// 4) Connexion MongoDB (inchangée)
+// 4) Connexion MongoDB
 $mongoUri    = getenv('MONGODB_URI')     ?: 'mongodb://localhost:27017';
 $mongoDBName = getenv('MONGODB_DB_NAME') ?: 'avisDB';
 try {
@@ -49,5 +49,4 @@ try {
     throw $e;
 }
 
-// 5) Retourner le PDO
 return $pdo;
