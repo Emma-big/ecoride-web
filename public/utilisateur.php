@@ -1,37 +1,34 @@
 <?php
-// public/utilisateur.php — Front Controller pour « Mon espace utilisateur »
+// public/utilisateur.php — Mon espace utilisateur
 
-// 1) Affichage des erreurs en mode debug
+// 1) Affichage des erreurs
 ini_set('display_errors','1');
 ini_set('display_startup_errors','1');
 error_reporting(E_ALL);
 
-// 2) Définir BASE_PATH
+// 2) BASE_PATH
 if (! defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-// 3) Charger Composer + Dotenv
+// 3) Composer + Dotenv
 require_once BASE_PATH . '/vendor/autoload.php';
 Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
 
-// 4) Charger la config et récupérer le PDO
-/** @var \PDO $pdo */
+// 4) Charger le PDO
 try {
+    /** @var \PDO $pdo */
     $pdo = require BASE_PATH . '/src/config.php';
 } catch (\Throwable $e) {
-    echo 'Erreur de connexion à la base de données : ' 
+    echo 'Erreur de connexion à la base de données : '
        . htmlspecialchars($e->getMessage());
     exit;
 }
 
-// 5) Démarrer session + inactivité
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-$inactive_duration = 600;
-if (isset($_SESSION['last_activity']) 
-    && time() - $_SESSION['last_activity'] > $inactive_duration
+// 5) Session + inactivité
+session_start();
+if (isset($_SESSION['last_activity'])
+    && time() - $_SESSION['last_activity'] > 600
 ) {
     session_unset();
     session_destroy();
@@ -45,39 +42,35 @@ if (empty($_SESSION['user']['utilisateur_id'])) {
     header('Location: /accessDenied');
     exit;
 }
-$uid       = (int) $_SESSION['user']['utilisateur_id'];
+$uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 7) Récupérer les infos utilisateur
+// 7) Récupérer ses infos
 try {
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
     $user = $stmt->fetch();
-
     if (! $user) {
-        throw new \Exception("Utilisateur introuvable");
+        throw new \Exception("Utilisateur introuvable.");
     }
-
 } catch (\Throwable $e) {
-    echo 'Erreur de connexion à la base de données : ' 
+    echo 'Erreur de connexion à la base de données : '
        . htmlspecialchars($e->getMessage());
     exit;
 }
 
-// 8) Variables pour le layout
+// 8) Variables layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
-$extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleAdmin.css'];
+$extraStyles = ['/assets/style/styleIndex.css','/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 9) Contenu principal
+// 9) Construire le contenu
 ob_start();
 ?>
 <main class="container mt-4">
-    <div class="big-title text-center mb-4">
-        <h1>Bienvenue, <?= htmlspecialchars($user['prenom'].' '.$user['nom']) ?></h1>
-        <p class="lead"><?= htmlspecialchars($user['email']) ?></p>
-    </div>
+    <?php require BASE_PATH . '/src/views/bigTitle.php'; ?>
+    <?php require BASE_PATH . '/src/controllers/principal/mesinfos.php'; ?>
 
     <!-- Choix de rôle -->
     <form action="/updateRolePost" method="POST" class="mb-5">
@@ -101,24 +94,18 @@ ob_start();
     <?php if ($isChauffeur): ?>
         <?php require BASE_PATH . '/src/controllers/principal/mesvoitures.php'; ?>
     <?php else: ?>
-        <p class="text-muted">
-            Vous devez être chauffeur pour gérer vos voitures.
-        </p>
+        <p class="text-muted">Vous devez être chauffeur pour gérer vos voitures.</p>
     <?php endif; ?>
 
     <!-- Mes covoiturages (Chauffeur) -->
     <h2>Mes covoiturages (Chauffeur)</h2>
     <?php if ($isChauffeur): ?>
         <div class="text-center my-4">
-            <a href="/covoiturageForm" class="btn btn-primary">
-                Créer un covoiturage
-            </a>
+            <a href="/covoiturageForm" class="btn btn-primary">Créer un covoiturage</a>
         </div>
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>
     <?php else: ?>
-        <p class="text-muted">
-            Vous devez être chauffeur pour gérer vos covoiturages.
-        </p>
+        <p class="text-muted">Vous devez être chauffeur pour gérer vos covoiturages.</p>
     <?php endif; ?>
 
     <!-- Mes covoiturages (Passager) -->
@@ -127,14 +114,12 @@ ob_start();
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php'; ?>
         <?php require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php'; ?>
     <?php else: ?>
-        <p class="text-muted">
-            Vous devez être passager pour voir vos trajets réservés.
-        </p>
+        <p class="text-muted">Vous devez être passager pour voir vos trajets.</p>
     <?php endif; ?>
 </main>
 <?php
 $mainContent = ob_get_clean();
 
-// 10) Afficher via le layout
+// 10) Afficher le layout
 require BASE_PATH . '/src/layout.php';
 exit;
