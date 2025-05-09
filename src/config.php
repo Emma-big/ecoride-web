@@ -6,13 +6,16 @@ $jawsdbUrl = getenv('JAWSDB_URL')
          ?: ($_SERVER['JAWSDB_URL'] ?? null)
          ?: ($_ENV['JAWSDB_URL']   ?? null);
 
-// Si getenv() ne renvoie rien, on essaie dans $_SERVER puis $_ENV
+// Fallback si nécessaire
 if (!$jawsdbUrl && isset($_SERVER['JAWSDB_URL'])) {
     $jawsdbUrl = $_SERVER['JAWSDB_URL'];
 }
 if (!$jawsdbUrl && isset($_ENV['JAWSDB_URL'])) {
     $jawsdbUrl = $_ENV['JAWSDB_URL'];
 }
+
+// **DEBUG** : afficher JAWSDB_URL brut
+file_put_contents('php://stderr', "[DB DEBUG] JAWSDB_URL={$jawsdbUrl}\n");
 
 // 2) Parsing de l’URL ou fallback local
 if ($jawsdbUrl) {
@@ -31,6 +34,12 @@ if ($jawsdbUrl) {
     $dbPass = '';
 }
 
+// **DEBUG** : afficher les paramètres extraits
+file_put_contents('php://stderr', sprintf(
+    "[DB DEBUG] host=%s port=%d db=%s user=%s\n",
+    $dbHost, $dbPort, $dbName, $dbUser
+));
+
 // 3) Autoload Composer
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
@@ -43,6 +52,9 @@ $dsn = sprintf(
     $dbPort,
     $dbName
 );
+
+// **DEBUG** : afficher le DSN construit (sans mot de passe)
+file_put_contents('php://stderr', "[DB DEBUG] DSN={$dsn}\n");
 
 try {
     $pdo = new PDO(
