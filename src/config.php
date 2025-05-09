@@ -1,10 +1,13 @@
 <?php
 // src/config.php
 
-// 1) On récupère JAWSDB_URL depuis getenv, puis $_ENV
-$jawsdbUrl = getenv('JAWSDB_URL')
-          ?: ($_ENV['JAWSDB_URL'] ?? null);
+// 1) Récupération de l’URL JAWSDB
+$jawsdbUrl = getenv('JAWSDB_URL') ?: ($_ENV['JAWSDB_URL'] ?? null);
 
+// **DEBUG TEMPORAIRE**
+file_put_contents('php://stderr', "[DEBUG] JAWSDB_URL={$jawsdbUrl}\n");
+
+// 2) Parsing
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
     $dbHost = $parts['host']   ?? 'localhost';
@@ -13,7 +16,6 @@ if ($jawsdbUrl) {
     $dbUser = $parts['user']   ?? '';
     $dbPass = $parts['pass']   ?? '';
 } else {
-    // fallback local
     $dbHost = 'localhost';
     $dbPort = 3306;
     $dbName = 'ecoride';
@@ -21,31 +23,22 @@ if ($jawsdbUrl) {
     $dbPass = '';
 }
 
-// 2) Autoload Composer
+// **DEBUG TEMPORAIRE**
+file_put_contents('php://stderr', "[DEBUG] DB_HOST={$dbHost}; DB_PORT={$dbPort}; DB_NAME={$dbName}; DB_USER={$dbUser}\n");
+
+// 3) Autoload
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
 }
 
-// 3) Connexion PDO en TCP grâce au port
-$dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-    $dbHost, $dbPort, $dbName
-);
+// 4) Connexion PDO
+$dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (\PDOException $e) {
-    throw $e;
-}
-
-// 4) Connexion MongoDB
-$mongoUri    = getenv('MONGODB_URI')     ?: 'mongodb://localhost:27017';
-$mongoDBName = getenv('MONGODB_DB_NAME') ?: 'avisDB';
-try {
-    $mongoClient = new MongoDB\Client($mongoUri);
-    $mongoDB     = $mongoClient->selectDatabase($mongoDBName);
-} catch (\Exception $e) {
     throw $e;
 }
 
