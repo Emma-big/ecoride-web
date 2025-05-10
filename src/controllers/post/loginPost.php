@@ -58,7 +58,7 @@ if ($user && password_verify($input['password'], $user['password'])) {
     } else {
         switch ($_SESSION['user']['role']) {
             case 1: header('Location: /admin');    break;
-            case 2:
+            case 2: header('Location: /employe');  break;
             case 3: header('Location: /index');    break;
             case 4: header('Location: /suspendu'); break;
             default: header('Location: /index');   break;
