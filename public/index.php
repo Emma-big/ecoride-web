@@ -3,10 +3,9 @@
 
 try {
     $pdo = require __DIR__ . '/../src/config.php';
-    error_log('DEBUG public/index.php – Config OK, DSN utilisé : ' . ini_get('pdo_mysql.default_socket'));
-} catch (\PDOException $e) {
+ } catch (\PDOException $e) {
     // on logue l’exception complète
-    error_log('❌ PDOException dans public/index.php : ' . $e->getMessage());
+    error_log('PDOException dans public/index.php : ' . $e->getMessage());
     echo "<h1>Erreur de connexion à la base de données :</h1>";
     echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
     exit;
@@ -20,9 +19,6 @@ error_reporting(E_ALL);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-// **DEBUG** : affiche tout le contenu de la session
-error_log('DEBUG SESSION → '. print_r($_SESSION, true));
 
 // 2) Définir BASE_PATH comme la racine du projet
 if (! defined('BASE_PATH')) {
@@ -56,9 +52,6 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
 // 4) Connexions PDO & MongoDB
 try {
     $pdo = require BASE_PATH . '/src/config.php';
-    // **DEBUG** : vérification de la variable d'environnement
-    error_log('DEBUG Web dyno – JAWSDB_URL=' . getenv('JAWSDB_URL'));
-
     $mongoClient = new MongoDB\Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017');
     $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
 } catch (\Throwable $e) {
@@ -90,8 +83,8 @@ switch ($uri) {
     case '/':
     case '/index':
     case '/index.php':
-        $mainView      = 'views/accueil.php';
         $barreRecherche= 'views/barreRecherche.php';
+        $mainView      = 'views/accueil.php';
         $pageTitle     = 'Accueil - EcoRide';
         $extraStyles   = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
         break;
