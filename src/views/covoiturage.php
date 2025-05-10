@@ -163,7 +163,7 @@ ob_start();
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
 </div>
 <section class="my-5">
-    <?php require_once BASE_PATH . '/src/views/barreRecherche.php'; ?>
+    <!-- Barre de recherche déjà affichée ci-dessus -->
 
     <?php if ($departRaw && $arriveeRaw && $dateRaw): ?>
         <!-- Affinage des résultats -->
