@@ -1,8 +1,8 @@
 <?php
 // src/controllers/principal/mesinfos.php
-// Affiche les infos utilisateur (prépare $user et $src en amont)
+// simple affichage des infos déjà chargées dans $user
 
-// Exemple de génération du chemin de la photo de profil
+// Génération du chemin de la photo de profil
 $src = '/uploads/avatars/' . ($user['avatar'] ?? 'default.png');
 ?>
 <div class="container">
