@@ -3,7 +3,8 @@
 // simple affichage des infos déjà chargées dans $user
 
 // Génération du chemin de la photo de profil
-$src = '/uploads/avatars/' . ($user['avatar'] ?? 'default.png');
+$src = '/assets/images/' . ($user['avatar'] ?? 'employeF.png');
+
 ?>
 <div class="container">
   <div class="row justify-content-center">
