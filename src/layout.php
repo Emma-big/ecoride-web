@@ -48,24 +48,15 @@
 $headerFile = __DIR__ . '/controllers/principal/scriptHeader.php';
 if (file_exists($headerFile)) {
     require_once $headerFile;
-} else {
-    echo "<p class='text-danger'>Fichier introuvable : $headerFile</p>";
 }
 
 // === Big Title ===
 if (empty($hideTitle)) {
-    $titleFile = __DIR__ . '/views/bigTitle.php';
-    if (file_exists($titleFile)) {
-        require_once $titleFile;
-    } else {
-        echo "<p class='text-danger'>Fichier introuvable : $titleFile</p>";
-    }
+    require_once __DIR__ . '/views/bigTitle.php';
 }
 
 // === Flash messages ===
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (!empty($_SESSION['flash'])) {
     echo '<div class="alert alert-success container mt-3">'
          . htmlspecialchars($_SESSION['flash'])
@@ -90,50 +81,35 @@ if (strpos($_SERVER['REQUEST_URI'], '/noteForm') === 0
     unset($_SESSION['form_errors'], $_SESSION['old']);
 }
 
+// === Barre de recherche sur index et covoiturage ===
+$uri = strtok($_SERVER['REQUEST_URI'], '?');
+if (in_array($uri, ['/', '/index', '/covoiturage'], true)) {
+    echo '<div class="container my-3">';
+    require_once __DIR__ . '/views/barreRecherche.php';
+    echo '</div>';
+}
+
 // === Contenu principal ===
+echo '<main class="container my-4 flex-fill">';
 if (!empty($mainContent)) {
     echo $mainContent;
 } elseif (!empty($mainView)) {
     $viewFile = __DIR__ . '/' . ltrim($mainView, '/');
     if (file_exists($viewFile)) {
         require $viewFile;
-        if (!empty($mainContent)) {
-            echo $mainContent;
-        }
-    } else {
-        echo "<p class='text-danger'>Vue introuvable : $viewFile</p>";
     }
 } else {
     echo '<p class="text-muted text-center">Aucun contenu à afficher.</p>';
 }
+echo '</main>';
 
 // === Footer global ===
-$footerFile = __DIR__ . '/views/footer.php';
-if (file_exists($footerFile)) {
-    require_once $footerFile;
-} else {
-    echo "<p class='text-danger'>Fichier introuvable : $footerFile</p>";
-}
+require_once __DIR__ . '/views/footer.php';
 ?>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js">
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const toggle = document.getElementById('togglePassword');
-  const pwd    = document.getElementById('password');
-  if (!toggle || !pwd) return;
-  toggle.addEventListener('click', () => {
-    pwd.type = pwd.type === 'password' ? 'text' : 'password';
-    toggle.querySelector('i')
-      .classList.toggle('bi-eye');
-    toggle.querySelector('i')
-      .classList.toggle('bi-eye-slash');
-  });
-});
-</script>
-
+<!-- JS commun -->
+<script src="…jquery…"></script>
+<script src="…bootstrap.bundle…"></script>
+…
 </body>
 </html>
