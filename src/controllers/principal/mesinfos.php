@@ -2,10 +2,13 @@
 // src/controllers/principal/mesinfos.php
 // simple affichage des infos déjà chargées dans $user
 
-// Détermination de l’avatar par défaut selon le genre
-$defaultAvatar = ($user['sexe'] === 'F') ? 'employeF.png' : 'employe.png';
+// 1) On s'assure qu'il y a toujours une valeur pour le genre
+$gender = $user['sexe'] ?? 'M';
 
-// Génération du chemin de la photo de profil
+// 2) Détermination de l’avatar par défaut selon le genre
+$defaultAvatar = ($gender === 'F') ? 'employeF.png' : 'employe.png';
+
+// 3) Génération du chemin de la photo de profil
 $src = '/assets/images/' . (!empty($user['avatar']) ? $user['avatar'] : $defaultAvatar);
 
 ?>
