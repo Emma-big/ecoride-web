@@ -49,7 +49,8 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
       ':uid' => $_SESSION['user']['utilisateur_id'],
     ]);
     if ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $formData = $data;
+    // on fusionne : les clés manquantes dans $data restent celles par défaut de $formData
+    $formData = array_merge($formData, $data);
     } else {
         $_SESSION['flash_error'] = 'Voiture introuvable ou non autorisée.';
         header('Location: /utilisateur');
