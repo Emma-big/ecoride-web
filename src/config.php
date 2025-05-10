@@ -5,18 +5,21 @@ if (! defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-// Pour debug : on verra dans les logs si Heroku a bien JAWSDB_URL
-error_log('ENV JAWSDB_URL = ' . getenv('JAWSDB_URL'));
+// Pour debug : on verra dans les logs quelle URL on utilise
+$jawsUrl = getenv('JAWSDB_URL') ?: getenv('JAWSDB_MAUVE_URL');
+error_log('ENV JAWSDB_URL_USED = ' . ($jawsUrl ?: 'none'));
 
-if (getenv('JAWSDB_URL')) {
-    $url = parse_url(getenv('JAWSDB_URL'));
-    $host   = $url['host']   ?? 'localhost';
+if ($jawsUrl) {
+    $url = parse_url($jawsUrl);
+    $host   = $url['host']   ?? '127.0.0.1';
     $port   = $url['port']   ?? 3306;
-    $dbname = ltrim($url['path'], '/') ?: 'ecoride';
+    // parse_url met le chemin avec un slash initial
+    $dbname = isset($url['path']) ? ltrim($url['path'], '/') : 'ecoride';
     $user   = $url['user']   ?? '';
     $pass   = $url['pass']   ?? '';
 } else {
-    $host   = $_ENV['DB_HOST'] ?? 'localhost';
+    // Fallback local / dev
+    $host   = $_ENV['DB_HOST'] ?? '127.0.0.1';
     $port   = $_ENV['DB_PORT'] ?? 3306;
     $dbname = $_ENV['DB_NAME'] ?? 'ecoride';
     $user   = $_ENV['DB_USER'] ?? 'root';
@@ -33,7 +36,7 @@ try {
         PDO::ATTR_EMULATE_PREPARES   => false,
     ]);
 } catch (PDOException $e) {
-    error_log('❌ Erreur PDO: ' . $e->getMessage());
+    error_log('Erreur PDO: ' . $e->getMessage());
     throw $e;
 }
 
