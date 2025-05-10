@@ -31,10 +31,16 @@ use function Helpers\renderError;
 
 // 3.1) Protection CSRF pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (empty($_POST['csrf_token']) || ! hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    // On récupère proprement les tokens comme chaînes
+    $submitted = (string) ($_POST['csrf_token'] ?? '');
+    $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+
+    // Si aucun token n’est disponible ou ne correspond pas → 403
+    if ($sessionToken === '' || !hash_equals($sessionToken, $submitted)) {
         renderError(403);
     }
 }
+
 // 3.2) Générer un token si nécessaire
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
