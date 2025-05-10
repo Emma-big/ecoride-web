@@ -1,11 +1,13 @@
 <?php
-// src/config.php — Initialise et retourne l’instance PDO
+// src/config.php
 
-if (!defined('BASE_PATH')) {
+if (! defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-// Si Heroku fournit JAWSDB_URL…
+// Pour debug : on verra dans les logs si Heroku a bien JAWSDB_URL
+error_log('ENV JAWSDB_URL = ' . getenv('JAWSDB_URL'));
+
 if (getenv('JAWSDB_URL')) {
     $url = parse_url(getenv('JAWSDB_URL'));
     $host   = $url['host']   ?? 'localhost';
@@ -14,7 +16,6 @@ if (getenv('JAWSDB_URL')) {
     $user   = $url['user']   ?? '';
     $pass   = $url['pass']   ?? '';
 } else {
-    // Sinon on tombe sur le local / .env
     $host   = $_ENV['DB_HOST'] ?? 'localhost';
     $port   = $_ENV['DB_PORT'] ?? 3306;
     $dbname = $_ENV['DB_NAME'] ?? 'ecoride';
@@ -22,9 +23,10 @@ if (getenv('JAWSDB_URL')) {
     $pass   = $_ENV['DB_PASS'] ?? '';
 }
 
+$dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
+error_log("DEBUG PDO DSN utilisé : $dsn");
+
 try {
-    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
-    error_log("DEBUG PDO DSN utilisé : $dsn");
     $pdo = new PDO($dsn, $user, $pass, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
