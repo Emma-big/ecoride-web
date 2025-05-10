@@ -43,6 +43,9 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
 // 4) Connexions PDO & MongoDB
 try {
     $pdo = require BASE_PATH . '/src/config.php';
+    // **DEBUG** : vérification de la variable d'environnement
+    error_log('DEBUG Web dyno – JAWSDB_URL=' . getenv('JAWSDB_URL'));
+
     $mongoClient = new MongoDB\Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017');
     $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
 } catch (\Throwable $e) {
