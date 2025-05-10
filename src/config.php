@@ -13,7 +13,10 @@ $jawsdbUrl = getenv('JAWSDB_URL') ?: null;
 // 3) Si JAWSDB_URL existe → on parse
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
-    $dbHost = $parts['host']   ?? '127.0.0.1';
+    $dbHost = $parts['host'] ?? '127.0.0.1';
+if ($dbHost === 'localhost') {
+    $dbHost = '127.0.0.1';
+}
     $dbPort = $parts['port']   ?? 3306;
     $dbName = ltrim($parts['path'] ?? '', '/');
     $dbUser = $parts['user']   ?? '';
