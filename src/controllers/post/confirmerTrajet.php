@@ -10,7 +10,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Vérifier les paramètres
 $id  = isset($_GET['id']) ? (int) $_GET['id'] : 0;

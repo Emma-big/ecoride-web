@@ -2,7 +2,7 @@
 namespace Adminlocal\EcoRide\Controllers\Post;
 
 // 1) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 2) Vérifier la méthode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

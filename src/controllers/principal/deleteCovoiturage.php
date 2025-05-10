@@ -7,7 +7,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Charger la configuration de la base de données
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Vérifier l’authentification
 $userId = $_SESSION['user']['id'] ?? null;

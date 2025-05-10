@@ -9,7 +9,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Charger la configuration BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Traitement du POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

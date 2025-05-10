@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 3) Charger la BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Récupérer & nettoyer
 $input = [

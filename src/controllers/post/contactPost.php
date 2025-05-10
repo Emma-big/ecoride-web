@@ -51,7 +51,7 @@ if (!empty($errors)) {
 }
 
 // 7) Inclure la config BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 8) Stockage en base
 try {

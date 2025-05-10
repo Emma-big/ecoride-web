@@ -4,7 +4,7 @@ namespace Adminlocal\EcoRide\Controllers\Principal;
  
 
 // 1) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 2) Récupération des filtres
 $villeDepart  = trim($_GET['depart']   ?? '');

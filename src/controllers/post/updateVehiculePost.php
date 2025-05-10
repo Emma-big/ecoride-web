@@ -4,7 +4,7 @@ namespace Adminlocal\EcoRide\Controllers\Post;
 use DateTime;
 
 // 1) Charger le PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 2) Session & auth
 if (session_status() !== PHP_SESSION_ACTIVE) {

@@ -14,7 +14,7 @@ $hideTitle = true;
 $user = $_SESSION['user'] ?? [];
 
 // 4) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 5) Récupérer le libellé du rôle
 $roleId = isset($user['role']) ? (int)$user['role'] : 0;

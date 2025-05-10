@@ -21,7 +21,7 @@ if (
 }
 
 // 3) Charger PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Nettoyer et valider l’ID de la voiture
 $voitureId      = isset($_POST['id']) ? (int) $_POST['id'] : 0;

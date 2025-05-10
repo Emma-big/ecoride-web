@@ -16,7 +16,7 @@ $old    = $_SESSION['old'] ?? [];
 unset($_SESSION['form_errors'], $_SESSION['old']);
 
 // 2) Charger le PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Charger listes pour les <select>
 $marques  = $pdo->query("SELECT marque_id, libelle FROM marques ORDER BY libelle")

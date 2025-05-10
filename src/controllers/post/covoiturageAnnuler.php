@@ -21,7 +21,7 @@ if (
 }
 
 // 3) Charger PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Nettoyer et valider les IDs
 $uid = (int) ($_SESSION['user']['utilisateur_id'] ?? 0);

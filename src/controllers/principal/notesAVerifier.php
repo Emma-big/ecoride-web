@@ -13,7 +13,7 @@ if (empty($_SESSION['user']) || (int)($_SESSION['user']['role'] ?? 0) !== 2) {
 }
 
 // 2) Charger la BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Récupérer les avis à valider (statut_id = 4)
 $sql = "

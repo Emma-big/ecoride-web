@@ -14,7 +14,7 @@ $hideTitle   = true; // masque le big title
 $extraStyles = ['/assets/style/styleCovoiturage.css'];
 
 // 3) Charger la BDD + récupérer les préférences dynamiques
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 $stmtP = $pdo->prepare(
     "SELECT libelle 
        FROM covoiturage_preferences 
