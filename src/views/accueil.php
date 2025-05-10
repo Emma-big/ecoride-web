@@ -10,7 +10,10 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 require_once BASE_PATH . '/src/controllers/principal/scriptHeader.php';
 require_once BASE_PATH . '/src/views/bigTitle.php';
 ?>
-
+<!-- Barre de recherche sur la page d'accueil -->
+<div class="container my-3">
+    <?php require BASE_PATH . '/src/views/barreRecherche.php'; ?>
+</div>
 <div class="container mt-5">
     <!-- Première carte -->
     <div class="card mb-4">
