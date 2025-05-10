@@ -11,6 +11,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// 1) Démarrage de la session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+// **DEBUG** : affiche tout le contenu de la session
+error_log('DEBUG SESSION → '. print_r($_SESSION, true));
+
 // 2) Définir BASE_PATH comme la racine du projet
 if (! defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/..'));
