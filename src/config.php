@@ -10,13 +10,13 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 // 2) JAWSDB_URL (Heroku)
 $jawsdbUrl = getenv('JAWSDB_URL') ?: null;
 
+// DEBUG – vérifier que la variable est lue
+error_log('DEBUG JAWSDB_URL='.getenv('JAWSDB_URL'));
+
 // 3) Si JAWSDB_URL existe → on parse
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
-    $dbHost = $parts['host'] ?? '127.0.0.1';
-if ($dbHost === 'localhost') {
-    $dbHost = '127.0.0.1';
-}
+    $dbHost = $parts['host']   ?? '127.0.0.1';
     $dbPort = $parts['port']   ?? 3306;
     $dbName = ltrim($parts['path'] ?? '', '/');
     $dbUser = $parts['user']   ?? '';
@@ -39,12 +39,11 @@ else {
     $dbPass = '';
 }
 
-// 6) Connexion PDO (TCP)
+// 6) Connexion PDO (force TCP en désactivant unix_socket)
 $dsn = sprintf(
     'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4;unix_socket=',
     $dbHost, $dbPort, $dbName
 );
-
 
 try {
     return new PDO($dsn, $dbUser, $dbPass, [
