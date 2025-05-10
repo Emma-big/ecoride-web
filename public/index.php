@@ -391,7 +391,7 @@ switch ($uri) {
 
     case '/loginPost':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once BASE_PATH . '/src/controllers/Post/loginPost.php';
+            require_once BASE_PATH . '/src/controllers/post/loginPost.php';
         } else {
             // Si quelqu’un tape manuellement /loginPost en GET
             header('Location: /login');
