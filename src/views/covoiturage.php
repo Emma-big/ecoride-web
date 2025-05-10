@@ -45,7 +45,7 @@ $offset = ($page - 1) * $limit;
 $totalPages = 1;
 
 if ($departRaw && $arriveeRaw && $dateRaw) {
-    require_once BASE_PATH . '/config/database.php';
+    $pdo = require BASE_PATH . '/src/config.php';
 
     // Construction WHERE + params
     $where  = "c.lieu_depart LIKE :ld AND c.lieu_arrive LIKE :la AND c.date_depart = :dd";
@@ -117,10 +117,10 @@ if ($departRaw && $arriveeRaw && $dateRaw) {
     foreach ($params as $k => $v) {
         $stmt->bindValue($k, $v);
     }
-    $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
-    $trajets = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    $trajets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($trajets)) {
         $dtStmt = $pdo->prepare(
@@ -138,62 +138,83 @@ if ($departRaw && $arriveeRaw && $dateRaw) {
 // 4) Capture du contenu principal
 ob_start();
 ?>
-<section class="my-5">
-  <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initSearchAutocomplete">
-  </script>
-  <?php require_once BASE_PATH . '/src/views/barreRecherche.php'; ?>
-
-  <?php if ($departRaw && $arriveeRaw && $dateRaw): ?>
-    <div class="mb-4">
-      <h3>Affiner les résultats</h3>
-      <form action="/covoiturage" method="get" class="row g-3 align-items-end" novalidate>
-        <input type="hidden" name="depart"   value="<?= htmlspecialchars($departRaw, ENT_QUOTES) ?>">
-        <input type="hidden" name="arrivee"  value="<?= htmlspecialchars($arriveeRaw, ENT_QUOTES) ?>">
-        <input type="hidden" name="date"     value="<?= htmlspecialchars($dateRaw, ENT_QUOTES) ?>">
-
-        <div class="col-md-3 form-check">
-          <input class="form-check-input" type="checkbox" id="ecologique" name="ecologique" <?= $eco ? 'checked' : '' ?>>
-          <label class="form-check-label" for="ecologique">Voyage écologique (voiture électrique)</label>
+<div class="container my-3">
+    <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
+    <form id="searchForm" action="/covoiturage" method="get" class="row g-3 justify-content-center mb-5" novalidate>
+        <div class="col-md-4">
+            <label for="depart" class="form-label">Adresse de départ</label>
+            <input type="text" id="depart" name="depart" class="form-control" required maxlength="150" pattern=".{5,150}" value="<?= htmlspecialchars($departRaw, ENT_QUOTES) ?>">
+            <div class="invalid-feedback">Adresse invalide (5–150 caractères).</div>
+        </div>
+        <div class="col-md-4">
+            <label for="arrivee" class="form-label">Adresse d'arrivée</label>
+            <input type="text" id="arrivee" name="arrivee" class="form-control" required maxlength="150" pattern=".{5,150}" value="<?= htmlspecialchars($arriveeRaw, ENT_QUOTES) ?>">
+            <div class="invalid-feedback">Adresse invalide (5–150 caractères).</div>
         </div>
         <div class="col-md-3">
-          <label for="max_price" class="form-label">Prix max (crédits)</label>
-          <input type="number" step="0.01" id="max_price" name="max_price" class="form-control" value="<?= htmlspecialchars($maxPrice, ENT_QUOTES) ?>">
-        </div>
-        <div class="col-md-3">
-          <label for="max_duration" class="form-label">Durée max (min)</label>
-          <input type="number" id="max_duration" name="max_duration" class="form-control" value="<?= htmlspecialchars($maxDur, ENT_QUOTES) ?>">
-        </div>
-        <div class="col-md-3">
-          <label for="min_rating" class="form-label">Note min (/5)</label>
-          <input type="number" step="0.1" min="0" max="5" id="min_rating" name="min_rating" class="form-control" value="<?= htmlspecialchars($minRating, ENT_QUOTES) ?>">
+            <label for="date" class="form-label">Date de départ</label>
+            <input type="date" id="date" name="date" class="form-control" required value="<?= htmlspecialchars($dateRaw, ENT_QUOTES) ?>">
+            <div class="invalid-feedback">Date requise.</div>
         </div>
         <div class="col-12 text-center">
-          <button type="submit" class="btn btn-secondary">Appliquer</button>
+            <button class="btn btn-primary">Rechercher</button>
         </div>
-      </form>
-    </div>
+    </form>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
+</div>
+<section class="my-5">
+    <?php require_once BASE_PATH . '/src/views/barreRecherche.php'; ?>
 
-    <?php if ($trajets): ?>
-      <h3 class="mb-4 text-center">Itinéraires disponibles</h3>
-      <div class="list-group">
-        <?php foreach ($trajets as $t): ?>
-          <?php
-            $d1    = new DateTime("{$t['date_depart']} {$t['heure_depart']}");
-            $d2    = new DateTime("{$t['date_arrive']} {$t['heure_arrive']}");
-            $diff  = $d1->diff($d2);
-            $duree = "{$diff->h}h" . str_pad($diff->i,2,'0',STR_PAD_LEFT) . "min";
+    <?php if ($departRaw && $arriveeRaw && $dateRaw): ?>
+        <!-- Affinage des résultats -->
+        <div class="mb-4">
+            <h3>Affiner les résultats</h3>
+            <form action="/covoiturage" method="get" class="row g-3 align-items-end" novalidate>
+                <input type="hidden" name="depart" value="<?= htmlspecialchars($departRaw, ENT_QUOTES) ?>">
+                <input type="hidden" name="arrivee" value="<?= htmlspecialchars($arriveeRaw, ENT_QUOTES) ?>">
+                <input type="hidden" name="date" value="<?= htmlspecialchars($dateRaw, ENT_QUOTES) ?>">
+                <div class="col-md-3 form-check">
+                    <input class="form-check-input" type="checkbox" id="ecologique" name="ecologique" <?= $eco ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="ecologique">Voyage écologique (voiture électrique)</label>
+                </div>
+                <div class="col-md-3">
+                    <label for="max_price" class="form-label">Prix max (crédits)</label>
+                    <input type="number" step="0.01" id="max_price" name="max_price" class="form-control" value="<?= htmlspecialchars($maxPrice, ENT_QUOTES) ?>">
+                </div>
+                <div class="col-md-3">
+                    <label for="max_duration" class="form-label">Durée max (min)</label>
+                    <input type="number" id="max_duration" name="max_duration" class="form-control" value="<?= htmlspecialchars($maxDur, ENT_QUOTES) ?>">
+                </div>
+                <div class="col-md-3">
+                    <label for="min_rating" class="form-label">Note min (/5)</label>
+                    <input type="number" step="0.1" min="0" max="5" id="min_rating" name="min_rating" class="form-control" value="<?= htmlspecialchars($minRating, ENT_QUOTES) ?>">
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-secondary">Appliquer</button>
+                </div>
+            </form>
+        </div>
 
-            $isLogged   = !empty($_SESSION['user']);
-            $userCredit = (float)($_SESSION['user']['credit'] ?? 0);
-            $price      = (float)$t['prix_personne'];
-            $hasSeats   = ((int)$t['nb_place'] > 0);
-          ?>
-          <div class="list-group-item mb-3">
-            <div class="d-flex align-items-center mb-2">
-              <img src="/assets/images/<?= htmlspecialchars($t['photo'] ?: 'default.png', ENT_QUOTES) ?>" class="rounded-circle me-3" width="50" height="50" alt="Profil <?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?>">
-              <div class="flex-grow-1">
+        <!-- Affichage des trajets -->
+        <?php if ($trajets): ?>
+            <h3 class="mb-4 text-center">Itinéraires disponibles</h3>
+            <div class="list-group">
+                <?php foreach ($trajets as $t): ?>
+                    <?php
+                        $d1    = new DateTime("{$t['date_depart']} {$t['heure_depart']}");
+                        $d2    = new DateTime("{$t['date_arrive']} {$t['heure_arrive']}");
+                        $diff  = $d1->diff($d2);
+                        $duree = "{$diff->h}h" . str_pad($diff->i,2,'0',STR_PAD_LEFT) . "min";
+
+                        $isLogged   = !empty($_SESSION['user']);
+                        $userCredit = (float)($_SESSION['user']['credit'] ?? 0);
+                        $price      = (float)$t['prix_personne'];
+                        $hasSeats   = ((int)$t['nb_place'] > 0);
+                    ?>
+                    <div class="list-group-item mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="/assets/images/<?= htmlspecialchars($t['photo'] ?: 'default.png', ENT_QUOTES) ?>" class="rounded-circle me-3" width="50" height="50" alt="Profil <?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?>">
+                            <div class="flex-grow-1">
                 <h6 class="mb-0"><?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?></h6>
                 <small class="text-muted">Note : <?= number_format($t['note_moyenne'],1) ?>/5</small>
               </div>
