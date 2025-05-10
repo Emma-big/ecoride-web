@@ -389,13 +389,13 @@ switch ($uri) {
         exit;
 
         case '/utilisateur':
-    require_once BASE_PATH . '/src/controllers/principal/utilisateur.php';
-    exit;
+        require_once __DIR__ . '/utilisateur.php';
+        exit;
 
-        default:
+    default:
         renderError(404);
 }
 
-// 6) Affichage du layout global
+// 6) Affichage du layout global (pour toutes les vues “$mainView”)
 require_once BASE_PATH . '/src/layout.php';
 exit;
