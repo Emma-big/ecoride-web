@@ -1,6 +1,16 @@
 <?php
 // public/index.php
 
+try {
+    $pdo = require __DIR__ . '/../src/config.php';
+    error_log('DEBUG public/index.php – Config OK, DSN utilisé : ' . ini_get('pdo_mysql.default_socket'));
+} catch (\PDOException $e) {
+    // on logue l’exception complète
+    error_log('❌ PDOException dans public/index.php : ' . $e->getMessage());
+    echo "<h1>Erreur de connexion à la base de données :</h1>";
+    echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
+    exit;
+}
 // Affichage des erreurs si APP_DEBUG=true
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
