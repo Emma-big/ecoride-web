@@ -11,10 +11,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 1) Démarrage de la session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 // **DEBUG** : affiche tout le contenu de la session
 error_log('DEBUG SESSION → '. print_r($_SESSION, true));
 
