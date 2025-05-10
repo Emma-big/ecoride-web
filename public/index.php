@@ -34,6 +34,7 @@ if (empty($_SESSION['csrf_token'])) {
 // 3.3) Autoload Composer + Dotenv
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
+    // Ne charger le .env qu’en local / si présent
     if (file_exists(BASE_PATH . '/.env')) {
         Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
     }
@@ -63,22 +64,25 @@ $_SESSION['last_activity'] = time();
 // === ROUTEUR SIMPLIFIÉ ===
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
-// Log de route (optionnel)
-file_put_contents(__DIR__.'/../logs/route.log', date('c').' → '.$_SERVER['HTTP_HOST'].' '.$_SERVER['REQUEST_URI'].PHP_EOL, FILE_APPEND);
+// (optionnel) Log de route
+file_put_contents(__DIR__.'/../logs/route.log',
+    date('c').' → '.$_SERVER['HTTP_HOST'].' '.$_SERVER['REQUEST_URI'].PHP_EOL,
+    FILE_APPEND
+);
 
 switch ($uri) {
     case '/':
     case '/index':
     case '/index.php':
-        $mainView = 'views/accueil.php';
-        $barreRecherche = 'views/barreRecherche.php';
-        $pageTitle = 'Accueil - EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
+        $mainView      = 'views/accueil.php';
+        $barreRecherche= 'views/barreRecherche.php';
+        $pageTitle     = 'Accueil - EcoRide';
+        $extraStyles   = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
         break;
 
     case '/login':
-        $mainView = 'forms/login.php';
-        $pageTitle = 'Connexion - EcoRide';
+        $mainView    = 'forms/login.php';
+        $pageTitle   = 'Connexion - EcoRide';
         $extraStyles = [
             '/assets/style/styleFormLogin.css',
             '/assets/style/styleCovoiturage.css',
