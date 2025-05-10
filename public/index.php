@@ -117,7 +117,9 @@ switch ($uri) {
         break;
 
     case '/employe':
-        require_once BASE_PATH . '/src/controllers/principal/employe.php';
+        $hideTitle = false;
+        $mainView  = 'controllers/principal/employe.php';
+        require_once BASE_PATH . '/src/layout.php';
         exit;
 
     case '/registerForm':
@@ -238,10 +240,6 @@ switch ($uri) {
             renderError(405);
         }
         break;
-
-    case '/loginPost':
-        require_once BASE_PATH . '/src/controllers/post/loginPost.php';
-        exit;
 
     case '/deconnexion':
         require_once BASE_PATH . '/src/controllers/principal/deconnexion.php';
@@ -387,8 +385,17 @@ switch ($uri) {
         require_once BASE_PATH . '/src/controllers/principal/deleteVoiture.php';
         exit;
 
-        case '/utilisateur':
+    case '/utilisateur':
         require_once __DIR__ . '/utilisateur.php';
+        exit;
+
+    case '/loginPost':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once BASE_PATH . '/src/controllers/Post/loginPost.php';
+        } else {
+            // Si quelqu’un tape manuellement /loginPost en GET
+            header('Location: /login');
+        }
         exit;
 
     default:
