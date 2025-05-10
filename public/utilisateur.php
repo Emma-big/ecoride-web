@@ -25,6 +25,7 @@ try {
     exit;
 }
 
+// 5) Gestion de l’inactivité
 if (isset($_SESSION['last_activity'])
     && time() - $_SESSION['last_activity'] > 600
 ) {
@@ -44,7 +45,40 @@ $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 7) Charger les infos de l’utilisateur
+// ──────────────────────────────────────────────────────────────────────────────
+// 7) Si aucun rôle n’est coché, on affiche **seulement** le formulaire de choix:
+// ──────────────────────────────────────────────────────────────────────────────
+if (! $isChauffeur && ! $isPassager) {
+    // Masquer le bigTitle global
+    $hideTitle   = true;
+    // Titre & styles
+    $pageTitle   = 'Choisissez votre rôle – EcoRide';
+    $extraStyles = ['/assets/style/styleIndex.css','/assets/style/styleAdmin.css'];
+
+    ob_start();
+    ?>
+    <main class="container mt-5">
+      <h2 class="text-center mb-4">Choisissez votre rôle</h2>
+      <form action="/updateRolePost" method="POST" class="text-center">
+        <label class="me-3">
+          <input type="checkbox" name="role_chauffeur" value="1"> Chauffeur
+        </label>
+        <label class="me-3">
+          <input type="checkbox" name="role_passager"  value="1"> Passager
+        </label>
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        <input type="hidden" name="csrf_token"
+               value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+      </form>
+    </main>
+    <?php
+    $mainContent = ob_get_clean();
+    require BASE_PATH . '/src/layout.php';
+    exit;
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
+// 8) Charger les infos de l’utilisateur
 try {
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
@@ -58,20 +92,26 @@ try {
     exit;
 }
 
-// 8) Config du layout
+// 9) Config du layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css','/assets/style/styleAdmin.css'];
-$withTitle   = false;
+$hideTitle   = true; // on ne réaffiche pas le bigTitle global sur cette page
 
-// 9) Contenu
+// 10) Contenu
 ob_start();
 require BASE_PATH . '/src/controllers/principal/mesinfos.php';
-require BASE_PATH . '/src/controllers/principal/mesvoitures.php';   // si chauffeur
-require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php';
-require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php';
-require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php';
+
+if ($isChauffeur) {
+    require BASE_PATH . '/src/controllers/principal/mesvoitures.php';
+    require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php';
+}
+if ($isPassager) {
+    require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php';
+    require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php';
+}
+
 $mainContent = ob_get_clean();
 
-// 10) Affichage via le layout
+// 11) Affichage via le layout
 require BASE_PATH . '/src/layout.php';
 exit;
