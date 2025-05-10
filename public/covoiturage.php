@@ -5,10 +5,7 @@
 global $hideTitle;
 $hideTitle = true;
 
-// 2) Afficher la barre de recherche via le layout
-$barreRecherche = 'src/views/barreRecherche.php';
-
-// 3) Vue principale et titre de la page
+// 2) Vue principale et titre de la page
 $pageTitle   = 'Rechercher un covoiturage';
 $extraStyles = [
     '/assets/style/styleFormLogin.css',
@@ -16,7 +13,7 @@ $extraStyles = [
 ];
 $mainView    = 'src/views/covoiturage.php';
 
-// 4) Inclusion du layout global
+// 3) Inclusion du layout global
 define('BASE_PATH', dirname(__DIR__));
 require_once BASE_PATH . '/src/layout.php';
 exit;

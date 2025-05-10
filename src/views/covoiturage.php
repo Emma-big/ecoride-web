@@ -140,15 +140,20 @@ ob_start();
 ?>
 <section class="my-5">
   <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
+  <!-- Barre de recherche -->
+  <div class="container my-3">
+    <?php require BASE_PATH . '/src/views/barreRecherche.php'; ?>
+  </div>
 
-    <div class="alert alert-info text-center">
-      Aucun trajet le <strong><?= (new DateTime($dateRaw))->format('d/m/Y') ?></strong>.<br>
-      Prochain : <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
-      <a href="/covoiturage?depart=<?= urlencode($departRaw) ?>&amp;arrivee=<?= urlencode($arriveeRaw) ?>&amp;date=<?= urlencode($next_date) ?>"
-         class="btn btn-sm btn-primary mt-2">
-        Voir
-      </a>
-    </div>
+  <?php if ($next_date): ?>
+  <div class="alert alert-info text-center">
+    Aucun trajet le <strong><?= (new DateTime($dateRaw))->format('d/m/Y') ?></strong>.<br>
+    Prochain :
+    <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
+    <a href="/covoiturage?depart=<?= urlencode($departRaw) ?>&amp;arrivee=<?= urlencode($arriveeRaw) ?>&amp;date=<?= urlencode($next_date) ?>"
+       class="btn btn-sm btn-primary mt-2">Voir</a>
+  </div>
+<?php endif; ?>
 
     <p class="text-center fst-italic">Aucun covoiturage ne correspond.</p>
 

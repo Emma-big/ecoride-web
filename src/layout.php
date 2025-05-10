@@ -90,21 +90,6 @@ if (strpos($_SERVER['REQUEST_URI'], '/noteForm') === 0
     unset($_SESSION['form_errors'], $_SESSION['old']);
 }
 
-// === Barre de recherche conditionnelle ===
-if (!empty($barreRecherche)) {
-    $barFile = __DIR__ . '/' . ltrim($barreRecherche, '/');
-    if (file_exists($barFile)) {
-        echo '<div class="container my-3">';
-        require_once $barFile;
-        echo '</div>';
-    } else {
-        echo "<p class='text-danger'>Fichier introuvable : $barFile</p>";
-    }
-}
-?>
-
-<main class="container my-4 flex-fill">
-<?php
 // === Contenu principal ===
 if (!empty($mainContent)) {
     echo $mainContent;
@@ -121,10 +106,7 @@ if (!empty($mainContent)) {
 } else {
     echo '<p class="text-muted text-center">Aucun contenu à afficher.</p>';
 }
-?>
-</main>
 
-<?php
 // === Footer global ===
 $footerFile = __DIR__ . '/views/footer.php';
 if (file_exists($footerFile)) {
