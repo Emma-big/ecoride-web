@@ -140,22 +140,7 @@ ob_start();
 ?>
 <section class="my-5">
   <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
-  <?php require BASE_PATH . '/src/views/barreRecherche.php'; ?>
 
-  <?php if ($departRaw && $arriveeRaw && $dateRaw): ?>
-    <div class="mb-4">
-      <h3>Affiner les résultats</h3>
-      <form action="/covoiturage" method="get" class="row g-3 align-items-end" novalidate>
-        <input type="hidden" name="depart" value="<?= htmlspecialchars($departRaw, ENT_QUOTES) ?>">
-        <input type="hidden" name="arrivee" value="<?= htmlspecialchars($arriveeRaw, ENT_QUOTES) ?>">
-        <input type="hidden" name="date" value="<?= htmlspecialchars($dateRaw, ENT_QUOTES) ?>">
-        <!-- … reste du formulaire d’affinage … -->
-      </form>
-    </div>
-
-    <!-- … affichage des trajets, pagination, etc. … -->
-
-  <?php elseif ($next_date): ?>
     <div class="alert alert-info text-center">
       Aucun trajet le <strong><?= (new DateTime($dateRaw))->format('d/m/Y') ?></strong>.<br>
       Prochain : <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
@@ -164,9 +149,9 @@ ob_start();
         Voir
       </a>
     </div>
-  <?php else: ?>
+
     <p class="text-center fst-italic">Aucun covoiturage ne correspond.</p>
-  <?php endif; ?>
+
 </section>
 <?php
 $mainContent = ob_get_clean();
