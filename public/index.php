@@ -1,4 +1,6 @@
 <?php
+// public/index.php
+
 // Affichage des erreurs si APP_DEBUG=true
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -32,7 +34,6 @@ if (empty($_SESSION['csrf_token'])) {
 // 3.3) Autoload Composer + Dotenv
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
-    // Ne charger le .env qu’en local / si présent
     if (file_exists(BASE_PATH . '/.env')) {
         Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
     }
@@ -78,7 +79,12 @@ switch ($uri) {
     case '/login':
         $mainView = 'forms/login.php';
         $pageTitle = 'Connexion - EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css', '/assets/style/styleCovoiturage.css', '/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleCovoiturage.css',
+            '/assets/style/styleIndex.css',
+            '/assets/style/styleBarreRecherche.css'
+        ];
         break;
 
     case '/admin':
@@ -363,11 +369,8 @@ switch ($uri) {
         exit;
 
     case '/utilisateur':
-        // Reprendre ici la connexion PDO & MongoDB
-        $pdo = require BASE_PATH . '/src/config.php';
-        $mongoClient = new MongoDB\Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017');
-        $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
-        // Charger ton contrôleur “Mon espace utilisateur”
+        // La connexion PDO/MongoDB est déjà faite en amont,
+        // on n'appelle plus session_start() ni config.php ici.
         require_once BASE_PATH . '/src/controllers/principal/utilisateur.php';
         exit;
 
