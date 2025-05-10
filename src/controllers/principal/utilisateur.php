@@ -1,5 +1,5 @@
 <?php
-// src/controllers/principal/utilisateur.php
+// src/controllers/principal/utilisateur.php — Mon espace utilisateur
 
 // 1) Vérifier l’authentification
 if (session_status() === PHP_SESSION_NONE) {
@@ -10,15 +10,14 @@ if (empty($_SESSION['user']['utilisateur_id'])) {
     exit;
 }
 
-// 2) Récupérer l’ID et les rôles depuis la session
+// 2) Récupérer l’ID et les rôles
 $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 3) Charger les informations utilisateur depuis la base
+// 3) Charger les infos utilisateur depuis la base
 try {
-    /** @var \PDO $pdo */
-    $stmt = $pdo->prepare('SELECT utilisateur_id, pseudo, email, nom, prenom, is_chauffeur, is_passager, credit, role FROM utilisateurs WHERE utilisateur_id = :id');
+    $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
     $user = $stmt->fetch();
     if (! $user) {
@@ -29,12 +28,12 @@ try {
     exit;
 }
 
-// 4) Préparer les variables pour la vue
+// 4) Configuration du layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 5) Rendu du contenu principal
+// 5) Génération du contenu
 ob_start();
 ?>
 <main class="container mt-4">
@@ -44,18 +43,13 @@ ob_start();
     <!-- Choix de rôle -->
     <form action="/updateRolePost" method="POST" class="mb-5">
         <label>
-            <input type="checkbox" name="role_chauffeur" value="1"
-                <?= ($isChauffeur) ? 'checked' : '' ?>> Chauffeur
+            <input type="checkbox" name="role_chauffeur" value="1" <?= $isChauffeur ? 'checked' : '' ?>> Chauffeur
         </label>
         <label class="ms-3">
-            <input type="checkbox" name="role_passager" value="1"
-                <?= ($isPassager) ? 'checked' : '' ?>> Passager
+            <input type="checkbox" name="role_passager" value="1" <?= $isPassager ? 'checked' : '' ?>> Passager
         </label>
-        <button type="submit" class="btn btn-secondary btn-sm ms-3">
-            Mettre à jour
-        </button>
-        <input type="hidden" name="csrf_token"
-            value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+        <button type="submit" class="btn btn-secondary btn-sm ms-3">Mettre à jour</button>
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
     </form>
 
     <!-- Mes voitures -->
@@ -63,24 +57,18 @@ ob_start();
     <?php if ($isChauffeur): ?>
         <?php require BASE_PATH . '/src/controllers/principal/mesvoitures.php'; ?>
     <?php else: ?>
-        <p class="text-muted">
-            Vous devez être chauffeur pour gérer vos voitures.
-        </p>
+        <p class="text-muted">Vous devez être chauffeur pour gérer vos voitures.</p>
     <?php endif; ?>
 
     <!-- Mes covoiturages (Chauffeur) -->
     <h2>Mes covoiturages (Chauffeur)</h2>
     <?php if ($isChauffeur): ?>
         <div class="text-center my-4">
-            <a href="/covoiturageForm" class="btn btn-primary">
-                Créer un covoiturage
-            </a>
+            <a href="/covoiturageForm" class="btn btn-primary">Créer un covoiturage</a>
         </div>
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>
     <?php else: ?>
-        <p class="text-muted">
-            Vous devez être chauffeur pour gérer vos covoiturages.
-        </p>
+        <p class="text-muted">Vous devez être chauffeur pour gérer vos covoiturages.</p>
     <?php endif; ?>
 
     <!-- Mes covoiturages (Passager) -->
@@ -89,9 +77,7 @@ ob_start();
         <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php'; ?>
         <?php require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php'; ?>
     <?php else: ?>
-        <p class="text-muted">
-            Vous devez être passager pour voir vos trajets.
-        </p>
+        <p class="text-muted">Vous devez être passager pour voir vos trajets.</p>
     <?php endif; ?>
 </main>
 <?php

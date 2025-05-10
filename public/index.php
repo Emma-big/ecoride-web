@@ -389,16 +389,10 @@ switch ($uri) {
         exit;
 
         case '/utilisateur':
-    // 1) (re)génère la connexion PDO & MongoDB
-    $pdo         = require BASE_PATH . '/src/config.php';
-    $mongoClient = new MongoDB\Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017');
-    $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
-
-    // 2) puis ton contrôleur
     require_once BASE_PATH . '/src/controllers/principal/utilisateur.php';
     exit;
 
-       default:
+        default:
         renderError(404);
 }
 
