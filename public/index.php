@@ -117,6 +117,7 @@ switch ($uri) {
         break;
 
     case '/employe':
+        $hideTitle = true;
         require_once BASE_PATH . '/src/controllers/principal/employe.php';
         exit;
 

@@ -46,7 +46,7 @@
                   <form method="POST" action="/reclamationResolue" class="d-inline">
                     <input type="hidden" name="reclamation_id" value="<?= htmlspecialchars($r['reclamation_id'], ENT_QUOTES) ?>">
                     <input type="hidden" name="csrf_token"      value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-                    <button class="btn btn-sm btn-primary">Problème résolu</button>
+                    <button class="btn btn-sm btn-primary"> ?</button>
                   </form>
               <?php
                 elseif ($sid === 8): ?>
