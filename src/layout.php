@@ -107,6 +107,8 @@ if (!empty($mainContent)) {
 } else {
     echo '<p class="text-muted text-center">Aucun contenu à afficher.</p>';
 }
+// <-- fermeture du main
+echo '</main>';
 
 // === Footer global ===
 $footerFile = __DIR__ . '/views/footer.php';
