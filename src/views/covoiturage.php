@@ -7,7 +7,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Variables pour le layout
-$barreRecherche = 'views/barreRecherche.php';
 $hideTitle      = true;
 $extraStyles    = ['/assets/style/styleIndex.css'];
 
