@@ -1,7 +1,7 @@
 <?php
 // src/controllers/principal/utilisateur.php
 
-// 1) (la session est déjà démarrée dans public/index.php)
+// 1) (plus de session_start)
 
 // 2) Vérifier l’authentification
 if (empty($_SESSION['user']['utilisateur_id'])) {
@@ -9,16 +9,12 @@ if (empty($_SESSION['user']['utilisateur_id'])) {
     exit;
 }
 
-// 3) On utilise directement $pdo fourni par public/index.php
-/** @var \PDO $pdo */
-
-// Récupération des flags
+// 3) Ici, $pdo existe déjà (initialisé dans public/index.php)
 $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
 try {
-    // 4) Charger les infos de l’utilisateur via $pdo
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
     $user = $stmt->fetch();
