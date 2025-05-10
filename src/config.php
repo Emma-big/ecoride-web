@@ -41,9 +41,10 @@ else {
 
 // 6) Connexion PDO (TCP)
 $dsn = sprintf(
-    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4;unix_socket=',
     $dbHost, $dbPort, $dbName
 );
+
 
 try {
     return new PDO($dsn, $dbUser, $dbPass, [
