@@ -169,4 +169,3 @@ ob_start();
 </section>
 <?php
 $mainContent = ob_get_clean();
-require BASE_PATH . '/src/layout.php';
