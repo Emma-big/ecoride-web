@@ -2,8 +2,11 @@
 // src/controllers/principal/mesinfos.php
 // simple affichage des infos déjà chargées dans $user
 
+// Détermination de l’avatar par défaut selon le genre
+$defaultAvatar = ($user['sexe'] === 'F') ? 'employeF.png' : 'employe.png';
+
 // Génération du chemin de la photo de profil
-$src = '/assets/images/' . ($user['avatar'] ?? 'employeF.png');
+$src = '/assets/images/' . (!empty($user['avatar']) ? $user['avatar'] : $defaultAvatar);
 
 ?>
 <div class="container">
@@ -31,7 +34,7 @@ $src = '/assets/images/' . ($user['avatar'] ?? 'employeF.png');
             </p>
           <?php endif; ?>
           <p class="mb-0"><strong>Crédits :</strong> <?= number_format($user['credit'], 2) ?> crédits</p>
-          <p class="mt-3 text-muted small">
+          <p class="mt-3 text-muted small" class="text-black">
             * Pour toute modification de vos données personnelles, merci de contacter : 
             <a href="mailto:contact@ecoride.com">contact@ecoride.com</a>
           </p>

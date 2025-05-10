@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':energie'              => $energieId  ,
         ]);
         if ($stmt2->rowCount()) {
-            $message = 'Voiture enregistré avec succès !';
+            $message = 'Voiture enregistrée avec succès !';
             $success = true;
         } else {
             $message = 'Une erreur est survenue lors de l\'enregistrement.';
