@@ -11,7 +11,7 @@ if (! defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-// 3) Composer + Dotenv (ne masque pas JAWSDB_URL)
+// 3) Composer + Dotenv
 require_once BASE_PATH . '/vendor/autoload.php';
 Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
 
@@ -25,8 +25,6 @@ try {
     exit;
 }
 
-// 5) Démarrer la session + inactivité
-session_start();
 if (isset($_SESSION['last_activity'])
     && time() - $_SESSION['last_activity'] > 600
 ) {
@@ -37,7 +35,7 @@ if (isset($_SESSION['last_activity'])
 }
 $_SESSION['last_activity'] = time();
 
-// 6) Vérifier l’authentification
+// 6) Authentification
 if (empty($_SESSION['user']['utilisateur_id'])) {
     header('Location: /accessDenied');
     exit;
@@ -67,67 +65,13 @@ $withTitle   = false;
 
 // 9) Contenu
 ob_start();
-?>
-<main class="container mt-4">
-    <?php require BASE_PATH . '/src/views/bigTitle.php'; ?>
-    <?php require BASE_PATH . '/src/controllers/principal/mesinfos.php'; ?>
-
-    <!-- Choix de rôle -->
-    <form action="/updateRolePost" method="POST" class="mb-5">
-        <label>
-            <input type="checkbox" name="role_chauffeur" value="1"
-                <?= $isChauffeur ? 'checked' : '' ?>> Chauffeur
-        </label>
-        <label class="ms-3">
-            <input type="checkbox" name="role_passager" value="1"
-                <?= $isPassager ? 'checked' : '' ?>> Passager
-        </label>
-        <button type="submit" class="btn btn-secondary btn-sm ms-3">
-            Mettre à jour
-        </button>
-        <input type="hidden" name="csrf_token"
-            value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-    </form>
-
-    <!-- Mes voitures -->
-    <h2>Mes voitures</h2>
-    <?php if ($isChauffeur): ?>
-        <?php require BASE_PATH . '/src/controllers/principal/mesvoitures.php'; ?>
-    <?php else: ?>
-        <p class="text-muted">
-            Vous devez être chauffeur pour gérer vos voitures.
-        </p>
-    <?php endif; ?>
-
-    <!-- Mes covoiturages (Chauffeur) -->
-    <h2>Mes covoiturages (Chauffeur)</h2>
-    <?php if ($isChauffeur): ?>
-        <div class="text-center my-4">
-            <a href="/covoiturageForm" class="btn btn-primary">
-                Créer un covoiturage
-            </a>
-        </div>
-        <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>
-    <?php else: ?>
-        <p class="text-muted">
-            Vous devez être chauffeur pour gérer vos covoiturages.
-        </p>
-    <?php endif; ?>
-
-    <!-- Mes covoiturages (Passager) -->
-    <h2>Mes covoiturages (Passager)</h2>
-    <?php if ($isPassager): ?>
-        <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php'; ?>
-        <?php require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php'; ?>
-    <?php else: ?>
-        <p class="text-muted">
-            Vous devez être passager pour voir vos trajets.
-        </p>
-    <?php endif; ?>
-</main>
-<?php
+require BASE_PATH . '/src/controllers/principal/mesinfos.php';
+require BASE_PATH . '/src/controllers/principal/mesvoitures.php';   // si chauffeur
+require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php';
+require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php';
+require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php';
 $mainContent = ob_get_clean();
 
-// 10) On affiche via le layout
+// 10) Affichage via le layout
 require BASE_PATH . '/src/layout.php';
 exit;

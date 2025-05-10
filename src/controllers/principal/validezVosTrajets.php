@@ -9,7 +9,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // Chargement PDO
-require_once BASE_PATH . '/config/database.php';
+require_once __DIR__ . '/../../../config/database.php';
 
 $uid = (int) ($_SESSION['user']['utilisateur_id'] ?? 0);
 
