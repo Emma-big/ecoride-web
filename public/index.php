@@ -86,15 +86,6 @@ file_put_contents(__DIR__.'/../logs/route.log',
 );
 
 switch ($uri) {
-    case '/':
-    case '/index':
-    case '/index.php':
-        $barreRecherche= 'views/barreRecherche.php';
-        $mainView      = 'views/accueil.php';
-        $pageTitle     = 'Accueil - EcoRide';
-        $extraStyles   = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
-        break;
-
     case '/login':
         $mainView    = 'forms/login.php';
         $pageTitle   = 'Connexion - EcoRide';
@@ -106,7 +97,33 @@ switch ($uri) {
         ];
         break;
 
-    case '/admin':
+    case '/loginPost':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once BASE_PATH . '/src/controllers/post/loginPost.php';
+        } else {
+            // Si quelqu’un tape manuellement /loginPost en GET
+            header('Location: /login');
+        }
+        exit;    
+
+    case '/employe':
+        // On veut afficher le BigTitle
+        $hideTitle = false;
+        // On indique au layout quelle vue charger
+        $mainView  = 'views/employe.php';
+        require_once BASE_PATH . '/src/layout.php';
+        exit;    
+    
+    case '/':
+    case '/index':
+    case '/index.php':
+        $barreRecherche= 'views/barreRecherche.php';
+        $mainView      = 'views/accueil.php';
+        $pageTitle     = 'Accueil - EcoRide';
+        $extraStyles   = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
+        break;
+
+        case '/admin':
         require_once __DIR__ . '/admin.php';
         exit;
 
@@ -115,14 +132,6 @@ switch ($uri) {
         $pageTitle = 'Modifier un compte - EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
         break;
-
-    case '/employe':
-        // On veut afficher le BigTitle
-        $hideTitle = false;
-        // On indique au layout quelle vue charger
-        $mainView  = 'views/employe.php';
-        require_once BASE_PATH . '/src/layout.php';
-        exit;
 
     case '/registerForm':
         $mainView = 'views/registerForm.php';
@@ -391,16 +400,7 @@ switch ($uri) {
         require_once __DIR__ . '/utilisateur.php';
         exit;
 
-    case '/loginPost':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once BASE_PATH . '/src/controllers/post/loginPost.php';
-        } else {
-            // Si quelqu’un tape manuellement /loginPost en GET
-            header('Location: /login');
-        }
-        exit;
-
-    default:
+       default:
         renderError(404);
 }
 
