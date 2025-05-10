@@ -1,16 +1,16 @@
 <?php
 // src/config.php
 
-// 1) Autoload + Dotenv (pour DB_* en local)
+// 1) Autoload + Dotenv (pour les DB_* en local)
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
     Dotenv\Dotenv::createImmutable(__DIR__ . '/../')->safeLoad();
 }
 
-// 2) Récupération JAWSDB_URL (Heroku)
+// 2) JAWSDB_URL (Heroku)
 $jawsdbUrl = getenv('JAWSDB_URL') ?: null;
 
-// 3) Si JAWSDB_URL présente → on parse
+// 3) Si JAWSDB_URL existe → on parse
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
     $dbHost = $parts['host']   ?? '127.0.0.1';
@@ -19,7 +19,7 @@ if ($jawsdbUrl) {
     $dbUser = $parts['user']   ?? '';
     $dbPass = $parts['pass']   ?? '';
 }
-// 4) Sinon si on a DB_HOST dans l’environnement → on l’utilise
+// 4) Sinon si on a DB_HOST dans l’environnement → fallback sur .env ou vars Heroku
 elseif (getenv('DB_HOST')) {
     $dbHost = getenv('DB_HOST');
     $dbPort = getenv('DB_PORT') ?: 3306;
@@ -27,7 +27,7 @@ elseif (getenv('DB_HOST')) {
     $dbUser = getenv('DB_USER');
     $dbPass = getenv('DB_PASS');
 }
-// 5) Sinon valeurs par défaut (localhost)
+// 5) Enfin, valeurs par défaut (localhost XAMPP)
 else {
     $dbHost = '127.0.0.1';
     $dbPort = 3306;
@@ -36,8 +36,11 @@ else {
     $dbPass = '';
 }
 
-// 6) Création du DSN et connexion PDO
-$dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
+// 6) Connexion PDO (TCP)
+$dsn = sprintf(
+    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+    $dbHost, $dbPort, $dbName
+);
 
 try {
     return new PDO($dsn, $dbUser, $dbPass, [
@@ -45,6 +48,6 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (\PDOException $e) {
-    // On renvoie une exception pour être affichée par le layout
+    // On laisse remonter l’erreur pour que ton layout l’affiche
     throw $e;
 }
