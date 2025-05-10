@@ -1,19 +1,19 @@
 <?php
 // public/utilisateur.php — Front Controller pour la page « Mon espace utilisateur »
 
+// 1) Définir BASE_PATH
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-// 1) Chargement de la config PDO
-/** @var \PDO $pdo */
+// 2) Charger la config PDO
 $pdo = require BASE_PATH . '/src/config.php';
 
-// 2) Démarrage de la session + inactivité
+// 3) Démarrage de la session + inactivité
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-$inactive_duration = 600;
+$inactive_duration = 600; // 10 minutes
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_duration)) {
     session_unset();
     session_destroy();
@@ -22,22 +22,23 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
 }
 $_SESSION['last_activity'] = time();
 
-// 3) Authentification
+// 4) Authentification
 if (empty($_SESSION['user'])) {
     header('Location: /accessDenied');
     exit;
 }
 
+// 5) Récupération des rôles et de l’ID
 $isChauffeur = !empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = !empty($_SESSION['user']['is_passager']);
 $uid         = (int) $_SESSION['user']['utilisateur_id'];
 
-// 4) Variables layout
+// 6) Variables pour le layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 5) Contenu principal
+// 7) Construction du contenu principal
 ob_start();
 ?>
 <main class="container mt-4">
@@ -53,7 +54,7 @@ ob_start();
             <input type="checkbox" name="role_passager" value="1" <?= $isPassager ? 'checked' : '' ?>> Passager
         </label>
         <button type="submit" class="btn btn-secondary btn-sm ms-3">Mettre à jour</button>
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES) ?>">
     </form>
 
     <!-- Mes voitures -->
@@ -87,6 +88,6 @@ ob_start();
 <?php
 $mainContent = ob_get_clean();
 
-// 6) Affichage via le layout
+// 8) Affichage via le layout
 require BASE_PATH . '/src/layout.php';
 exit;
