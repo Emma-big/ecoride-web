@@ -1,38 +1,40 @@
 <?php
 // src/controllers/principal/utilisateur.php
 
-// 1) (plus de session_start)
-
-// 2) Vérifier l’authentification
+// 1) Vérifier l’authentification
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if (empty($_SESSION['user']['utilisateur_id'])) {
     header('Location: /accessDenied');
     exit;
 }
 
-// 3) Ici, $pdo existe déjà (initialisé dans public/index.php)
+// 2) Récupérer l’ID et les rôles depuis la session
 $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
+// 3) Charger les informations utilisateur depuis la base
 try {
-    $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
+    /** @var \PDO $pdo */
+    $stmt = $pdo->prepare('SELECT utilisateur_id, pseudo, email, nom, prenom, is_chauffeur, is_passager, credit, role FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
     $user = $stmt->fetch();
     if (! $user) {
         throw new \Exception("Utilisateur introuvable.");
     }
 } catch (\Throwable $e) {
-    echo '<p>Erreur de connexion à la base de données : '
-       . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p>Erreur de connexion à la base de données : ' . htmlspecialchars($e->getMessage()) . '</p>';
     exit;
 }
 
-// 5) Config du layout
+// 4) Préparer les variables pour la vue
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 6) Contenu
+// 5) Rendu du contenu principal
 ob_start();
 ?>
 <main class="container mt-4">
@@ -43,11 +45,11 @@ ob_start();
     <form action="/updateRolePost" method="POST" class="mb-5">
         <label>
             <input type="checkbox" name="role_chauffeur" value="1"
-                <?= $isChauffeur ? 'checked' : '' ?>> Chauffeur
+                <?= ($isChauffeur) ? 'checked' : '' ?>> Chauffeur
         </label>
         <label class="ms-3">
             <input type="checkbox" name="role_passager" value="1"
-                <?= $isPassager ? 'checked' : '' ?>> Passager
+                <?= ($isPassager) ? 'checked' : '' ?>> Passager
         </label>
         <button type="submit" class="btn btn-secondary btn-sm ms-3">
             Mettre à jour
@@ -95,6 +97,6 @@ ob_start();
 <?php
 $mainContent = ob_get_clean();
 
-// 7) On affiche via le layout
+// 6) Affichage via le layout global
 require BASE_PATH . '/src/layout.php';
 exit;
