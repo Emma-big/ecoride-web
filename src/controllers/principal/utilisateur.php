@@ -1,17 +1,7 @@
 <?php
 // src/controllers/principal/utilisateur.php
 
-// 1) Démarrer la session + inactivité
-session_start();
-if (isset($_SESSION['last_activity'])
-    && time() - $_SESSION['last_activity'] > 600
-) {
-    session_unset();
-    session_destroy();
-    header('Location: /inactivite');
-    exit;
-}
-$_SESSION['last_activity'] = time();
+// 1) La session est déjà démarrée dans public/index.php
 
 // 2) Vérifier l’authentification
 if (empty($_SESSION['user']['utilisateur_id'])) {
@@ -22,7 +12,7 @@ $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 3) Charger les infos de l’utilisateur
+// 3) Charger les infos de l’utilisateur via le $pdo fourni
 try {
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
