@@ -10,9 +10,6 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 // 2) JAWSDB_URL (Heroku)
 $jawsdbUrl = getenv('JAWSDB_URL') ?: null;
 
-// DEBUG – vérifier que la variable est lue
-error_log('DEBUG JAWSDB_URL='.getenv('JAWSDB_URL'));
-
 // 3) Si JAWSDB_URL existe → on parse
 if ($jawsdbUrl) {
     $parts  = parse_url($jawsdbUrl);
