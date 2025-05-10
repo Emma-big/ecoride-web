@@ -118,8 +118,7 @@ switch ($uri) {
 
     case '/employe':
         $hideTitle = true;
-        // Dit au layout quelle vue afficher
-        $mainView  = 'views/employe.php';
+        $mainView  = '/src/controllers/principal/employe.php';
         require_once BASE_PATH . '/src/layout.php';
         exit;
 
