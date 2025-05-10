@@ -91,6 +91,7 @@ if (strpos($_SERVER['REQUEST_URI'], '/noteForm') === 0
 }
 
 // === Contenu principal ===
+echo '<main class="flex-fill">';
 if (!empty($mainContent)) {
     echo $mainContent;
 } elseif (!empty($mainView)) {
