@@ -39,12 +39,14 @@ else {
     $dbPass = '';
 }
 
-// ...
-// 6) Connexion PDO (TCP uniquement)
 $dsn = sprintf(
     'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
     $dbHost, $dbPort, $dbName
 );
+
+// === DÉBUG ===
+error_log('DEBUG PDO DSN='.$dsn);
+error_log('DEBUG PDO USER='.$dbUser);
 
 try {
     return new PDO($dsn, $dbUser, $dbPass, [
