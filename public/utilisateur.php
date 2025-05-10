@@ -1,15 +1,12 @@
 <?php
-// public/utilisateur.php — Front Controller pour la page « Mon espace utilisateur »
+// public/utilisateur.php — Front Controller pour « Mon espace utilisateur »
 
-// 1) Définir la racine du projet et démarrer la session + inactivité
+// 1) Démarrage de la session + inactivité
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-if (! defined('BASE_PATH')) {
-    define('BASE_PATH', dirname(__DIR__));
-}
 $inactive_duration = 600;
-if (isset($_SESSION['last_activity']) && time() - $_SESSION['last_activity'] > $inactive_duration) {
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_duration)) {
     session_unset();
     session_destroy();
     header('Location: /inactivite');
@@ -23,22 +20,25 @@ if (empty($_SESSION['user'])) {
     exit;
 }
 
-// 3) Masquer le bigTitle global
+// 3) Définir BASE_PATH et masquer le bigTitle global
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', dirname(__DIR__));
+}
 $hideTitle = true;
 
-// 4) Rôles
+// 4) Rôles et ID courant
 $isChauffeur = !empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = !empty($_SESSION['user']['is_passager']);
 $uid         = (int) $_SESSION['user']['utilisateur_id'];
 
-// 5) Variables layout
+// 5) Variables pour le layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = [
     '/assets/style/styleIndex.css',
-    '/assets/style/styleAdmin.css',
+    '/assets/style/styleAdmin.css'
 ];
 
-// === Contenu principal ===
+// 6) Capturer le contenu principal
 ob_start();
 ?>
 <main class="container mt-4">
@@ -90,6 +90,6 @@ ob_start();
 <?php
 $mainContent = ob_get_clean();
 
-// 6) Appel du layout
+// 7) Rendu via le layout
 require BASE_PATH . '/src/layout.php';
 exit;
