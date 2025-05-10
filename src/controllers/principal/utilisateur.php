@@ -8,12 +8,17 @@ if (empty($_SESSION['user']['utilisateur_id'])) {
     header('Location: /accessDenied');
     exit;
 }
+
+// 3) On récupère le PDO créé par public/index.php
+/** @var \PDO $pdo */
+global $pdo;
+
 $uid         = (int) $_SESSION['user']['utilisateur_id'];
 $isChauffeur = ! empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = ! empty($_SESSION['user']['is_passager']);
 
-// 3) Charger les infos de l’utilisateur via le $pdo fourni
 try {
+    // 4) Charger les infos de l’utilisateur via $pdo
     $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
     $stmt->execute([':id' => $uid]);
     $user = $stmt->fetch();
@@ -21,17 +26,17 @@ try {
         throw new \Exception("Utilisateur introuvable.");
     }
 } catch (\Throwable $e) {
-    echo 'Erreur de connexion à la base de données : '
-       . htmlspecialchars($e->getMessage());
+    echo '<p>Erreur de connexion à la base de données : '
+       . htmlspecialchars($e->getMessage()) . '</p>';
     exit;
 }
 
-// 4) Config du layout
+// 5) Config du layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
-$extraStyles = ['/assets/style/styleIndex.css','/assets/style/styleAdmin.css'];
+$extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleAdmin.css'];
 $withTitle   = false;
 
-// 5) Contenu
+// 6) Contenu
 ob_start();
 ?>
 <main class="container mt-4">
@@ -94,6 +99,6 @@ ob_start();
 <?php
 $mainContent = ob_get_clean();
 
-// 6) On affiche via le layout
+// 7) On affiche via le layout
 require BASE_PATH . '/src/layout.php';
 exit;
