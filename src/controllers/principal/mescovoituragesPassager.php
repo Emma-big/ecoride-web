@@ -1,15 +1,7 @@
 <?php
 // src/controllers/principal/mescovoituragesPassager.php
 
-use Adminlocal\EcoRide\Helpers\MongoHelper;
-
-// Protection
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-// Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+// Note : la session et $pdo sont déjà initialisés dans public/index.php
 
 $uid = (int) ($_SESSION['user']['utilisateur_id'] ?? 0);
 
@@ -25,7 +17,7 @@ $cntPs = $pdo->prepare(
        JOIN covoiturage c ON c.covoiturage_id = r.covoiturage_id
       WHERE r.utilisateur_id = :uid'
 );
-$cntPs->execute(['uid' => $uid]);
+$cntPs->execute([':uid' => $uid]);
 $totalPs = (int)$cntPs->fetchColumn();
 $pagesPs = (int)ceil($totalPs / $limitPs);
 
