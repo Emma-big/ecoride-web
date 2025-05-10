@@ -1,7 +1,12 @@
 <?php
 // src/views/employe.php
 
-// On suppose que layout.php a déjà fait session_start() et défini $hideTitle
+// 1) Démarrer la session tout de suite
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+// 2) Lire l’utilisateur en session
 $user = $_SESSION['user'] ?? [];
 
 // Récupérer le libellé du rôle
