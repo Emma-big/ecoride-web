@@ -138,33 +138,11 @@ if ($departRaw && $arriveeRaw && $dateRaw) {
 // 4) Capture du contenu principal
 ob_start();
 ?>
-<div class="container my-3">
-    <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
-    <form id="searchForm" action="/covoiturage" method="get" class="row g-3 justify-content-center mb-5" novalidate>
-        <div class="col-md-4">
-            <label for="depart" class="form-label">Adresse de départ</label>
-            <input type="text" id="depart" name="depart" class="form-control" required maxlength="150" pattern=".{5,150}" value="<?= htmlspecialchars($departRaw, ENT_QUOTES) ?>">
-            <div class="invalid-feedback">Adresse invalide (5–150 caractères).</div>
-        </div>
-        <div class="col-md-4">
-            <label for="arrivee" class="form-label">Adresse d'arrivée</label>
-            <input type="text" id="arrivee" name="arrivee" class="form-control" required maxlength="150" pattern=".{5,150}" value="<?= htmlspecialchars($arriveeRaw, ENT_QUOTES) ?>">
-            <div class="invalid-feedback">Adresse invalide (5–150 caractères).</div>
-        </div>
-        <div class="col-md-3">
-            <label for="date" class="form-label">Date de départ</label>
-            <input type="date" id="date" name="date" class="form-control" required value="<?= htmlspecialchars($dateRaw, ENT_QUOTES) ?>">
-            <div class="invalid-feedback">Date requise.</div>
-        </div>
-        <div class="col-12 text-center">
-            <button class="btn btn-primary">Rechercher</button>
-        </div>
-    </form>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
-</div>
+<div class="container my-3">  
 <section class="my-5">
-    <!-- Barre de recherche déjà affichée ci-dessus -->
-
+   <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
+   <?php require BASE_PATH . '/src/views/barreRecherche.php'; ?>
+    
     <?php if ($departRaw && $arriveeRaw && $dateRaw): ?>
         <!-- Affinage des résultats -->
         <div class="mb-4">
