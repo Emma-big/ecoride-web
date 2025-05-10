@@ -1,10 +1,16 @@
 <?php
 namespace Adminlocal\EcoRide\Forms;
 
-// Charger l'autoloader Composer et les variables d'environnement
+// Charger l'autoloader Composer
 require_once BASE_PATH . '/vendor/autoload.php';
-$dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
-$dotenv->load();
+
+// En local, charger .env s'il existe
+if (file_exists(BASE_PATH . '/.env')) {
+    $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
+    $dotenv->load();
+} else {
+    error_log('No .env file found, skipping Dotenv load');
+}
 
 // 1) Démarrage de la session si nécessaire
 if (session_status() !== PHP_SESSION_ACTIVE) {
