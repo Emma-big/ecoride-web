@@ -43,7 +43,6 @@ $rides = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // 5) Affichage
 ?>
-<h2 class="mt-4">Mes covoiturages (Chauffeur)</h2>
 
 <?php if (empty($rides)): ?>
     <p class="text-center text-muted">Vous n’avez pas encore créé de covoiturage.</p>
