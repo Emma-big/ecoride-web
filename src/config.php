@@ -39,9 +39,10 @@ else {
     $dbPass = '';
 }
 
-// 6) Connexion PDO (force TCP en désactivant unix_socket)
+// ...
+// 6) Connexion PDO (TCP uniquement)
 $dsn = sprintf(
-    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4;unix_socket=',
+    'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
     $dbHost, $dbPort, $dbName
 );
 
@@ -51,6 +52,5 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (\PDOException $e) {
-    // On laisse remonter l’erreur pour que ton layout l’affiche
     throw $e;
 }
