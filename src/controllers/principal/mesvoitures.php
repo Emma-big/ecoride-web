@@ -20,8 +20,6 @@ $stmt->execute([':uid' => $uid]);
 $mesVoitures = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 ?>
 
-<h2>Mes voitures</h2>
-
 <?php if (empty($mesVoitures)): ?>
   <p class="text-center text-muted">Aucune voiture trouvée.</p>
 <?php else: ?>

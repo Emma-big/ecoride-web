@@ -1,0 +1,160 @@
+[1mdiff --git a/public/utilisateur.php b/public/utilisateur.php[m
+[1mindex aff13c5..30439bb 100644[m
+[1m--- a/public/utilisateur.php[m
+[1m+++ b/public/utilisateur.php[m
+[36m@@ -1,12 +1,12 @@[m
+ <?php[m
+ // public/utilisateur.php — Front Controller pour la page « Mon espace utilisateur »[m
+ [m
+[31m-// 1) Définir BASE_PATH[m
+[32m+[m[32m// 1) Définir la racine du projet[m[41m[m
+ if (! defined('BASE_PATH')) {[m
+     define('BASE_PATH', dirname(__DIR__));[m
+ }[m
+ [m
+[31m-// 2) Lancer la session (nécessaire avant tout appel à $_SESSION)[m
+[32m+[m[32m// 2) Démarrer la session (nécessaire pour $_SESSION et CSRF)[m[41m[m
+ if (session_status() !== PHP_SESSION_ACTIVE) {[m
+     session_start();[m
+ }[m
+[36m@@ -17,14 +17,13 @@[m [mtry {[m
+     $pdo = require BASE_PATH . '/src/config.php';[m
+ } catch (\Throwable $e) {[m
+     echo '<h1>Erreur de connexion à la base de données</h1>';[m
+[31m-    echo '<pre>'. htmlspecialchars($e->getMessage()) .'</pre>';[m
+[32m+[m[32m    echo '<pre>' . htmlspecialchars($e->getMessage()) . '</pre>';[m[41m[m
+     exit;[m
+ }[m
+ [m
+ // 4) Inactivité[m
+ $inactive_duration = 600;[m
+[31m-if ([m
+[31m-    isset($_SESSION['last_activity'])[m
+[32m+[m[32mif (isset($_SESSION['last_activity'])[m[41m[m
+     && (time() - $_SESSION['last_activity'] > $inactive_duration)[m
+ ) {[m
+     session_unset();[m
+[36m@@ -40,7 +39,7 @@[m [mif (empty($_SESSION['user'])) {[m
+     exit;[m
+ }[m
+ [m
+[31m-// 6) Rôles et ID[m
+[32m+[m[32m// 6) Récupérer le rôle et l’ID[m[41m[m
+ $isChauffeur = !empty($_SESSION['user']['is_chauffeur']);[m
+ $isPassager  = !empty($_SESSION['user']['is_passager']);[m
+ $uid         = (int) $_SESSION['user']['utilisateur_id'];[m
+[36m@@ -49,64 +48,69 @@[m [m$uid         = (int) $_SESSION['user']['utilisateur_id'];[m
+ $pageTitle   = 'Mon espace utilisateur - EcoRide';[m
+ $extraStyles = [[m
+     '/assets/style/styleIndex.css',[m
+[31m-    '/assets/style/styleAdmin.css'[m
+[32m+[m[32m    '/assets/style/styleAdmin.css',[m[41m[m
+ ];[m
+[31m-// on masque le bigTitle global[m
+[32m+[m[32m// on masque le big-title global (car on l’injecte manuellement ci-dessous)[m[41m[m
+ $hideTitle   = true;[m
+ [m
+[31m-// 8) Contenu principal[m
+[31m-ob_start(); [m
+[32m+[m[32m// 8) Capturer le contenu principal[m[41m[m
+[32m+[m[32mob_start();[m[41m[m
+ ?>[m
+ <main class="container mt-4">[m
+[31m-    <?php require BASE_PATH . '/src/views/bigTitle.php'; ?>[m
+[32m+[m[32m  <!-- Big Title (manuellement) -->[m[41m[m
+[32m+[m[32m  <?php require BASE_PATH . '/src/views/bigTitle.php'; ?>[m[41m[m
+ [m
+[31m-    <?php require BASE_PATH . '/src/controllers/principal/mesinfos.php'; ?>[m
+[32m+[m[32m  <!-- Mes Informations -->[m[41m[m
+[32m+[m[32m  <?php require BASE_PATH . '/src/controllers/principal/mesinfos.php'; ?>[m[41m[m
+ [m
+[31m-    <!-- Choix de rôle -->[m
+[31m-    <form action="/updateRolePost" method="POST" class="mb-5">[m
+[31m-        <label class="me-3">[m
+[31m-            <input type="checkbox" name="role_chauffeur" value="1"[m
+[31m-                <?= $isChauffeur ? 'checked' : '' ?>>[m
+[31m-            Chauffeur[m
+[31m-        </label>[m
+[31m-        <label class="me-3">[m
+[31m-            <input type="checkbox" name="role_passager"  value="1"[m
+[31m-                <?= $isPassager  ? 'checked' : '' ?>>[m
+[31m-            Passager[m
+[31m-        </label>[m
+[31m-        <button type="submit" class="btn btn-secondary btn-sm">Mettre à jour</button>[m
+[31m-        <input type="hidden" name="csrf_token"[m
+[31m-               value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES) ?>">[m
+[31m-    </form>[m
+[32m+[m[32m  <!-- Choix de rôle -->[m[41m[m
+[32m+[m[32m  <form action="/updateRolePost" method="POST" class="mb-5">[m[41m[m
+[32m+[m[32m    <label class="me-3">[m[41m[m
+[32m+[m[32m      <input type="checkbox" name="role_chauffeur" value="1"[m[41m[m
+[32m+[m[32m        <?= $isChauffeur ? 'checked' : '' ?>>[m[41m[m
+[32m+[m[32m      Chauffeur[m[41m[m
+[32m+[m[32m    </label>[m[41m[m
+[32m+[m[32m    <label class="me-3">[m[41m[m
+[32m+[m[32m      <input type="checkbox" name="role_passager" value="1"[m[41m[m
+[32m+[m[32m        <?= $isPassager ? 'checked' : '' ?>>[m[41m[m
+[32m+[m[32m      Passager[m[41m[m
+[32m+[m[32m    </label>[m[41m[m
+[32m+[m[32m    <button type="submit" class="btn btn-secondary btn-sm">Mettre à jour</button>[m[41m[m
+[32m+[m[32m    <input type="hidden" name="csrf_token"[m[41m[m
+[32m+[m[32m      value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES) ?>">[m[41m[m
+[32m+[m[32m  </form>[m[41m[m
+ [m
+[31m-    <h2>Mes voitures</h2>[m
+[31m-    <?php if ($isChauffeur): ?>[m
+[31m-        <?php require BASE_PATH . '/src/controllers/principal/mesvoitures.php'; ?>[m
+[31m-    <?php else: ?>[m
+[31m-        <p class="text-muted">Vous devez être chauffeur pour gérer vos voitures.</p>[m
+[31m-    <?php endif; ?>[m
+[32m+[m[32m  <!-- Mes voitures -->[m[41m[m
+[32m+[m[32m  <h2>Mes voitures</h2>[m[41m[m
+[32m+[m[32m  <?php if ($isChauffeur): ?>[m[41m[m
+[32m+[m[32m    <?php require BASE_PATH . '/src/controllers/principal/mesvoitures.php'; ?>[m[41m[m
+[32m+[m[32m  <?php else: ?>[m[41m[m
+[32m+[m[32m    <p class="text-muted">Vous devez être chauffeur pour créer et voir vos voitures.</p>[m[41m[m
+[32m+[m[32m  <?php endif; ?>[m[41m[m
+ [m
+[31m-    <h2>Mes covoiturages (Chauffeur)</h2>[m
+[31m-    <?php if ($isChauffeur): ?>[m
+[31m-        <div class="text-center my-4">[m
+[31m-            <a href="/covoiturageForm" class="btn btn-primary">Créer un covoiturage</a>[m
+[31m-        </div>[m
+[31m-        <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>[m
+[31m-    <?php else: ?>[m
+[31m-        <p class="text-muted">Vous devez être chauffeur pour gérer vos trajets.</p>[m
+[31m-    <?php endif; ?>[m
+[32m+[m[32m  <!-- Mes covoiturages (Chauffeur) -->[m[41m[m
+[32m+[m[32m  <h2>Mes covoiturages (Chauffeur)</h2>[m[41m[m
+[32m+[m[32m  <?php if ($isChauffeur): ?>[m[41m[m
+[32m+[m[32m    <div class="text-center my-4">[m[41m[m
+[32m+[m[32m      <a href="/covoiturageForm" class="btn btn-primary">Créer un covoiturage</a>[m[41m[m
+[32m+[m[32m    </div>[m[41m[m
+[32m+[m[32m    <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesChauffeur.php'; ?>[m[41m[m
+[32m+[m[32m  <?php else: ?>[m[41m[m
+[32m+[m[32m    <p class="text-muted">Vous devez être chauffeur pour gérer vos trajets.</p>[m[41m[m
+[32m+[m[32m  <?php endif; ?>[m[41m[m
+ [m
+[31m-    <h2>Mes covoiturages (Passager)</h2>[m
+[31m-    <?php if ($isPassager): ?>[m
+[31m-        <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php'; ?>[m
+[31m-        <?php require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php'; ?>[m
+[31m-    <?php else: ?>[m
+[31m-        <p class="text-muted">Vous devez être passager pour voir vos réservations.</p>[m
+[31m-    <?php endif; ?>[m
+[32m+[m[32m  <!-- Mes covoiturages (Passager) -->[m[41m[m
+[32m+[m[32m  <h2>Mes covoiturages (Passager)</h2>[m[41m[m
+[32m+[m[32m  <?php if ($isPassager): ?>[m[41m[m
+[32m+[m[32m    <?php require BASE_PATH . '/src/controllers/principal/mescovoituragesPassager.php'; ?>[m[41m[m
+[32m+[m[32m    <?php require BASE_PATH . '/src/controllers/principal/validezVosTrajets.php'; ?>[m[41m[m
+[32m+[m[32m  <?php else: ?>[m[41m[m
+[32m+[m[32m    <p class="text-muted">Vous devez être passager pour voir vos réservations.</p>[m[41m[m
+[32m+[m[32m  <?php endif; ?>[m[41m[m
+ </main>[m
+ <?php[m
+ $mainContent = ob_get_clean();[m
+ [m
+[31m-// 9) Affichage via le layout[m
+[32m+[m[32m// 9) Affichage via le layout global[m[41m[m
+ require BASE_PATH . '/src/layout.php';[m
+ exit;[m
