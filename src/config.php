@@ -1,60 +1,56 @@
 <?php
 // src/config.php
 
-// 1) Démarrage de la session si nécessaire
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// 1) Autoload + Dotenv (pour les DB_* en local)
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+    Dotenv\Dotenv::createImmutable(__DIR__ . '/../')->safeLoad();
 }
 
-// 2) Configuration DB locale ou via JAWSDB_URL (Heroku)
-$jawsdbUrl = getenv('JAWSDB_URL');
+// 2) JAWSDB_URL (Heroku)
+$jawsdbUrl = getenv('JAWSDB_URL') ?: null;
+
+// DEBUG – vérifier que la variable est lue
+error_log('DEBUG JAWSDB_URL='.getenv('JAWSDB_URL'));
+
+// 3) Si JAWSDB_URL existe → on parse
 if ($jawsdbUrl) {
-    $dbparts = parse_url($jawsdbUrl);
-    $_ENV['DB_HOST'] = $dbparts['host']   ?? '';
-    $_ENV['DB_NAME'] = ltrim($dbparts['path'] ?? '', '/');
-    $_ENV['DB_USER'] = $dbparts['user']   ?? '';
-    $_ENV['DB_PASS'] = $dbparts['pass']   ?? '';
-    $_ENV['DB_PORT'] = $dbparts['port']   ?? 3306;
-} else {
-    $_ENV['DB_HOST'] = 'localhost';
-    $_ENV['DB_NAME'] = 'ecoride';
-    $_ENV['DB_USER'] = 'root';
-    $_ENV['DB_PASS'] = '';
-    $_ENV['DB_PORT'] = 3306;
+    $parts  = parse_url($jawsdbUrl);
+    $dbHost = $parts['host']   ?? '127.0.0.1';
+    $dbPort = $parts['port']   ?? 3306;
+    $dbName = ltrim($parts['path'] ?? '', '/');
+    $dbUser = $parts['user']   ?? '';
+    $dbPass = $parts['pass']   ?? '';
+}
+// 4) Sinon si on a DB_HOST dans l’environnement → fallback sur .env ou vars Heroku
+elseif (getenv('DB_HOST')) {
+    $dbHost = getenv('DB_HOST');
+    $dbPort = getenv('DB_PORT') ?: 3306;
+    $dbName = getenv('DB_NAME');
+    $dbUser = getenv('DB_USER');
+    $dbPass = getenv('DB_PASS');
+}
+// 5) Enfin, valeurs par défaut (localhost XAMPP)
+else {
+    $dbHost = '127.0.0.1';
+    $dbPort = 3306;
+    $dbName = 'ecoride';
+    $dbUser = 'root';
+    $dbPass = '';
 }
 
-// 3) Charger l’autoloader Composer (PDO, MongoDB, etc.)
-if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
-    require_once BASE_PATH . '/vendor/autoload.php';
-}
-
-// 4) Connexion MySQL via PDO
+// 6) Connexion PDO (TCP)
 $dsn = sprintf(
     'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-    $_ENV['DB_HOST'],
-    $_ENV['DB_PORT'],
-    $_ENV['DB_NAME']
+    $dbHost, $dbPort, $dbName
 );
+
 try {
-    $pdo = new PDO($dsn, $_ENV['DB_USER'], $_ENV['DB_PASS'], [
+    return new PDO($dsn, $dbUser, $dbPass, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (\PDOException $e) {
-    // Votre handler global attrapera l’exception et renverra la 500
+    // On laisse remonter l’erreur pour que ton layout l’affiche
     throw $e;
 }
-
-// 5) Connexion MongoDB
-$mongoUri    = getenv('MONGODB_URI')       ?: 'mongodb://localhost:27017';
-$mongoDBName = getenv('MONGODB_DB_NAME')   ?: 'avisDB';
-try {
-    $mongoClient = new MongoDB\Client($mongoUri);
-    $mongoDB     = $mongoClient->selectDatabase($mongoDBName);
-} catch (\Exception $e) {
-    // Transformer ça en exception non cachée pour renvoyer la 500
-    throw $e;
-}
-
-// 6) Retourner l’objet PDO
-return $pdo;

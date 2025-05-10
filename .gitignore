@@ -1,33 +1,27 @@
 # Ignore environment file
-
 .env
 
 # Composer dependencies/vendor/
 
 # PHPUnit coverage reports
-
 /coverage.xml
 /coverage/
 
 # Logs
-
 /logs/
 
 # IDE and OS files
-
 .idea/
 .vscode/
-.DS\_Store
+.DS_Store
 Thumbs.db
+#*.log
 
 # Node modules
-
-/node\_modules/
+/node_modules/
 
 # Build artifacts
-
 /dist/
 
 # Optional: Xdebug cache
-
 /.phpunit.result.cache
