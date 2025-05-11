@@ -131,7 +131,7 @@ switch ($uri) {
 
     case '/admin':
         $hideTitle = true;
-        $mainView  = 'controllers/principal/adminDashboard.php';
+        $mainView  = 'views/adminDashboard.php';
         require_once BASE_PATH . '/src/layout.php';
         exit;
 
