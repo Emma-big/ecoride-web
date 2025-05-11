@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Inclusion du formulaire de sélection de compte (dans src/forms)
-$path = __DIR__ . '/../src/forms/selectCompteForm.php';
+$path = __DIR__ . '/../src/forms/modifCompteForm.php';
 if (!file_exists($path)) {
     header('Content-Type: text/plain; charset=utf-8');
     echo "ERREUR : formulaire introuvable ici :\n" . $path;

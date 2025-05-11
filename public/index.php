@@ -135,13 +135,7 @@ switch ($uri) {
         require_once BASE_PATH . '/src/layout.php';
         exit;
 
-    case '/modifCompteForm':
-        $mainView = 'forms/modifCompteForm.php';
-        $pageTitle = 'Modifier un compte - EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css'];
-        break;
-
-    case '/registerForm':
+       case '/registerForm':
         $mainView = 'views/registerForm.php';
         $pageTitle = 'Créer un compte - EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
@@ -395,7 +389,7 @@ switch ($uri) {
         }
         break;
 
-            case '/deleteVoiture':
+    case '/deleteVoiture':
         // Seule la méthode POST est autorisée
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             renderError(405);
@@ -407,6 +401,24 @@ switch ($uri) {
     case '/utilisateur':
         require_once __DIR__ . '/utilisateur.php';
         exit;
+
+      // Afficher le formulaire de modification de rôle (GET)
+    case '/modifCompteForm':
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            header('Location: /admin');
+            exit;
+        }
+        require BASE_PATH . '/public/selectCompteForm.php';
+        exit;
+
+    // Traiter la mise à jour de rôle (POST)
+    case '/modifCompteAction':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin');
+            exit;
+        }
+        require BASE_PATH . '/public/modifCompteAction.php';
+        exit;    
 
        default:
         renderError(404);
