@@ -7,38 +7,40 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// 2) Récupérer l'utilisateur
-$user = $_SESSION['user'] ?? [];
+// 1) Charger la connexion PDO
+$pdo = require_once __DIR__ . '/../../src/config.php';
 
-// 1) Récupération et validation du sexe depuis la BDD
-$sexeRaw = trim($user['choix'] ?? 'Homme');
-$sexeNorm = mb_strtolower($sexeRaw, 'UTF-8') === 'femme' ? 'Femme' : 'Homme';
+// 2) Récupérer l’utilisateur à jour depuis la BDD
+if (empty($_SESSION['user']['id'])) {
+    header('Location: /login.php');
+    exit;
+}
+$stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE id = :id');
+$stmt->execute(['id' => $_SESSION['user']['id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// 2) Détection d’un indicateur binaire pour le genre
+// 3) Normaliser le sexe selon la colonne `choix` (valeurs “Homme”/“Femme”)
+$sexeRaw  = trim($user['choix'] ?? 'Homme');
+$sexeNorm = (mb_strtolower($sexeRaw, 'UTF-8') === 'femme') ? 'Femme' : 'Homme';
 $isFemale = ($sexeNorm === 'Femme');
 
-// 3) Choix de l’avatar par défaut selon le rôle et le genre
+// 4) Sélection de l’avatar par rôle et genre
 switch ((int)($user['role'] ?? 0)) {
-    case 1: // Administrateur
+    case 1:
         $defaultAvatar = 'admin.png';
         break;
-
-    case 2: // Employé
-        $defaultAvatar = $isFemale
-            ? 'employeF.png'
-            : 'employe.png';
+    case 2:
+        $defaultAvatar = $isFemale ? 'employeF.png' : 'employe.png';
         break;
-
-    default: // Passager ou autre
-        $defaultAvatar = $isFemale
-            ? 'femme.png'
-            : 'homme.png';
+    default:
+        $defaultAvatar = $isFemale ? 'femme.png' : 'homme.png';
         break;
 }
 
-// 5) Utiliser la colonne photo si renseignée, sinon l'avatar par défaut
+// 5) URL de l’image : si l’utilisateur a uploadé une photo, on l’utilise ; sinon l’avatar par défaut
 $src = '/assets/images/' . (!empty($user['photo']) ? $user['photo'] : $defaultAvatar);
 ?>
+
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6">
@@ -48,12 +50,12 @@ $src = '/assets/images/' . (!empty($user['photo']) ? $user['photo'] : $defaultAv
         </div>
         <div class="card-body text-center p-4">
           <img src="<?= htmlspecialchars($src, ENT_QUOTES) ?>"
-               alt="Photo de <?= htmlspecialchars($user['pseudo'], ENT_QUOTES) ?>"
+               alt="Photo de <?= htmlspecialchars($user['pseudo'] ?? '', ENT_QUOTES) ?>"
                class="img-fluid rounded-circle mb-3 profile-img">
 
-          <h5 class="mb-3"><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom'], ENT_QUOTES) ?></h5>
-          <p class="mb-2"><strong>Pseudo :</strong> <?= htmlspecialchars($user['pseudo'], ENT_QUOTES) ?></p>
-          <p class="mb-2"><strong>Email :</strong> <?= htmlspecialchars($user['email'], ENT_QUOTES) ?></p>
+          <h5 class="mb-3"><?= htmlspecialchars(($user['prenom'] ?? '') . ' ' . ($user['nom'] ?? ''), ENT_QUOTES) ?></h5>
+          <p class="mb-2"><strong>Pseudo :</strong> <?= htmlspecialchars($user['pseudo'] ?? '', ENT_QUOTES) ?></p>
+          <p class="mb-2"><strong>Email :</strong> <?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES) ?></p>
           <?php if (!empty($user['telephone'])): ?>
             <p class="mb-2"><strong>Téléphone :</strong> <?= htmlspecialchars($user['telephone'], ENT_QUOTES) ?></p>
           <?php endif; ?>
@@ -63,7 +65,7 @@ $src = '/assets/images/' . (!empty($user['photo']) ? $user['photo'] : $defaultAv
               <?= date('d-m-Y', strtotime($user['date_naissance'])) ?>
             </p>
           <?php endif; ?>
-          <p class="mb-0"><strong>Crédits :</strong> <?= number_format($user['credit'], 2) ?> crédits</p>
+          <p class="mb-0"><strong>Crédits :</strong> <?= number_format($user['credit'] ?? 0, 2) ?> crédits</p>
           <p class="mt-3 text-muted small">
             * Pour toute modification de vos données personnelles, merci de contacter : 
             <a href="mailto:contact@ecoride.com" class="text-black">contact@ecoride.com</a>
