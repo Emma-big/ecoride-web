@@ -1,3 +1,11 @@
+<?php
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+// === DEBUG SESSION ===
+// Envoie dans les logs Heroku le contenu de la session à chaque requête
+error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
+?>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -37,9 +37,9 @@ $src = '/assets/images/' . (!empty($user['avatar']) ? $user['avatar'] : $default
             </p>
           <?php endif; ?>
           <p class="mb-0"><strong>Crédits :</strong> <?= number_format($user['credit'], 2) ?> crédits</p>
-          <p class="mt-3 text-muted small" class="text-black">
+          <p class="mt-3 text-muted small">
             * Pour toute modification de vos données personnelles, merci de contacter : 
-            <a href="mailto:contact@ecoride.com">contact@ecoride.com</a>
+            <a href="mailto:contact@ecoride.com" class="text-black">contact@ecoride.com</a>
           </p>
         </div>
       </div>
