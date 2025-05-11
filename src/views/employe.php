@@ -15,7 +15,7 @@ try {
     $roleLabel = 'inconnu';
 }
 ?>
-<main class="container my-4">
+<div class="container my-4">
   <h1 class="text-center mb-4">Mon espace Employé</h1>
   <div class="text-center mb-5">
     <p>Connexion réussie&nbsp;!</p>
@@ -34,4 +34,4 @@ try {
       <a href="/reclamations-problemes" class="btn btn-outline-danger w-100">Trajets problématiques</a>
     </div>
   </div>
-</main>
+</div>
