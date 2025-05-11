@@ -47,7 +47,7 @@ unset($_SESSION['form_errors'], $_SESSION['old']);
       </div>
     <?php endif; ?>
 
-    <form class="formLogin mx-auto" action="/registerPost" method="POST" novalidate>
+    <form class="formLogin mx-auto" action="/registerPost" method="POST" novalidate autocomplete="off">
         <?php
           $pseudo    = htmlspecialchars($old['pseudo']    ?? '', ENT_QUOTES);
           $email     = htmlspecialchars($old['email']     ?? '', ENT_QUOTES);
@@ -70,7 +70,7 @@ unset($_SESSION['form_errors'], $_SESSION['old']);
 
        <div class="mb-3">
             <label for="email" class="form-label">Adresse email :</label>
-            <input type="email" id="email" name="email"
+            <input type="email" id="email" name="email" autocomplete="off"
                    class="form-control<?= isset($errors['email']) ? ' is-invalid' : '' ?>"
                    value="<?= $email ?>" required>
             <?php if(isset($errors['email'])): ?>
@@ -80,7 +80,7 @@ unset($_SESSION['form_errors'], $_SESSION['old']);
 
         <div class="mb-3">
             <label for="password" class="form-label">Mot de passe :</label>
-            <input type="password" id="password" name="password"
+            <input type="password" id="password" name="password" autocomplete="new-password"
                    class="form-control<?= isset($errors['password']) ? ' is-invalid' : '' ?>"
                    required>
             <?php if(isset($errors['password'])): ?>
