@@ -4,13 +4,11 @@
 // 1) Pas de sortie avant les headers
 header('Content-Type: application/json');
 
-// 2) Session si besoin (ce endpoint ne nécessite pas d'authentification)
+// 2) Charger la configuration PDO (src/config.php) et démarrage session si besoin
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
-// 3) Charger la connexion PDO (database.php est à la racine config)
-require_once __DIR__ . '/../config/database.php';
+$pdo = require_once __DIR__ . '/../src/config.php';
 
 try {
     $stmt = $pdo->prepare(
@@ -27,6 +25,6 @@ try {
     exit;
 }
 
-// 4) Retour JSON
+// 3) Retour JSON
 echo json_encode(['total' => $total]);
 exit;

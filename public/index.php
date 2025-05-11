@@ -418,7 +418,12 @@ switch ($uri) {
             exit;
         }
         require BASE_PATH . '/src/forms/modifCompteAction.php';
-        exit;    
+        exit;  
+        
+    case '/compteur_api.php':
+        // on veut bien exécuter le fichier brut, sans passer par le layout
+        require BASE_PATH . '/public/compteur_api.php';
+        exit;
 
        default:
         renderError(404);
