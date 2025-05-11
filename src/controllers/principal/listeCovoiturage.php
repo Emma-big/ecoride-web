@@ -1,8 +1,6 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
- 
-
 // 1) Charger la config PDO
 $pdo = require BASE_PATH . '/src/config.php';
 
