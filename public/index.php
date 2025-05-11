@@ -122,8 +122,10 @@ switch ($uri) {
         $extraStyles   = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
         break;
 
-        case '/admin':
-        require_once __DIR__ . '/admin.php';
+    case '/admin':
+        $hideTitle = true;
+        $mainView  = 'controllers/principal/adminDashBoard.php';
+        require_once BASE_PATH . '/src/layout.php';
         exit;
 
     case '/modifCompteForm':

@@ -18,12 +18,9 @@ try {
 <div class="container my-4">
   <h1 class="text-center mb-4">Mon espace Employé</h1>
   <div class="text-center mb-5">
-    <p>Connexion réussie&nbsp;!</p>
-    <p>Bienvenue&nbsp;<strong><?= htmlspecialchars($user['prenom'] ?? 'Utilisateur', ENT_QUOTES) ?></strong>,</p>
-    <p>
-      Vous êtes connecté(e) en tant que
-      <strong><?= htmlspecialchars($roleLabel, ENT_QUOTES) ?></strong>
-      sous le pseudo&nbsp;:
+    <p>Connexion réussie ! Bienvenue <strong><?= htmlspecialchars($user['prenom'] ?? '', ENT_QUOTES) ?></strong>,</p>
+    <p class="mb-3">
+      Vous êtes connecté(e) en tant qu'employé(e) sous le pseudo :
       <strong><?= htmlspecialchars($user['pseudo'] ?? '', ENT_QUOTES) ?></strong>
     </p>
     <button class="btn btn-secondary" onclick="location.href='/deconnexion'">Déconnexion</button>
