@@ -10,24 +10,29 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 // 2) Récupérer l'utilisateur
 $user = $_SESSION['user'] ?? [];
 
-// 3) Normalisation du genre en majuscule ('F' ou 'M')
-$rawSexe = strtolower(trim($user['sexe'] ?? 'M'));
-if (strpos($rawSexe, 'Femme') === 0) {
-    $gender = 'F';
-} else {
-    $gender = 'M';
-}
+// 1) Récupération et validation du sexe depuis la BDD
+$sexeRaw = trim($user['sexe'] ?? 'Homme');
+$sexeNorm = mb_strtolower($sexeRaw, 'UTF-8') === 'femme' ? 'Femme' : 'Homme';
 
-// 4) Choix de l'avatar par défaut selon rôle et genre
+// 2) Détection d’un indicateur binaire pour le genre
+$isFemale = ($sexeNorm === 'Femme');
+
+// 3) Choix de l’avatar par défaut selon le rôle et le genre
 switch ((int)($user['role'] ?? 0)) {
     case 1: // Administrateur
         $defaultAvatar = 'admin.png';
         break;
+
     case 2: // Employé
-        $defaultAvatar = ($gender === 'F') ? 'employeF.png' : 'employe.png';
+        $defaultAvatar = $isFemale
+            ? 'employeF.png'
+            : 'employe.png';
         break;
+
     default: // Passager ou autre
-        $defaultAvatar = ($gender === 'F') ? 'femme.png' : 'homme.png';
+        $defaultAvatar = $isFemale
+            ? 'femme.png'
+            : 'homme.png';
         break;
 }
 

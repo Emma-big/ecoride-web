@@ -124,8 +124,8 @@ unset($_SESSION['form_errors'], $_SESSION['old']);
                     class="form-select<?= isset($errors['choix']) ? ' is-invalid' : '' ?>"
                     required>
                 <option value="">Sélectionner</option>
-                <option value="H" <?= $choix==='H'?'selected':'' ?>>Homme</option>
-                <option value="F" <?= $choix==='F'?'selected':'' ?>>Femme</option>
+                <option value="H" <?= $choix==='Homme'?'selected':'' ?>>Homme</option>
+                <option value="F" <?= $choix==='Femme'?'selected':'' ?>>Femme</option>
             </select>
             <?php if(isset($errors['choix'])): ?>
               <div class="invalid-feedback"><?= htmlspecialchars($errors['choix'], ENT_QUOTES) ?></div>

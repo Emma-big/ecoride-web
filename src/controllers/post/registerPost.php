@@ -46,7 +46,7 @@ $dt = \DateTime::createFromFormat('Y-m-d', $input['naissance']);
 if (!($dt && $dt->format('Y-m-d') === $input['naissance'])) {
     $errors['naissance'] = 'Date de naissance invalide.';
 }
-if (!in_array($input['choix'], ['H','F'], true)) {
+if (!in_array($input['choix'], ['Homme','Femme'], true)) {
     $errors['choix'] = 'Choix de sexe invalide.';
 }
 if (!preg_match('/^\+?[0-9]{6,15}$/', $input['phone'])) {
@@ -76,7 +76,7 @@ if ($stmt->fetch()) {
 
 // 8) Hash & defaults
 $hashed = password_hash($input['password'], PASSWORD_DEFAULT);
-$photo  = $input['choix'] === 'F' ? 'femme.png' : 'homme.png';
+$photo  = $input['choix'] === 'Femme' ? 'femme.png' : 'homme.png';
 $credit = 20;
 $role   = 3;
 

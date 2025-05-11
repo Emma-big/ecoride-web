@@ -132,8 +132,8 @@ unset($_SESSION['old'], $_SESSION['flash'], $_SESSION['form_errors']);
                             class="form-select"
                             required>
                         <option value="">-- Sélectionnez --</option>
-                        <option value="H" <?= isset($old['choix']) && $old['choix']==='H' ? 'selected' : '' ?>>Homme</option>
-                        <option value="F" <?= isset($old['choix']) && $old['choix']==='F' ? 'selected' : '' ?>>Femme</option>
+                        <option value="H" <?= isset($old['choix']) && $old['choix']==='Homme' ? 'selected' : '' ?>>Homme</option>
+                        <option value="F" <?= isset($old['choix']) && $old['choix']==='Femme' ? 'selected' : '' ?>>Femme</option>
                     </select>
                 </div>
                 <div class="mb-3">
