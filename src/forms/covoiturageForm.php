@@ -140,7 +140,7 @@ if (empty($voitures)) {
         <div class="mb-3">
             <label for="prix" class="form-label">Prix par personne (crédits)</label>
             <input type="number" id="prix" name="prix" class="form-control" min="2" step="0.01" required value="<?= htmlspecialchars($old['prix'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-        <small class="text-muted">La plateforme perçoit 2 crédits par passager.</small>
+        <small class="text-muted text-white">La plateforme perçoit 2 crédits par passager.</small>
         </div>
 
         <!-- Nombre de places -->
