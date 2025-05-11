@@ -19,8 +19,7 @@ require_once BASE_PATH . '/src/views/bigTitle.php';
     <!-- Message de bienvenue -->
     <div class="card p-3 mb-4 bg-primary">
         <p class="mb-3 text-white">
-            Connexion réussie ! Bienvenue
-            <strong><?= htmlspecialchars($_SESSION['user']['prenom'], ENT_QUOTES) ?></strong>,<br>
+            Connexion réussie ! Bienvenue <strong><?= htmlspecialchars($_SESSION['user']['prenom'], ENT_QUOTES) ?></strong>,<br>
             Vous êtes connecté(e) en tant qu'Administrateur sous le pseudo :
             <strong><?= htmlspecialchars($_SESSION['user']['pseudo'], ENT_QUOTES) ?></strong>
         </p>
@@ -41,17 +40,49 @@ require_once BASE_PATH . '/src/views/bigTitle.php';
         <!-- Création d'un compte employé -->
         <div class="col-12 col-md-6 mb-3">
             <div class="card p-3">
-                <h2 class="h5">Créer un compte employé(e)</h2>
-                <?php
-                // Embed uniquement le formulaire sans recharger le layout complet
-                define('EMBED_EMPLOYEE_FORM', true);
-                  // On inclut directement le partial de formulaire,
-                  // sans enveloppe <html>…</html> qui cassait la mise en page
-                  require_once BASE_PATH . '/src/views/registerEmploye.php';
-                ?>
+            <h2 class="h5">Créer un compte employé(e)</h2>
+                <form method="POST" action="/registerPostEmploye" class="mt-3" novalidate>
+                    <div class="mb-3">
+                        <label for="pseudo" class="form-label">Pseudo :</label>
+                        <input type="text" name="pseudo" id="pseudo" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email :</label>
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe :</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom :</label>
+                        <input type="text" name="name" id="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="surname" class="form-label">Prénom :</label>
+                        <input type="text" name="surname" id="surname" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="naissance" class="form-label">Date de naissance :</label>
+                        <input type="date" name="naissance" id="naissance" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="choix" class="form-label">Sexe :</label>
+                        <select name="choix" id="choix" class="form-select" required>
+                            <option value="">-- Sélectionnez --</option>
+                            <option value="H">Homme</option>
+                            <option value="F">Femme</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Téléphone :</label>
+                        <input type="text" name="phone" id="phone" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+                </form>
             </div>
         </div>
-
         <!-- Gestion des rôles et suspensions -->
         <div class="col-12 col-md-6 mb-3">
             <div class="card p-3">
