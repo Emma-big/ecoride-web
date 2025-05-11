@@ -36,7 +36,7 @@ $user = $_SESSION['user'];
     <div class="col-12 col-md-6 mb-3">
       <div class="card p-3">
         <h2 class="h5">Créer un compte employé(e)</h2>
-        <?php require_once BASE_PATH . '/src/views/registerEmployeForm.php'; ?>
+        <?php require_once BASE_PATH . '/src/views/registerEmploye.php'; ?>
       </div>
     </div>
 
