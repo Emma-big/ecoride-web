@@ -69,9 +69,7 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
 // 4) Connexions PDO & MongoDB
 try {
     $pdo = require BASE_PATH . '/src/config.php';
-    $mongoClient = new MongoDB\Client(getenv('MONGODB_URI') ?: 'mongodb://localhost:27017');
-    $mongoDB     = $mongoClient->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
-} catch (\Throwable $e) {
+   } catch (\Throwable $e) {
     echo '<h1>Erreur de connexion à la BDD</h1>';
     echo '<pre>' . htmlspecialchars($e->getMessage()) . "\n\n" . htmlspecialchars($e->getTraceAsString()) . '</pre>';
     exit;

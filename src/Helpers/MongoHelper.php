@@ -9,12 +9,26 @@ class MongoHelper
 {
     private static ?Client $client = null;
 
+    /**
+     * Récupère une collection MongoDB en utilisant les variables d'environnement.
+     *
+     * @param string $collectionName
+     * @return \MongoDB\Collection
+     */
     public static function getCollection(string $collectionName)
     {
         if (self::$client === null) {
-            self::$client = new Client('mongodb://localhost:27017');
+            // Lire l'URI et le nom de base depuis les vars d'environnement
+            $uri    = getenv('MONGODB_URI')    ?: 'mongodb://localhost:27017';
+            $dbName = getenv('MONGODB_DB_NAME') ?: 'avisDB';
+            error_log("DEBUG MongoHelper using URI: {$uri}, DB: {$dbName}");
+
+            require_once BASE_PATH . '/vendor/autoload.php';
+            self::$client = new Client($uri);
         }
-        $database = self::$client->ecoride_db; // nom de ta base
-        return $database->$collectionName;     // accès à la collection
+        // Sélection de la base
+        $database = self::$client->selectDatabase(getenv('MONGODB_DB_NAME') ?: 'avisDB');
+        // Retourne la collection
+        return $database->selectCollection($collectionName);
     }
 }
