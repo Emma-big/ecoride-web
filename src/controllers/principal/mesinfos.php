@@ -7,15 +7,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// 2) Récupérer l’utilisateur à jour depuis la BDD
-if (empty($_SESSION['user']['id'])) {
-    header('Location: /login.php');
-    exit;
-}
-$stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE id = :id');
-$stmt->execute(['id' => $_SESSION['user']['id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-
 // 3) Normaliser le sexe selon la colonne `choix` (valeurs “Homme”/“Femme”)
 $sexeRaw  = trim($user['choix'] ?? 'Homme');
 $sexeNorm = (mb_strtolower($sexeRaw, 'UTF-8') === 'femme') ? 'Femme' : 'Homme';
