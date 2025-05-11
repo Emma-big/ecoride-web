@@ -92,7 +92,7 @@ if ($departRaw && $arriveeRaw && $dateRaw) {
               JOIN voitures v  ON v.voiture_id  = c.voiture_id
               JOIN energies en ON en.energie_id = v.energie
               JOIN utilisateurs u ON u.utilisateur_id = c.utilisateur
-         LEFT JOIN notes n  ON n.covoiturage_id = c.covoiturage_id
+              LEFT JOIN notes    AS n  ON n.chauffeur_id   = c.utilisateur
              WHERE $where
           GROUP BY c.covoiturage_id";
     if ($minRating > 0) {
@@ -129,7 +129,7 @@ if ($departRaw && $arriveeRaw && $dateRaw) {
 // 5) Capture du contenu principal
 ob_start();
 ?>
-<section class="my-5">
+<section class="container my-5">
   <h2 class="text-center mb-4">Rechercher un covoiturage</h2>
   <div class="container my-3">
     <?php require BASE_PATH . '/src/views/barreRecherche.php'; ?>
@@ -145,7 +145,7 @@ ob_start();
 
         <div class="col-md-3 form-check">
           <input class="form-check-input" type="checkbox" id="ecologique" name="ecologique" <?= $eco ? 'checked' : '' ?>>
-          <label class="form-check-label" for="ecologique">Véhicule électrique uniquement</label>
+          <label class="form-check-label" for="ecologique">Voiture électrique uniquement</label>
         </div>
 
         <div class="col-md-3">
@@ -202,7 +202,7 @@ ob_start();
             <p class="mb-1"><strong>Départ :</strong> <?= (new DateTime($t['date_depart']))->format('d/m/Y') ?> à <?= (new DateTime($t['heure_depart']))->format('H\hi') ?></p>
             <p class="mb-1"><strong>Arrivée :</strong> <?= (new DateTime($t['date_arrive']))->format('d/m/Y') ?> à <?= (new DateTime($t['heure_arrive']))->format('H\hi') ?></p>
             <p class="mb-1"><strong>Durée :</strong> <?= $duree ?></p>
-            <div class="text-end">   <div class="text-end">
+            <div class="text-end">
               <a href="/detail-covoiturage?id=<?= (int)$t['covoiturage_id'] ?>"
                  class="btn btn-sm btn-primary">Détail</a>
             </div>
