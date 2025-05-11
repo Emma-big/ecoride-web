@@ -12,7 +12,7 @@ $user = $_SESSION['user'] ?? [];
 
 // 3) Normalisation du genre en majuscule ('F' ou 'M')
 $rawSexe = strtolower(trim($user['sexe'] ?? 'M'));
-if (strpos($rawSexe, 'f') === 0) {
+if (strpos($rawSexe, 'Femme') === 0) {
     $gender = 'F';
 } else {
     $gender = 'M';
