@@ -37,14 +37,29 @@ error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
     <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
   <?php endforeach; endif; ?>
 
-  <?php if (!empty($barreRecherche)): 
-    // On récupère la clé depuis l'env (ne jamais committer .env)
-    $gKey = $_ENV['GOOGLE_API_KEY'] ?? getenv('GOOGLE_API_KEY') ?? '';
-  ?>
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($gKey) ?>&libraries=places&callback=initSearchAutocomplete">
-    </script>
-  <?php endif; ?>
+ <?php if (!empty($barreRecherche)): 
+  $gKey = $_ENV['GOOGLE_API_KEY'] ?? getenv('GOOGLE_API_KEY') ?? '';
+?>
+  <!-- 1) Chargement de l'API Google Maps + Places avec callback -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($gKey) ?>&libraries=places&callback=initSearchAutocomplete">
+  </script>
+
+  <!-- 2) Déclaration de la fonction callback attendue -->
+  <script>
+    window.initSearchAutocomplete = function() {
+      ['depart','arrivee'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        new google.maps.places.Autocomplete(el, {
+          types: ['address'],
+          componentRestrictions: { country: 'fr' }
+        });
+      });
+    };
+  </script>
+<?php endif; ?>
+
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
