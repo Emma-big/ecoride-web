@@ -32,12 +32,23 @@ use function Helpers\renderError;
 // 3.1) Protection CSRF pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // On récupère proprement les tokens comme chaînes
-    $submitted = (string) ($_POST['csrf_token'] ?? '');
+    $submitted    = (string) ($_POST['csrf_token'] ?? '');
     $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
 
-    // Si aucun token n’est disponible ou ne correspond pas → 403
+    // DEBUG : log des tokens
+    error_log(sprintf(
+        'CSRF DEBUG — session="%s", submitted="%s"',
+        $sessionToken,
+        $submitted
+    ));
+
+    // Si aucun token n’est disponible ou ne correspond pas → on renvoie au login
     if ($sessionToken === '' || !hash_equals($sessionToken, $submitted)) {
-        renderError(403);
+        // Pour debug, on peut temporairement rediriger vers le form
+        header('Location: /login?error=csrf');
+        exit;
+        // ou, pour restaurer le 403 :
+        // renderError(403);
     }
 }
 
