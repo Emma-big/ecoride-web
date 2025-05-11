@@ -140,18 +140,80 @@ ob_start();
     <?php require BASE_PATH . '/src/views/barreRecherche.php'; ?>
   </div>
 
-  <?php if ($next_date): ?>
-  <div class="alert alert-info text-center">
-    Aucun trajet le <strong><?= (new DateTime($dateRaw))->format('d/m/Y') ?></strong>.<br>
-    Prochain :
-    <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
-    <a href="/covoiturage?depart=<?= urlencode($departRaw) ?>&amp;arrivee=<?= urlencode($arriveeRaw) ?>&amp;date=<?= urlencode($next_date) ?>"
-       class="btn btn-sm btn-primary mt-2">Voir</a>
-  </div>
-<?php endif; ?>
+   <?php if ($trajets): ?>
+      <h3 class="mb-4 text-center">Itinéraires disponibles</h3>
+      <div class="list-group">
+        <?php foreach ($trajets as $t): ?>
+          <?php
+            $d1    = new DateTime("{$t['date_depart']} {$t['heure_depart']}");
+            $d2    = new DateTime("{$t['date_arrive']} {$t['heure_arrive']}");
+            $diff  = $d1->diff($d2);
+            $duree = "{$diff->h}h" . str_pad($diff->i,2,'0',STR_PAD_LEFT) . "min";
 
-    <p class="text-center fst-italic">Aucun covoiturage ne correspond.</p>
+            $isLogged   = !empty($_SESSION['user']);
+            $userCredit = (float)($_SESSION['user']['credit'] ?? 0);
+            $price      = (float)$t['prix_personne'];
+            $hasSeats   = ((int)$t['nb_place'] > 0);
+          ?>
+          <div class="list-group-item mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <img src="/assets/images/<?= htmlspecialchars($t['photo'] ?: 'default.png', ENT_QUOTES) ?>" class="rounded-circle me-3" width="50" height="50" alt="Profil <?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?>">
+              <div class="flex-grow-1">
+                <h6 class="mb-0"><?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?></h6>
+                <small class="text-muted">Note : <?= number_format($t['note_moyenne'],1) ?>/5</small>
+              </div>
+              <span class="badge <?= $t['ecologique'] ? 'bg-success' : 'bg-secondary' ?> ms-3"><?= $t['ecologique'] ? 'Écologique' : 'Standard' ?></span>
+            </div>
+            <p class="mb-1"><strong>Places :</strong> <?= (int)$t['nb_place'] ?></p>
+            <p class="mb-1"><strong>Prix :</strong> <?= $price ?> crédits</p>
+            <p class="mb-1"><strong>Départ :</strong> <?= (new DateTime($t['date_depart']))->format('d/m/Y') ?> à <?= (new DateTime($t['heure_depart']))->format('H\hi') ?></p>
+            <p class="mb-1"><strong>Arrivée :</strong> <?= (new DateTime($t['date_arrive']))->format('d/m/Y') ?> à <?= (new DateTime($t['heure_arrive']))->format('H\hi') ?></p>
+            <p class="mb-1"><strong>Durée :</strong> <?= $duree ?></p>
+            <div class="text-end">
+              <a href="/detail-covoiturage?id=<?= (int)$t['covoiturage_id'] ?>" class="btn btn-outline-primary btn-sm me-2">Détail</a>
+              <?php if (!$isLogged): ?>
+                <a href="/login" class="btn btn-outline-primary btn-sm">Se connecter</a>
+              <?php elseif (!$hasSeats): ?>
+                <button class="btn btn-outline-secondary btn-sm" disabled>Complet</button>
+              <?php elseif ($isLogged && $hasSeats && $userCredit >= $price): ?>
+                <form action="/participerCovoiturage" method="POST" class="d-inline" onsubmit="return confirm('Confirmez l’utilisation de <?= $price ?> crédits ?');">
+                  <input type="hidden" name="id" value="<?= (int)$t['covoiturage_id'] ?>">
+                  <button class="btn btn-success btn-sm">Participer</button>
+                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+                </form>
+              <?php elseif ($isLogged && $userCredit < $price): ?>
+                <button class="btn btn-outline-warning btn-sm" disabled>Crédits insuffisants : <?= $userCredit ?> / <?= $price ?></button>
+              <?php endif; ?>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+
+      <!-- Pagination -->
+      <?php if ($totalPages > 1): ?>
+        <nav aria-label="Pagination covoiturages" class="mt-4">
+          <ul class="pagination justify-content-center">
+            <?php for ($p = 1; $p <= $totalPages; $p++): ?>
+              <li class="page-item <?= $p === $page ? 'active' : '' ?>">
+                <a class="page-link" href="?depart=<?= urlencode($departRaw) ?>&arrivee=<?= urlencode($arriveeRaw) ?>&date=<?= urlencode($dateRaw) ?>&page=<?= $p ?>"><?= $p ?></a>
+              </li>
+            <?php endfor; ?>
+          </ul>
+        </nav>
+      <?php endif; ?>
+
+    <?php elseif ($next_date): ?>
+      <div class="alert alert-info text-center">
+        Aucun trajet le <strong><?= (new DateTime($dateRaw))->format('d/m/Y') ?></strong>.<br>
+        Prochain : <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
+        <a href="/covoiturage?depart=<?= urlencode($departRaw) ?>&amp;arrivee=<?= urlencode($arriveeRaw) ?>&amp;date=<?= urlencode($next_date) ?>" class="btn btn-sm btn-primary mt-2">Voir</a>
+      </div>
+    <?php else: ?>
+      <p class="text-center fst-italic">Aucun covoiturage ne correspond.</p>
+    <?php endif; ?>
 
 </section>
 <?php
 $mainContent = ob_get_clean();
+require_once BASE_PATH . '/src/layout.php';
+?>
