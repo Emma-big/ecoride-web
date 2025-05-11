@@ -2,13 +2,10 @@
 // src/controllers/principal/mesinfos.php
 // Affichage des infos utilisateur avec avatar selon rôle et sexe
 
-// 0) Démarrer la session si nécessaire
+// 1) Démarrer la session si nécessaire
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
-// 1) Charger la connexion PDO
-$pdo = require_once dirname(__DIR__, 2) . '/config.php';
 
 // 2) Récupérer l’utilisateur à jour depuis la BDD
 if (empty($_SESSION['user']['id'])) {
