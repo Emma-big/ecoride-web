@@ -10,8 +10,13 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 // 2) Récupérer l'utilisateur
 $user = $_SESSION['user'] ?? [];
 
-// 3) Genre toujours en majuscule pour comparaison
-$gender = strtoupper($user['sexe'] ?? 'M');
+// 3) Normalisation du genre en majuscule ('F' ou 'M')
+$rawSexe = strtolower(trim($user['sexe'] ?? 'M'));
+if (strpos($rawSexe, 'f') === 0) {
+    $gender = 'F';
+} else {
+    $gender = 'M';
+}
 
 // 4) Choix de l'avatar par défaut selon rôle et genre
 switch ((int)($user['role'] ?? 0)) {
