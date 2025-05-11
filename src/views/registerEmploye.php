@@ -1,5 +1,7 @@
 <?php
 // src/views/registerEmploye.php
+// Si on est en embed depuis le dashboard, on va juste afficher le formulaire
+$embed = defined('EMBED_EMPLOYEE_FORM') && EMBED_EMPLOYEE_FORM;
 
 // 2) Variables pour le layout
 $pageTitle = "Inscription Employé - EcoRide";

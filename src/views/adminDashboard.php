@@ -43,6 +43,8 @@ require_once BASE_PATH . '/src/views/bigTitle.php';
             <div class="card p-3">
                 <h2 class="h5">Créer un compte employé(e)</h2>
                 <?php
+                // Embed uniquement le formulaire sans recharger le layout complet
+                define('EMBED_EMPLOYEE_FORM', true);
                   // On inclut directement le partial de formulaire,
                   // sans enveloppe <html>…</html> qui cassait la mise en page
                   require_once BASE_PATH . '/src/views/registerEmploye.php';
