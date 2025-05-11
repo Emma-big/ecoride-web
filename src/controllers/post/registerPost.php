@@ -62,8 +62,7 @@ if ($errors) {
 }
 
 // 6) Charger la BDD
-require_once BASE_PATH . '/src/config.php';
-$pdo = $config['mysql'];
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 7) Vérifier unicité email
 $stmt = $pdo->prepare("SELECT 1 FROM utilisateurs WHERE email = :email");
