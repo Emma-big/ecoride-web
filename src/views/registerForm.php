@@ -1,11 +1,6 @@
 <?php
 // src/views/registerForm.php
 
-// 1) Session
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Récupérer erreurs & anciennes valeurs
 $errors = $_SESSION['form_errors'] ?? [];
 $old    = $_SESSION['old'] ?? [];

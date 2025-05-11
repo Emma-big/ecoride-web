@@ -1,10 +1,8 @@
 <?php
 // src/views/vehiculeForm.php
 
-// 1) Session + auth
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+// 1) auth
+
 if (empty($_SESSION['user'])) {
     header('Location: /login');
     exit;

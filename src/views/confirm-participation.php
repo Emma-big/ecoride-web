@@ -1,13 +1,6 @@
 <?php
 // src/views/confirm-participation.php
 
- 
-
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Variables pour le layout
 $pageTitle   = "Confirmation de participation - EcoRide";
 $withTitle   = false;  // pas de bigTitle ici

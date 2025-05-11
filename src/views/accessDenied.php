@@ -1,13 +1,6 @@
 <?php
 // src/views/accessDenied.php
 
- 
-
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Variables pour le layout
 $pageTitle = "Accès refusé - EcoRide";
 $withTitle = true;

@@ -1,11 +1,6 @@
 <?php
 // src/views/contact_form.php
 
-// 1) Session + auth
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Récupérer erreurs et anciennes valeurs
 $errors = $_SESSION['form_errors'] ?? [];
 $old    = $_SESSION['old'] ?? [];

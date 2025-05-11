@@ -1,11 +1,6 @@
 <?php
 // src/views/covoiturage.php — avec pagination
 
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Variables pour le layout
 $barreRecherche = 'views/barreRecherche.php';
 $hideTitle   = true;

@@ -1,10 +1,8 @@
 <?php
 // src/views/adminDashboard.php
 
-// 1) Démarrer la session et vérifier le rôle admin
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+// 1) Vérifier le rôle admin
+
 if (empty($_SESSION['user']) || (int)($_SESSION['user']['role'] ?? 0) !== 1) {
     header('Location: /login');
     exit;

@@ -1,11 +1,6 @@
 <?php
 // src/views/accueil.php
 
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Inclusion du header et titre principal
 require_once BASE_PATH . '/src/controllers/principal/scriptHeader.php';
 require_once BASE_PATH . '/src/views/bigTitle.php';

@@ -1,12 +1,7 @@
 <?php
 // src/views/employe.php
 
-// 1) Démarrer la session tout de suite
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-// 2) Lire l’utilisateur en session
+// 1) Lire l’utilisateur en session
 $user = $_SESSION['user'] ?? [];
 
 // Récupérer le libellé du rôle

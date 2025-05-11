@@ -1,11 +1,6 @@
 <?php
 // src/views/selectCompteForm.php
 
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Charger la config PDO
 $pdo = require BASE_PATH . '/src/config.php';
 
