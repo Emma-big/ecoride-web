@@ -2,7 +2,7 @@
 // src/controllers/principal/mesinfos.php
 // Affichage des infos utilisateur avec avatar selon rôle et sexe
 
-// 1) Démarrer la session si nécessaire
+// 0) Démarrer la session si nécessaire
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -11,7 +11,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 $user = $_SESSION['user'] ?? [];
 
 // 1) Récupération et validation du sexe depuis la BDD
-$sexeRaw = trim($user['sexe'] ?? 'Homme');
+$sexeRaw = trim($user['choix'] ?? 'Homme');
 $sexeNorm = mb_strtolower($sexeRaw, 'UTF-8') === 'femme' ? 'Femme' : 'Homme';
 
 // 2) Détection d’un indicateur binaire pour le genre
