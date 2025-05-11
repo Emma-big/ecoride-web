@@ -1,101 +1,72 @@
 <?php
-namespace Adminlocal\EcoRide\Controllers\Principal;
+// src/views/reclamations_problemes.php
 
-use Adminlocal\EcoRide\Helpers\MongoHelper;
+// Vue des réclamations problématiques avec responsive design
+?>
+<div class="container my-5">
+  <h1 class="mb-4 text-center">Trajets problématiques</h1>
 
-// 1) Vérification du rôle employé (role = 2)
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-if (empty($_SESSION['user']) || (int)($_SESSION['user']['role'] ?? 0) !== 2) {
-    http_response_code(403);
-    exit('Accès interdit');
-}
+  <?php if (empty($reclamations)): ?>
+    <p class="text-center">Aucune réclamation en cours.</p>
+  <?php else: ?>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Commentaire</th>
+            <th>Passager</th>
+            <th>Chauffeur</th>
+            <th>Trajet</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($reclamations as $r): ?>
+            <tr>
+              <td><?= $r['reclamation_id'] ?></td>
+              <td><?= date('d/m/Y H:i', strtotime($r['date_signal'])) ?></td>
+              <td><?= htmlspecialchars($r['commentaire'], ENT_QUOTES) ?></td>
+              <td>
+                <strong><?= htmlspecialchars($r['passager']['pseudo'], ENT_QUOTES) ?></strong><br>
+                <?= htmlspecialchars($r['passager']['email'], ENT_QUOTES) ?>
+              </td>
+              <td>
+                <strong><?= htmlspecialchars($r['chauffeur']['pseudo'], ENT_QUOTES) ?></strong><br>
+                <?= htmlspecialchars($r['chauffeur']['email'], ENT_QUOTES) ?>
+              </td>
+              <td>
+                <?= htmlspecialchars($r['covoiturage']['lieu_depart'], ENT_QUOTES) ?> →
+                <?= htmlspecialchars($r['covoiturage']['lieu_arrive'], ENT_QUOTES) ?><br>
+                <?= date('d/m/Y', strtotime($r['covoiturage']['date_depart'])) ?>
+              </td>
+              <td><?= htmlspecialchars($r['statut_libelle'], ENT_QUOTES) ?></td>
+              <td>
+                <form method="POST" action="/reclamationTraitee" class="d-inline">
+                  <input type="hidden" name="reclamation_id" value="<?= $r['reclamation_id'] ?>">
+                  <button type="submit" class="btn btn-sm btn-success">Traité</button>
+                </form>
+                <form method="POST" action="/reclamationResolue" class="d-inline ms-1">
+                  <input type="hidden" name="reclamation_id" value="<?= $r['reclamation_id'] ?>">
+                  <button type="submit" class="btn btn-sm btn-warning">Résolu</button>
+                </form>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
 
-// 2) Charger PDO
-$pdo = require BASE_PATH . '/src/config.php';
-
-// 3) Pagination
-$page    = max(1, (int)($_GET['page'] ?? 1));
-$perPage = 10;
-$offset  = ($page - 1) * $perPage;
-
-// 4) Récupérer UNIQUEMENT les statuts concernés (1,3,4,7,8),  
-//    et cette fois **reclamation_id** (PK int) + **mongo_id**
-$stmt = $pdo->prepare("
-    SELECT reclamation_id,
-           mongo_id,
-           covoiturage_id,
-           utilisateur_id,
-           utilisateur_concerne,
-           commentaire,
-           statut_id,
-           date_signal
-      FROM reclamations
-     WHERE statut_id IN (0,1,3,4,5,7,8)
-  ORDER BY date_signal DESC
-     LIMIT :lim OFFSET :off
-");
-$stmt->bindValue('lim', $perPage, \PDO::PARAM_INT);
-$stmt->bindValue('off', $offset, \PDO::PARAM_INT);
-$stmt->execute();
-$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-// 5) Comptage total
-$totalStmt = $pdo->prepare("SELECT COUNT(*) FROM reclamations WHERE statut_id IN (0,1,3,4,5,7,8)");
-$totalStmt->execute();
-$total = (int)$totalStmt->fetchColumn();
-$pages = (int)ceil($total / $perPage);
-
-// 6) Enrichir chaque ligne
-$reclamations = [];
-foreach ($rows as $r) {
-    // données covoiturage
-    $stmt2 = $pdo->prepare("
-        SELECT lieu_depart, date_depart,
-               lieu_arrive, date_arrive,
-               prix_personne
-          FROM covoiturage
-         WHERE covoiturage_id = ?
-    ");
-    $stmt2->execute([(int)$r['covoiturage_id']]);
-    $covoit = $stmt2->fetch(\PDO::FETCH_ASSOC);
-
-    // passager
-    $stmt3 = $pdo->prepare("SELECT pseudo, email FROM utilisateurs WHERE utilisateur_id = ?");
-    $stmt3->execute([(int)$r['utilisateur_id']]);
-    $passager = $stmt3->fetch(\PDO::FETCH_ASSOC);
-
-    // chauffeur
-    $stmt4 = $pdo->prepare("SELECT pseudo, email FROM utilisateurs WHERE utilisateur_id = ?");
-    $stmt4->execute([(int)$r['utilisateur_concerne']]);
-    $chauffeur = $stmt4->fetch(\PDO::FETCH_ASSOC);
-
-    // libellé statut
-    $stmt5 = $pdo->prepare("SELECT libelle FROM statuts WHERE statut = ?");
-    $stmt5->execute([(int)$r['statut_id']]);
-    $statutLib = $stmt5->fetchColumn();
-
-    $reclamations[] = [
-        // **ici** on passe bien la PK SQL pour les forms
-        'reclamation_id'   => (int)$r['reclamation_id'],
-        'mongo_id'         => $r['mongo_id'],
-        'covoiturage_id'   => $r['covoiturage_id'],
-        'commentaire'      => $r['commentaire'],
-        'date_signal'      => $r['date_signal'],
-        'statut_id'        => (int)$r['statut_id'],
-        'statut_libelle'   => $statutLib,
-        'covoiturage'      => $covoit,
-        'passager'         => $passager,
-        'chauffeur'        => $chauffeur,
-    ];
-}
-
-// 7) Envoi vers la vue
-$pageTitle   = 'Trajets problématiques - EcoRide';
-$hideTitle   = false;
-$extraStyles = ['/assets/style/styleIndex.css'];
-$mainView    = 'views/reclamations_problemes.php';
-
-require_once BASE_PATH . '/src/layout.php';
-exit;
+    <nav aria-label="Pagination">
+      <ul class="pagination justify-content-center">
+        <?php for ($i = 1; $i <= $pages; $i++): ?>
+          <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+          </li>
+        <?php endfor; ?>
+      </ul>
+    </nav>
+  <?php endif; ?>
+</div>
