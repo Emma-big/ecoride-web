@@ -8,7 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 1) Charger la connexion PDO
-$pdo = require_once __DIR__ . '/../../config.php';
+$pdo = require_once dirname(__DIR__, 2) . '/config.php';
 
 // 2) Récupérer l’utilisateur à jour depuis la BDD
 if (empty($_SESSION['user']['id'])) {
