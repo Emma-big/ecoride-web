@@ -5,6 +5,7 @@
   <h2 class="text-center mb-4">Trajets signalés</h2>
 
   <?php if (!empty($reclamations)): ?>
+    <div class="table-responsive">
     <table class="table table-striped">
       <thead>
         <tr>
@@ -64,7 +65,7 @@
         <?php endforeach; ?>
       </tbody>
     </table>
-
+    </div>
     <!-- Pagination -->
     <nav aria-label="Pagination">
       <ul class="pagination justify-content-center">
