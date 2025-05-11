@@ -9,11 +9,11 @@ if (! defined('BASE_PATH')) {
 $jawsUrl = getenv('JAWSDB_URL') ?: getenv('JAWSDB_MAUVE_URL');
 error_log('ENV JAWSDB_URL_USED = ' . ($jawsUrl ?: 'none'));
 
+// CONFIGURATION MySQL
 if ($jawsUrl) {
     $url = parse_url($jawsUrl);
     $host   = $url['host']   ?? '127.0.0.1';
     $port   = $url['port']   ?? 3306;
-    // parse_url met le chemin avec un slash initial
     $dbname = isset($url['path']) ? ltrim($url['path'], '/') : 'ecoride';
     $user   = $url['user']   ?? '';
     $pass   = $url['pass']   ?? '';
@@ -40,4 +40,22 @@ try {
     throw $e;
 }
 
+// CONFIGURATION MongoDB
+// Lire l'URI et le nom de base depuis les vars d'env
+$mongoUri = getenv('MONGODB_URI') ?: 'mongodb://localhost:27017';
+$mongoDbName = getenv('MONGODB_DB_NAME') ?: 'avisDB';
+error_log('DEBUG MongoDB URI utilisé : ' . $mongoUri);
+
+try {
+    // Chargement de l'autoloader Composer pour MongoDB\Client
+    require_once BASE_PATH . '/vendor/autoload.php';
+    $mongoClient = new MongoDB\Client($mongoUri);
+    $mongoDB     = $mongoClient->selectDatabase($mongoDbName);
+} catch (Exception $e) {
+    error_log('Erreur MongoDB: ' . $e->getMessage());
+    // On ne lève pas d'exception pour ne pas bloquer MySQL si Mongo est indisponible
+    $mongoDB = null;
+}
+
+// Retourne l'objet PDO pour MySQL. MongoDB est disponible via \$mongoDB global.
 return $pdo;
