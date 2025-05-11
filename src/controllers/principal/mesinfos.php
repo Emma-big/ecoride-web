@@ -1,16 +1,33 @@
 <?php
 // src/controllers/principal/mesinfos.php
-// simple affichage des infos déjà chargées dans $user
+// Affichage des infos utilisateur avec avatar selon rôle et sexe
 
-// 1) On s'assure qu'il y a toujours une valeur pour le genre
-$gender = $user['sexe'] ?? 'M';
+// 1) Démarrer la session si nécessaire
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
-// 2) Détermination de l’avatar par défaut selon le genre
-$defaultAvatar = ($gender === 'F') ? 'employeF.png' : 'employe.png';
+// 2) Récupérer l'utilisateur
+$user = $_SESSION['user'] ?? [];
 
-// 3) Génération du chemin de la photo de profil
-$src = '/assets/images/' . (!empty($user['avatar']) ? $user['avatar'] : $defaultAvatar);
+// 3) Genre toujours en majuscule pour comparaison
+$gender = strtoupper($user['sexe'] ?? 'M');
 
+// 4) Choix de l'avatar par défaut selon rôle et genre
+switch ((int)($user['role'] ?? 0)) {
+    case 1: // Administrateur
+        $defaultAvatar = 'admin.png';
+        break;
+    case 2: // Employé
+        $defaultAvatar = ($gender === 'F') ? 'employeF.png' : 'employe.png';
+        break;
+    default: // Passager ou autre
+        $defaultAvatar = ($gender === 'F') ? 'femme.png' : 'homme.png';
+        break;
+}
+
+// 5) Utiliser la colonne photo si renseignée, sinon l'avatar par défaut
+$src = '/assets/images/' . (!empty($user['photo']) ? $user['photo'] : $defaultAvatar);
 ?>
 <div class="container">
   <div class="row justify-content-center">
