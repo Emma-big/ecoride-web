@@ -32,7 +32,7 @@ ob_start();
   <div class="card mb-4">
     <div class="card-body d-flex gap-4">
       <img
-        src="/assets/images/<?= htmlspecialchars($covoiturage['chauffeur_photo'] ?: 'default.png', ENT_QUOTES) ?>"
+        src="/assets/images/<?= htmlspecialchars($covoiturage['chauffeur_photo'] ?: 'homme.png', ENT_QUOTES) ?>"
         alt="Photo de <?= htmlspecialchars($covoiturage['chauffeur_pseudo'], ENT_QUOTES) ?>"
         class="rounded-circle"
         width="100" height="100"

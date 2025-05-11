@@ -190,7 +190,7 @@ ob_start();
           ?>
           <div class="list-group-item mb-3">
             <div class="d-flex align-items-center mb-2">
-              <img src="/assets/images/<?= htmlspecialchars($t['photo'] ?: 'default.png', ENT_QUOTES) ?>" class="rounded-circle me-3" width="50" height="50" alt="Profil <?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?>">
+              <img src="/assets/images/<?= htmlspecialchars($t['photo'] ?: 'homme.png', ENT_QUOTES) ?>" class="rounded-circle me-3" width="50" height="50" alt="Profil <?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?>">
               <div class="flex-grow-1">
                 <h6 class="mb-0"><?= htmlspecialchars($t['pseudo'], ENT_QUOTES) ?></h6>
                 <small class="text-muted">Note : <?= number_format($t['note_moyenne'], 1) ?>/5</small>
@@ -210,14 +210,14 @@ ob_start();
         <?php endforeach; ?>
       </div>
     <?php elseif ($next_date): ?>
-      <div class="alert alert-info text-center">
-        Aucun trajet le <strong><?= (new DateTime($date))->format('d/m/Y') ?></strong>.<br>
-        Prochain covoiturage le <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
-        <a href="/covoiturage?depart=<?= urlencode($depart) ?>&arrivee=<?= urlencode($arrivee) ?>&date=<?= $next_date ?>"
-           class="btn btn-sm btn-primary mt-2">Rechercher cette date</a>
-      </div>
-    <?php else: ?>
-      <p class="text-center fst-italic">Aucun covoiturage ne correspond à vos critères.</p>
-    <?php endif; ?>
-  <?php endif; ?>
+  <div class="alert alert-info text-center">
+    Aucun trajet le <strong><?= (new DateTime($dateRaw))->format('d/m/Y') ?></strong>.<br>
+    Prochain covoiturage le <strong><?= (new DateTime($next_date))->format('d/m/Y') ?></strong>.<br>
+    <a href="/covoiturage?depart=<?= urlencode($departRaw) ?>&amp;arrivee=<?= urlencode($arriveeRaw) ?>&amp;date=<?= urlencode($next_date) ?>"
+       class="btn btn-sm btn-primary mt-2">Voir</a>
+  </div>
+<?php else: ?>
+  <p class="text-center fst-italic">Aucun covoiturage ne correspond à vos critères.</p>
+<?php endif; ?>
+<?php endif; ?>
 </section>
