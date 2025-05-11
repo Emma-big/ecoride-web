@@ -117,12 +117,8 @@ switch ($uri) {
         exit;    
 
     case '/employe':
-        // On veut afficher le BigTitle
-        $hideTitle = false;
-        // On indique au layout quelle vue charger
-        $mainView  = 'views/employe.php';
-        require_once BASE_PATH . '/src/layout.php';
-        exit;    
+        require_once BASE_PATH . '/src/controllers/principal/employe.php';
+        exit;   
     
     case '/':
     case '/index':
