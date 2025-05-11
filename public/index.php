@@ -408,7 +408,7 @@ switch ($uri) {
             header('Location: /admin');
             exit;
         }
-        require BASE_PATH . '/public/selectCompteForm.php';
+        require BASE_PATH . '/src/forms/modifCompteForm.php';
         exit;
 
     // Traiter la mise à jour de rôle (POST)
@@ -417,7 +417,7 @@ switch ($uri) {
             header('Location: /admin');
             exit;
         }
-        require BASE_PATH . '/public/modifCompteAction.php';
+        require BASE_PATH . '/src/forms/modifCompteAction.php';
         exit;    
 
        default:
