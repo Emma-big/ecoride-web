@@ -145,7 +145,7 @@ ob_start();
 
         <div class="col-md-3 form-check">
           <input class="form-check-input" type="checkbox" id="ecologique" name="ecologique" <?= $eco ? 'checked' : '' ?>>
-          <label class="form-check-label" for="ecologique">Voiture électrique uniquement</label>
+          <label class="form-check-label" for="ecologique">Voyage écologique (voiture électrique)</label>
         </div>
 
         <div class="col-md-3">
