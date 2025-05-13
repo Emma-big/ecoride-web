@@ -17,7 +17,7 @@ $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? 'no-reply@ecoride.local';
 $fromName    = $_ENV['MAIL_FROM_NAME']    ?? 'EcoRide';
 
 // 3) Charger la BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Vérifier la méthode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

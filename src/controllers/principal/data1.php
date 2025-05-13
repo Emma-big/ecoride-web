@@ -5,7 +5,7 @@
 header('Content-Type: application/json; charset=UTF-8');
 
 // 2) config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) récupérer dates GET et valider
 $rawStart = $_GET['start'] ?? '';

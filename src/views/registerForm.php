@@ -1,11 +1,6 @@
 <?php
 // src/views/registerForm.php
 
-// 1) Session
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Récupérer erreurs & anciennes valeurs
 $errors = $_SESSION['form_errors'] ?? [];
 $old    = $_SESSION['old'] ?? [];
@@ -52,7 +47,7 @@ unset($_SESSION['form_errors'], $_SESSION['old']);
       </div>
     <?php endif; ?>
 
-    <form class="formLogin mx-auto" action="/registerPost" method="POST" novalidate>
+    <form class="formLogin mx-auto" action="/registerPost" method="POST" novalidate autocomplete="off">
         <?php
           $pseudo    = htmlspecialchars($old['pseudo']    ?? '', ENT_QUOTES);
           $email     = htmlspecialchars($old['email']     ?? '', ENT_QUOTES);
@@ -73,7 +68,79 @@ unset($_SESSION['form_errors'], $_SESSION['old']);
             <?php endif; ?>
         </div>
 
-        <!-- ... autres champs ... -->
+       <div class="mb-3">
+            <label for="email" class="form-label">Adresse email :</label>
+            <input type="email" id="email" name="email" autocomplete="off"
+                   class="form-control<?= isset($errors['email']) ? ' is-invalid' : '' ?>"
+                   value="<?= $email ?>" required>
+            <?php if(isset($errors['email'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['email'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe :</label>
+            <input type="password" id="password" name="password" autocomplete="new-password"
+                   class="form-control<?= isset($errors['password']) ? ' is-invalid' : '' ?>"
+                   required>
+            <?php if(isset($errors['password'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['password'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Nom :</label>
+            <input type="text" id="name" name="name"
+                   class="form-control<?= isset($errors['name']) ? ' is-invalid' : '' ?>"
+                   value="<?= $name ?>" required>
+            <?php if(isset($errors['name'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['name'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="surname" class="form-label">Prénom :</label>
+            <input type="text" id="surname" name="surname"
+                   class="form-control<?= isset($errors['surname']) ? ' is-invalid' : '' ?>"
+                   value="<?= $surname ?>" required>
+            <?php if(isset($errors['surname'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['surname'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="naissance" class="form-label">Date de naissance :</label>
+            <input type="date" id="naissance" name="naissance"
+                   class="form-control<?= isset($errors['naissance']) ? ' is-invalid' : '' ?>"
+                   value="<?= $naissance ?>" required>
+            <?php if(isset($errors['naissance'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['naissance'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="choix" class="form-label">Sexe :</label>
+            <select id="choix" name="choix"
+                    class="form-select<?= isset($errors['choix']) ? ' is-invalid' : '' ?>"
+                    required>
+                <option value="">Sélectionner</option>
+                <option value="H" <?= $choix==='Homme'?'selected':'' ?>>Homme</option>
+                <option value="F" <?= $choix==='Femme'?'selected':'' ?>>Femme</option>
+            </select>
+            <?php if(isset($errors['choix'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['choix'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Téléphone :</label>
+            <input type="text" id="phone" name="phone"
+                   class="form-control<?= isset($errors['phone']) ? ' is-invalid' : '' ?>"
+                   value="<?= $phone ?>" required>
+            <?php if(isset($errors['phone'])): ?>
+              <div class="invalid-feedback"><?= htmlspecialchars($errors['phone'], ENT_QUOTES) ?></div>
+            <?php endif; ?>
+        </div>
 
         <div class="mb-3 text-center">
             <button type="submit" class="btn btn-primary">Créer un compte</button>

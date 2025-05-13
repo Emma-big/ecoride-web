@@ -1,10 +1,8 @@
 <?php
 // src/views/vehiculeForm.php
 
-// 1) Session + auth
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+// 1) auth
+
 if (empty($_SESSION['user'])) {
     header('Location: /login');
     exit;
@@ -16,7 +14,7 @@ $old    = $_SESSION['old'] ?? [];
 unset($_SESSION['form_errors'], $_SESSION['old']);
 
 // 2) Charger le PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Charger listes pour les <select>
 $marques  = $pdo->query("SELECT marque_id, libelle FROM marques ORDER BY libelle")
@@ -49,7 +47,8 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
       ':uid' => $_SESSION['user']['utilisateur_id'],
     ]);
     if ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $formData = $data;
+    // on fusionne : les clés manquantes dans $data restent celles par défaut de $formData
+    $formData = array_merge($formData, $data);
     } else {
         $_SESSION['flash_error'] = 'Voiture introuvable ou non autorisée.';
         header('Location: /utilisateur');

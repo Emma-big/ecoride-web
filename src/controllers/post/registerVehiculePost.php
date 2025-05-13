@@ -7,7 +7,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // Helpers de validation
 function validateModel(string $m): bool {
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $couleurForm       = trim($_POST['couleur'] ?? '');
     $immatForm         = strtoupper(trim($_POST['immatriculation'] ?? ''));
     $premiereImmatForm = $_POST['date_premiere_immat'] ?? '';
-    $energieForm       = trim($_POST['energie'] ?? '');
+    $energieId         = trim($_POST['energie_id'] ?? '');
     $proprioId         = (int) ($_SESSION['user']['utilisateur_id'] ?? 0);
 
     // Validation serveur
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validateImmat($immatForm)) {
         $errors[] = 'Immatriculation invalide (1–15 caractères alphanumériques ou tirets).';
     }
-    if (empty($marqueForm) || empty($energieForm) || empty($premiereImmatForm)) {
+    if (empty($marqueForm) || empty($energieId  ) || empty($premiereImmatForm)) {
         $errors[] = 'Tous les champs sont requis.';
     }
     if ($errors) {
@@ -79,10 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':immatriculation'      => $immatForm,
             ':couleur'              => $couleurForm,
             ':date_premiere_immat'  => $premiereImmatForm,
-            ':energie'              => $energieForm,
+            ':energie'              => $energieId  ,
         ]);
         if ($stmt2->rowCount()) {
-            $message = 'Voiture enregistré avec succès !';
+            $message = 'Voiture enregistrée avec succès !';
             $success = true;
         } else {
             $message = 'Une erreur est survenue lors de l\'enregistrement.';

@@ -13,7 +13,7 @@ if (empty($_SESSION['user']) || (int)($_SESSION['user']['role'] ?? 0) !== 2) {
 }
 
 // 3) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Récupérer et valider l’ID de la note et l’action
 $noteId = isset($_POST['note_id']) ? (int) $_POST['note_id'] : 0;

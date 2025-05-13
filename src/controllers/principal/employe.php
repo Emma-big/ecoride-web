@@ -1,4 +1,5 @@
 <?php
+// src/controllers/principal/employe.php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
 // 1) Démarrer la session si nécessaire
@@ -17,7 +18,8 @@ $pageTitle   = 'Espace Employé - EcoRide';
 $hideTitle   = true;
 $extraStyles = [
     '/assets/style/styleIndex.css',
-    '/assets/style/styleAdmin.css'
+    '/assets/style/styleBarreRecherche.css',
+    '/assets/style/styleFooter.css',
 ];
 
 // 4) Choisir la vue principale

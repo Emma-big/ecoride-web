@@ -1,20 +1,13 @@
 <?php
 // src/views/detail-covoiturage.php
 
- 
-
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Variables pour le layout
 $pageTitle   = "Détail du covoiturage";
 $hideTitle   = true; // masque le big title
 $extraStyles = ['/assets/style/styleCovoiturage.css'];
 
 // 3) Charger la BDD + récupérer les préférences dynamiques
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 $stmtP = $pdo->prepare(
     "SELECT libelle 
        FROM covoiturage_preferences 
@@ -39,7 +32,7 @@ ob_start();
   <div class="card mb-4">
     <div class="card-body d-flex gap-4">
       <img
-        src="/assets/images/<?= htmlspecialchars($covoiturage['chauffeur_photo'] ?: 'default.png', ENT_QUOTES) ?>"
+        src="/assets/images/<?= htmlspecialchars($covoiturage['chauffeur_photo'] ?: 'homme.png', ENT_QUOTES) ?>"
         alt="Photo de <?= htmlspecialchars($covoiturage['chauffeur_pseudo'], ENT_QUOTES) ?>"
         class="rounded-circle"
         width="100" height="100"

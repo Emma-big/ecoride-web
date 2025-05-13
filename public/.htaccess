@@ -1,64 +1,10 @@
-# public/.htaccess
-
-# ─── 0) Interdire l’indexation des dossiers ─────────────────────────────────
-<IfModule mod_autoindex.c>
-    Options -Indexes
-</IfModule>
-
-# ─── 1) Centralisation des erreurs via index.php ───────────────────────────
-ErrorDocument 403 /index.php
-ErrorDocument 404 /index.php
-ErrorDocument 405 /index.php
-
-# ─── 2) Security headers ────────────────────────────────────────────────────
-<IfModule mod_headers.c>
-    Header always set X-Frame-Options "SAMEORIGIN"
-    Header always set X-Content-Type-Options "nosniff"
-    Header always set X-XSS-Protection "1; mode=block"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    Header always set Strict-Transport-Security "max-age=2592000; includeSubDomains; preload"
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://maps.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://maps.gstatic.com; connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com;"
-</IfModule>
-
-# ─── 3) URL Rewriting ─────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
 
-    # 3.1) Laisser passer gen_hash.php
-  RewriteRule ^gen_hash\.php$ - [L]
+  # Exclure le dossier documents_pdf des réécritures
+  RewriteRule ^documents_pdf/ - [L]
 
-  # 3.2) Servir uniquement les fichiers existants (pas les dossiers)
-  RewriteCond %{REQUEST_FILENAME} -f
-  RewriteRule ^ - [L]
-
-  # 3.3) /foo → foo.php si foo.php existe
-  RewriteCond %{REQUEST_FILENAME}.php -f
-  RewriteRule ^([^/]+)/?$ $1.php [L]
-
-  # 3.4) Tout le reste → index.php (front controller)
-  RewriteRule . index.php [QSA,L]
-</IfModule>
-
-# ─── 4) Protection des fichiers sensibles ────────────────────────────────────
-<FilesMatch "\.(env|gitignore|htaccess|composer\.(json|lock)|sql|md)$">
-  Require all denied
-</FilesMatch>
-RedirectMatch 403 ^/(config|vendor)/
-
-# ─── 5) Mise en cache statique ───────────────────────────────────────────────
-<IfModule mod_expires.c>
-  ExpiresActive On
-  ExpiresByType image/jpg "access plus 1 month"
-  ExpiresByType image/jpeg "access plus 1 month"
-  ExpiresByType image/png "access plus 1 month"
-  ExpiresByType image/gif "access plus 1 month"
-  ExpiresByType image/webp "access plus 1 month"
-  ExpiresByType text/css "access plus 1 month"
-  ExpiresByType application/javascript "access plus 1 month"
-</IfModule>
-
-# ─── 6) Compression GZIP ─────────────────────────────────────────────────────
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript
+  # Tout autre chemin non-fichier passe par index.php
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule . index.php [L]
 </IfModule>

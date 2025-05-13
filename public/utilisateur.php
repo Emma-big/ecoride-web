@@ -1,13 +1,12 @@
 <?php
 // public/utilisateur.php — Front Controller pour la page « Mon espace utilisateur »
 
-if (!defined('BASE_PATH')) {
+// 1) Définir BASE_PATH
+if (! defined('BASE_PATH')) {
     define('BASE_PATH', dirname(__DIR__));
 }
 
-require_once BASE_PATH . '/src/config.php';
-
-// Démarrer session + inactivité
+// 2) Démarrer la session + inactivité
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -20,38 +19,70 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 }
 $_SESSION['last_activity'] = time();
 
-// Authentification
+// 3) Authentification
 if (empty($_SESSION['user'])) {
     header('Location: /accessDenied');
     exit;
 }
 
+// 4) Chargement du PDO
+try {
+    /** @var \PDO $pdo */
+    $pdo = require BASE_PATH . '/src/config.php';
+} catch (\Throwable $e) {
+    echo '<h1>Erreur de connexion à la base de données</h1>';
+    echo '<pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
+    exit;
+}
+
+// 5) Récupérer les infos de l’utilisateur
+$uid = (int) $_SESSION['user']['utilisateur_id'];
+try {
+    $stmt = $pdo->prepare('SELECT * FROM utilisateurs WHERE utilisateur_id = :id');
+    $stmt->execute([':id' => $uid]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (! $user) {
+        throw new \Exception("Utilisateur introuvable.");
+    }
+} catch (\Throwable $e) {
+    echo '<h1>Erreur de récupération des données utilisateur</h1>';
+    echo '<pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
+    exit;
+}
+
+// 6) Déterminer les rôles courants
 $isChauffeur = !empty($_SESSION['user']['is_chauffeur']);
 $isPassager  = !empty($_SESSION['user']['is_passager']);
-$uid         = (int) $_SESSION['user']['utilisateur_id'];
 
-// Variables layout
+// 7) Variables pour le layout
 $pageTitle   = 'Mon espace utilisateur - EcoRide';
 $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleAdmin.css'];
-$withTitle   = false;
+$hideTitle   = true;
 
-// Contenu principal
+// 8) Capturer le contenu
 ob_start();
 ?>
 <main class="container mt-4">
     <?php require BASE_PATH . '/src/views/bigTitle.php'; ?>
-    <?php require BASE_PATH . '/src/controllers/principal/mesinfos.php'; ?>
+
+    <?php
+    // la partial mesinfos.php attend un tableau $user
+    require BASE_PATH . '/src/controllers/principal/mesinfos.php';
+    ?>
 
     <!-- Choix de rôle -->
     <form action="/updateRolePost" method="POST" class="mb-5">
         <label>
-            <input type="checkbox" name="role_chauffeur" value="1" <?= $isChauffeur ? 'checked' : '' ?>> Chauffeur
+            <input type="checkbox" name="role_chauffeur" value="1" <?= $isChauffeur ? 'checked' : '' ?>>
+            Chauffeur
         </label>
         <label class="ms-3">
-            <input type="checkbox" name="role_passager" value="1" <?= $isPassager ? 'checked' : '' ?>> Passager
+            <input type="checkbox" name="role_passager" value="1" <?= $isPassager ? 'checked' : '' ?>>
+            Passager
         </label>
         <button type="submit" class="btn btn-secondary btn-sm ms-3">Mettre à jour</button>
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+        <input type="hidden" name="csrf_token"
+               value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES) ?>">
     </form>
 
     <!-- Mes voitures -->
@@ -84,4 +115,7 @@ ob_start();
 </main>
 <?php
 $mainContent = ob_get_clean();
+
+// 9) Appel du layout
 require BASE_PATH . '/src/layout.php';
+exit;

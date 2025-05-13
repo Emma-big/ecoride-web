@@ -1,13 +1,8 @@
 <?php
 // src/views/selectCompteForm.php
 
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Récupérer tous les comptes utilisateurs
 $queryCompte = "SELECT pseudo, email FROM utilisateurs ORDER BY pseudo ASC";

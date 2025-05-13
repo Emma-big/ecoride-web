@@ -1,3 +1,11 @@
+<?php
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+// === DEBUG SESSION ===
+// Envoie dans les logs Heroku le contenu de la session à chaque requête
+error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
+?>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,17 +32,36 @@
   <!-- 4) Footer (en dernier, pour n’écraser que le footer) -->
   <link rel="stylesheet" href="/assets/style/styleFooter.css">
 
-  <!-- puis vos éventuels extraStyles et scripts Maps -->
+  <!-- puis vos éventuels extraStyles et script Maps -->
   <?php if (!empty($extraStyles)): foreach ($extraStyles as $css): ?>
     <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
   <?php endforeach; endif; ?>
-  <?php if (!empty($barreRecherche)): ?>
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=TA_CLE_API&libraries=places&callback=initSearchAutocomplete">
-    </script>
-  <?php endif; ?>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+ <?php if (!empty($barreRecherche)): 
+  $gKey = $_ENV['GOOGLE_API_KEY'] ?? getenv('GOOGLE_API_KEY') ?? '';
+?>
+  <!-- 1) Chargement de l'API Google Maps + Places avec callback -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($gKey) ?>&libraries=places&callback=initSearchAutocomplete">
+  </script>
+
+  <!-- 2) Déclaration de la fonction callback attendue -->
+  <script>
+    window.initSearchAutocomplete = function() {
+      ['depart','arrivee'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        new google.maps.places.Autocomplete(el, {
+          types: ['address'],
+          componentRestrictions: { country: 'fr' }
+        });
+      });
+    };
+  </script>
+<?php endif; ?>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -86,22 +113,8 @@ if (strpos($_SERVER['REQUEST_URI'], '/noteForm') === 0
     unset($_SESSION['form_errors'], $_SESSION['old']);
 }
 
-// === Barre de recherche conditionnelle ===
-if (!empty($barreRecherche)) {
-    $barFile = __DIR__ . '/' . ltrim($barreRecherche, '/');
-    if (file_exists($barFile)) {
-        echo '<div class="container my-3">';
-        require_once $barFile;
-        echo '</div>';
-    } else {
-        echo "<p class='text-danger'>Fichier introuvable : $barFile</p>";
-    }
-}
-?>
-
-<main class="container my-4 flex-fill">
-<?php
 // === Contenu principal ===
+echo '<main class="flex-fill">';
 if (!empty($mainContent)) {
     echo $mainContent;
 } elseif (!empty($mainView)) {
@@ -117,10 +130,9 @@ if (!empty($mainContent)) {
 } else {
     echo '<p class="text-muted text-center">Aucun contenu à afficher.</p>';
 }
-?>
-</main>
+// <-- fermeture du main
+echo '</main>';
 
-<?php
 // === Footer global ===
 $footerFile = __DIR__ . '/views/footer.php';
 if (file_exists($footerFile)) {

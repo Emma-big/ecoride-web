@@ -2,7 +2,7 @@
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
 // 1) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 2) Cas liste issue de la recherche
 if (isset($_GET['depart'], $_GET['arrivee'], $_GET['date'])) {

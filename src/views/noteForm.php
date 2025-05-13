@@ -2,7 +2,7 @@
 // src/views/noteForm.php
 
 // 1) Session & CSRF
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+
 if (empty($_SESSION['user'])) {
     header('Location: /accessDenied');
     exit;

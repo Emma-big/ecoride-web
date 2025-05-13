@@ -25,7 +25,7 @@ if (
 }
 
 // 3) Charger la BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Nettoyer les données
 $input = [
@@ -128,36 +128,6 @@ foreach ($prefs as $i => $line) {
 }
 
 // 7) En cas d'erreurs, redirection
-if ($errors) {
-    $_SESSION['form_errors'] = $errors;
-    $_SESSION['old']         = $input;
-    header('Location: /covoiturageForm');
-    exit;
-}
-
-// 8) Géolocalisation fallback si nécessaire
-$apiKey = 'AIzaSyDc3McaygJjPxHuOygMh4CUIUN4ZcKMYyg';
-function geocode(string $address, string $apiKey): ?array {
-    $res = @file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($address) . "&key={$apiKey}&language=fr");
-    if (!$res) return null;
-    $data = json_decode($res, true);
-    if (empty($data['results']) || $data['status'] !== 'OK') return null;
-    return $data['results'][0]['geometry']['location'];
-}
-
-foreach (['depart','arrivee'] as $which) {
-    $latk = "{$which}_lat";
-    $lngk = "{$which}_lng";
-    if (empty($input[$latk]) || empty($input[$lngk]) || !is_numeric($input[$latk]) || !is_numeric($input[$lngk])) {
-        $loc = geocode($input["ville_{$which}"], $apiKey);
-        if ($loc) {
-            $input[$latk] = $loc['lat'];
-            $input[$lngk] = $loc['lng'];
-        } else {
-            $errors["geo_{$which}"] = 'Impossible de géolocaliser l’adresse de ' . ($which === 'depart' ? 'départ' : 'd’arrivée') . '.';
-        }
-    }
-}
 if ($errors) {
     $_SESSION['form_errors'] = $errors;
     $_SESSION['old']         = $input;

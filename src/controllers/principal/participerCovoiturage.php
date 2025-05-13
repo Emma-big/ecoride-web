@@ -9,7 +9,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Récupérer l'ID du covoiturage
 $covoitId = (int) ($_POST['id'] ?? $_GET['id'] ?? 0);

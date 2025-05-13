@@ -1,10 +1,8 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
- 
-
 // 1) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 2) Récupération des filtres
 $villeDepart  = trim($_GET['depart']   ?? '');
@@ -31,7 +29,7 @@ $sql = "
       JOIN voitures      AS v ON v.voiture_id     = c.voiture_id
       JOIN energies      AS en ON en.energie_id    = v.energie
       JOIN utilisateurs   AS u ON u.utilisateur_id = c.utilisateur
- LEFT JOIN notes          AS n ON n.covoiturage_id = c.covoiturage_id
+    LEFT JOIN notes    AS n  ON n.chauffeur_id   = c.utilisateur
      WHERE 1 = 1
 ";
 $params = [];

@@ -1,18 +1,10 @@
 <?php
-declare(strict_types=1);
+// bootstrap.php
 
-require_once __DIR__ . '/vendor/autoload.php';
+// 1) Chargement de l’autoloader Composer
+require __DIR__ . '/vendor/autoload.php';
 
-use Adminlocal\EcoRide\Helpers\LoggerHelper;
-
-// Gestion automatique des erreurs fatales
-set_exception_handler(function (Throwable $e) {
-    LoggerHelper::error('Exception non capturée', [
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine()
-    ]);
-
-    // Tu peux aussi afficher un message simple si besoin
-    echo "Une erreur est survenue. Consultez les logs.";
-});
+// 2) Chargement du fichier .env si présent
+if (file_exists(__DIR__ . '/.env')) {
+    \Dotenv\Dotenv::createImmutable(__DIR__)->safeLoad();
+}

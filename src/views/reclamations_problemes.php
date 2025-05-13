@@ -5,6 +5,7 @@
   <h2 class="text-center mb-4">Trajets signalés</h2>
 
   <?php if (!empty($reclamations)): ?>
+    <div class="table-responsive">
     <table class="table table-striped">
       <thead>
         <tr>
@@ -46,7 +47,7 @@
                   <form method="POST" action="/reclamationResolue" class="d-inline">
                     <input type="hidden" name="reclamation_id" value="<?= htmlspecialchars($r['reclamation_id'], ENT_QUOTES) ?>">
                     <input type="hidden" name="csrf_token"      value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-                    <button class="btn btn-sm btn-primary">Problème résolu</button>
+                    <button class="btn btn-sm btn-primary">Problème résolu ?</button>
                   </form>
               <?php
                 elseif ($sid === 8): ?>
@@ -64,7 +65,7 @@
         <?php endforeach; ?>
       </tbody>
     </table>
-
+    </div>
     <!-- Pagination -->
     <nav aria-label="Pagination">
       <ul class="pagination justify-content-center">

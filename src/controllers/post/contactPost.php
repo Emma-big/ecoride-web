@@ -4,6 +4,7 @@ namespace Adminlocal\EcoRide\Controllers\Post;
 use PDOException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
 
 // 1) Dotenv
 $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
@@ -26,7 +27,6 @@ $input = [
     'titre'       => filter_input(INPUT_POST, 'titre', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '',
     'description' => filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '',
 ];
-
 $errors = [];
 
 // 5) Validation des champs
@@ -51,14 +51,13 @@ if (!empty($errors)) {
 }
 
 // 7) Inclure la config BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 8) Stockage en base
 try {
-    $stmt = $pdo->prepare("
-        INSERT INTO message (chat_id, utilisateur, role, content, created_at)
-        VALUES (:chat_id, :utilisateur, :role, :content, NOW())
-    ");
+    $stmt = $pdo->prepare(
+        "INSERT INTO message (chat_id, utilisateur, role, content, created_at) VALUES (:chat_id, :utilisateur, :role, :content, NOW())"
+    );
     $stmt->execute([
         ':chat_id'     => 0,
         ':utilisateur' => $input['email'],
@@ -74,26 +73,37 @@ try {
 // 9) Envoi du mail via PHPMailer
 try {
     $mail = new PHPMailer(true);
+    // SMTP configuration
     $mail->isSMTP();
-    $mail->Host       = $_ENV['MAIL_HOST'];
+    $mail->Host       = getenv('MAIL_HOST');
     $mail->SMTPAuth   = true;
-    $mail->Username   = $_ENV['MAIL_USERNAME'];
-    $mail->Password   = $_ENV['MAIL_PASSWORD'];
+    $mail->Username   = getenv('MAIL_USERNAME');
+    $mail->Password   = getenv('MAIL_PASSWORD');
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = $_ENV['MAIL_PORT'];
+    $mail->Port       = getenv('MAIL_PORT');
 
-    $mail->setFrom($_ENV['MAIL_FROM_ADDRESS'], $_ENV['MAIL_FROM_NAME']);
-    $mail->addAddress($_ENV['MAIL_ADMIN_ADDRESS'], 'Support EcoRide');
+    // Expéditeur & destinataire
+    $mail->setFrom(getenv('MAIL_FROM_ADDRESS'), getenv('MAIL_FROM_NAME'));
+    $mail->addAddress(getenv('MAIL_ADMIN_ADDRESS'), 'Support EcoRide');
     $mail->addReplyTo($input['email']);
 
+    // Contenu du message
     $mail->isHTML(true);
-    $mail->Subject = "Nouveau message de contact : " . htmlspecialchars($input['titre'], ENT_QUOTES);
+    $mail->Subject = 'Nouveau message de contact : ' . htmlspecialchars($input['titre'], ENT_QUOTES);
     $mail->Body    = '<p><strong>De :</strong> ' . htmlspecialchars($input['email'], ENT_QUOTES) . '</p>'
                    . '<p><strong>Sujet :</strong> ' . nl2br(htmlspecialchars($input['titre'], ENT_QUOTES)) . '</p>'
                    . '<p><strong>Message :</strong><br>' . nl2br(htmlspecialchars($input['description'], ENT_QUOTES)) . '</p>';
+
+    // Debug SMTP
+    $mail->SMTPDebug  = SMTP::DEBUG_SERVER;
+    $mail->Debugoutput = function($str, $level) {
+        error_log("[SMTP DEBUG level {$level}] {$str}");
+    };
+
+    // Envoi
     $mail->send();
 } catch (Exception $e) {
-    // On ignore l'erreur pour l'UX
+    error_log('PHPMailer Exception: ' . $e->getMessage());
 }
 
 // 10) Redirection de confirmation

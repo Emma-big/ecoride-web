@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 3) Charger la BDD
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Récupérer & nettoyer
 $input = [
@@ -53,7 +53,7 @@ $dt = \DateTime::createFromFormat('Y-m-d', $input['naissance']);
 if (!($dt && $dt->format('Y-m-d') === $input['naissance'])) {
     $errors['naissance'] = 'Date de naissance invalide.';
 }
-if (!in_array($input['choix'], ['H','F'], true)) {
+if (!in_array($input['choix'], ['Homme','Femme'], true)) {
     $errors['choix'] = 'Choix de sexe invalide.';
 }
 if (!preg_match('/^\+?[0-9]{6,15}$/', $input['phone'])) {
@@ -77,7 +77,7 @@ if ($errors) {
 
 // 8) Hash & defaults
 $hashed  = password_hash($input['password'], PASSWORD_DEFAULT);
-$photo   = $input['choix'] === 'F' ? 'employeF.png' : 'employe.png';
+$photo   = $input['choix'] === 'Femme' ? 'employeF.png' : 'employe.png';
 $role    = 2;   // employé
 $credit  = 0;
 

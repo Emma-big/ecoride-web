@@ -8,9 +8,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Chargement PDO
-require_once BASE_PATH . '/config/database.php';
-
 $uid = (int) ($_SESSION['user']['utilisateur_id'] ?? 0);
 
 $stmt = $pdo->prepare(

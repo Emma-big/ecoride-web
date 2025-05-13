@@ -10,7 +10,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 // 2) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 3) Vérifier les paramètres
 $id  = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -25,14 +25,96 @@ if ($id <= 0 || $uid <= 0) {
 
 // 5) Cas "Tout est OK" ➔ Créditer le chauffeur
 if ($ok === 1) {
-    // … (identique)
+    $stmt = $pdo->prepare("
+        SELECT prix_personne, utilisateur
+          FROM covoiturage
+         WHERE covoiturage_id = ?
+    ");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $prix        = (float) $row['prix_personne'];
+        $chauffeurId = (int) $row['utilisateur'];
+        $driverShare = max(0, $prix - 2); // Commission de 2 crédits
+
+        if ($driverShare > 0) {
+            $upd = $pdo->prepare("
+                UPDATE utilisateurs
+                   SET credit = credit + ?
+                 WHERE utilisateur_id = ?
+            ");
+            $upd->execute([$driverShare, $chauffeurId]);
+        }
+    }
+
+    // ➔ Après OK ➔ redirige vers formulaire de note
     header("Location: /noteForm?id={$id}");
     exit;
 }
 
 // 6) Cas "Signaler un problème"
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // … (identique)
+    // 6.1) Validation
+    $commentaire = trim($_POST['commentaire'] ?? '');
+    if ($commentaire === '') {
+        header("Location: /confirmerTrajet?id={$id}&ok=0&error=empty");
+        exit;
+    }
+
+    // 6.2) Trouver le chauffeur concerné
+    $stmt = $pdo->prepare("
+        SELECT utilisateur
+          FROM covoiturage
+         WHERE covoiturage_id = ?
+    ");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        header('Location: /utilisateur');
+        exit;
+    }
+    $chauffeurId = (int) $row['utilisateur'];
+
+    // 6.3) Insertion dans MongoDB
+    $collection = MongoHelper::getCollection('reclamations');
+
+    $mongoInsert = [
+        'covoiturage_id'       => $id,
+        'utilisateur_id'       => $uid,
+        'utilisateur_concerne' => $chauffeurId,
+        'date_signal'          => date('Y-m-d H:i:s'),
+        'commentaire'          => $commentaire,
+        'statut_id'            => 3
+    ];
+
+    $result   = $collection->insertOne($mongoInsert);
+    $mongoId  = (string)$result->getInsertedId();
+
+    // 6.4) Lier à la base relationnelle
+    // Récupération du commentaire depuis le POST
+$commentaire = trim($_POST['commentaire'] ?? '');
+
+// Préparation de la requête avec les colonnes manquantes
+$stmt = $pdo->prepare("
+    INSERT INTO reclamations
+        (mongo_id, covoiturage_id, utilisateur_id, utilisateur_concerne, commentaire, statut_id, date_signal)
+    VALUES
+        (:mongo_id, :covoiturage_id, :utilisateur_id, :utilisateur_concerne, :commentaire, :statut_id, NOW())
+");
+
+// Exécution avec tous les paramètres
+$stmt->execute([
+    ':mongo_id'            => $mongoId,
+    ':covoiturage_id'      => $id,
+    ':utilisateur_id'      => $uid,
+    ':utilisateur_concerne'=> $chauffeurId,
+    ':commentaire'         => $commentaire,
+    ':statut_id'           => 1,         // ou tout autre statut par défaut voulu
+]);
+
+    // ➔ Après signalement ➔ rediriger vers confirmation
     header('Location: /confirmation-avis');
     exit;
 }
@@ -47,11 +129,11 @@ ob_start();
 <head>
     <meta charset="UTF-8">
     <title>Signaler un problème</title>
-
-    <!-- CSS Bootstrap si besoin -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Règles de responsive et styleIndex déjà chargés via le layout -->
+    <style>
+        body { font-family: sans-serif; padding: 2rem; }
+        textarea { width: 100%; height: 8em; }
+        .error { color: red; margin-bottom: 1em; }
+    </style>
 </head>
 <body class="report-problem">
     <div class="container py-4">
@@ -63,7 +145,7 @@ ob_start();
 
         <form method="post" action="?id=<?= urlencode($id) ?>&ok=0">
             <div class="mb-3">
-                <label for="commentaire" class="form-label">Votre commentaire :</label>
+                <label for="commentaire" class="form-label" rows="5">Votre commentaire :</label>
                 <textarea id="commentaire" name="commentaire" required
                           placeholder="Décrivez ici le problème rencontré…"></textarea>
             </div>

@@ -12,7 +12,7 @@ $old    = $_SESSION['old']         ?? [];
 unset($_SESSION['form_errors'], $_SESSION['old']);
 
 // 3) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Récupérer le pseudo passé en GET
 $pseudo = trim(filter_input(INPUT_GET, 'compte', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? '');

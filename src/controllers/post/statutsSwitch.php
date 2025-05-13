@@ -13,7 +13,7 @@ if (empty($_SESSION['user']) || $_SESSION['user']['role'] != 1) {
 }
 
 // 3) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 4) Récupérer l’ID et l’action
 $id     = (int) ($_POST['id'] ?? 0);

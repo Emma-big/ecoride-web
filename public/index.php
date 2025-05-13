@@ -1,8 +1,19 @@
 <?php
-// public/index.php — Front Controller
+// public/index.php
 
+try {
+    $pdo = require __DIR__ . '/../src/config.php';
+ } catch (\PDOException $e) {
+    // on logue l’exception complète
+    error_log('PDOException dans public/index.php : ' . $e->getMessage());
+    echo "<h1>Erreur de connexion à la base de données :</h1>";
+    echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
+    exit;
+}
+// Affichage des erreurs si APP_DEBUG=true
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 // 1) Démarrage de la session
 if (session_status() === PHP_SESSION_NONE) {
@@ -18,42 +29,53 @@ if (! defined('BASE_PATH')) {
 require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Helpers\renderError;
 
-// Gestionnaire des exceptions non capturées → page 500
-set_exception_handler(function(\Throwable $e) {
-    // Optionnel : log($e);
-    renderError(500);
-});
-
-// Gestionnaire des erreurs PHP → transforme en Exception
-set_error_handler(function($severity, $message, $file, $line) {
-    throw new \ErrorException($message, 0, $severity, $file, $line);
-});
-
-
-// 3.1) Protection CSRF pour toutes les requêtes POST
+// 3.1) Protection CSRF pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (
-        empty($_POST['csrf_token'])
-        || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
-    ) {
-        renderError(403);
+    // On récupère proprement les tokens comme chaînes
+    $submitted    = (string) ($_POST['csrf_token'] ?? '');
+    $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+
+    // DEBUG : log des tokens
+    error_log(sprintf(
+        'CSRF DEBUG — session="%s", submitted="%s"',
+        $sessionToken,
+        $submitted
+    ));
+
+    // Si aucun token n’est disponible ou ne correspond pas → on renvoie au login
+    if ($sessionToken === '' || !hash_equals($sessionToken, $submitted)) {
+        // Pour debug, on peut temporairement rediriger vers le form
+        header('Location: /login?error=csrf');
+        exit;
+        // ou, pour restaurer le 403 :
+        // renderError(403);
     }
 }
-// 3.2) Générer un token unique si nécessaire
+
+// 3.2) Générer un token si nécessaire
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 3.3) Charger l’autoloader Composer et Dotenv AVANT la config
+// 3.3) Autoload Composer + Dotenv
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
-    Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
+    // Ne charger le .env qu’en local / si présent
+    if (file_exists(BASE_PATH . '/.env')) {
+        Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
+    }
 }
 
-// 4) Charger la configuration (PDO, MongoDB…)
-require_once BASE_PATH . '/src/config.php';
+// 4) Connexions PDO & MongoDB
+try {
+    $pdo = require BASE_PATH . '/src/config.php';
+   } catch (\Throwable $e) {
+    echo '<h1>Erreur de connexion à la BDD</h1>';
+    echo '<pre>' . htmlspecialchars($e->getMessage()) . "\n\n" . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    exit;
+}
 
-// 5) Gestion de l'inactivité (10 minutes)
+// 5) Gestion de l'inactivité
 $inactive_duration = 600;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_duration)) {
     session_unset();
@@ -66,40 +88,46 @@ $_SESSION['last_activity'] = time();
 // === ROUTEUR SIMPLIFIÉ ===
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
-// DEBUG temporaire
-file_put_contents(__DIR__.'/../logs/route.log', date('c').' → '.$_SERVER['HTTP_HOST'].' '.$_SERVER['REQUEST_URI'].PHP_EOL, FILE_APPEND);
-
 switch ($uri) {
-    case '/':
-    case '/index':
-    case '/index.php':
-        $mainView = 'views/accueil.php';
-        $barreRecherche = 'views/barreRecherche.php';
-        $pageTitle = 'Accueil - EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
-        break;
-
     case '/login':
-        $mainView = 'forms/login.php';
-        $pageTitle = 'Connexion - EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css', '/assets/style/styleCovoiturage.css', '/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
+        $mainView    = 'forms/login.php';
+        $pageTitle   = 'Connexion - EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleCovoiturage.css',
+            '/assets/style/styleIndex.css',
+            '/assets/style/styleBarreRecherche.css'
+        ];
         break;
 
-    case '/admin':
-        require_once __DIR__ . '/admin.php';
-        exit;
-
-    case '/modifCompteForm':
-        $mainView = 'forms/modifCompteForm.php';
-        $pageTitle = 'Modifier un compte - EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css'];
-        break;
+    case '/loginPost':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once BASE_PATH . '/src/controllers/post/loginPost.php';
+        } else {
+            header('Location: /login');
+        }
+        exit;    
 
     case '/employe':
         require_once BASE_PATH . '/src/controllers/principal/employe.php';
+        exit;   
+    
+    case '/':
+    case '/index':
+    case '/index.php':
+        $barreRecherche= 'views/barreRecherche.php';
+        $mainView      = 'views/accueil.php';
+        $pageTitle     = 'Accueil - EcoRide';
+        $extraStyles   = ['/assets/style/styleIndex.css', '/assets/style/styleBarreRecherche.css'];
+        break;
+
+    case '/admin':
+        $hideTitle = true;
+        $mainView  = 'views/adminDashboard.php';
+        require_once BASE_PATH . '/src/layout.php';
         exit;
 
-    case '/registerForm':
+       case '/registerForm':
         $mainView = 'views/registerForm.php';
         $pageTitle = 'Créer un compte - EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
@@ -217,10 +245,6 @@ switch ($uri) {
             renderError(405);
         }
         break;
-
-    case '/loginPost':
-        require_once BASE_PATH . '/src/controllers/post/loginPost.php';
-        exit;
 
     case '/deconnexion':
         require_once BASE_PATH . '/src/controllers/principal/deconnexion.php';
@@ -357,20 +381,46 @@ switch ($uri) {
         }
         break;
 
-        case '/deleteVoiture':
-            // Seule la méthode POST est autorisée
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                renderError(405);
-            }
-        
-            // Le CSRF est déjà vérifié en amont pour toute requête POST
-            require_once BASE_PATH . '/src/controllers/principal/deleteVoiture.php';
-            exit;
-    
-    default:
-        renderError(404);
-    }
+    case '/deleteVoiture':
+        // Seule la méthode POST est autorisée
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            renderError(405);
+        }
+        // Le CSRF est déjà vérifié en amont pour toute requête POST
+        require_once BASE_PATH . '/src/controllers/principal/deleteVoiture.php';
+        exit;
 
-// 6) Affichage du layout global
+    case '/utilisateur':
+        require_once __DIR__ . '/utilisateur.php';
+        exit;
+
+      // Afficher le formulaire de modification de rôle (GET)
+    case '/modifCompteForm':
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            header('Location: /admin');
+            exit;
+        }
+        require BASE_PATH . '/src/forms/modifCompteForm.php';
+        exit;
+
+    // Traiter la mise à jour de rôle (POST)
+    case '/modifCompteAction':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin');
+            exit;
+        }
+        require BASE_PATH . '/src/forms/modifCompteAction.php';
+        exit;  
+        
+    case '/compteur_api.php':
+        // on veut bien exécuter le fichier brut, sans passer par le layout
+        require BASE_PATH . '/public/compteur_api.php';
+        exit;
+
+       default:
+        renderError(404);
+}
+
+// 6) Affichage du layout global (pour toutes les vues “$mainView”)
 require_once BASE_PATH . '/src/layout.php';
 exit;

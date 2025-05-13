@@ -1,0 +1,7 @@
+# .codecov.yml
+coverage:
+  status:
+    project:
+      default:
+        # cible automatique (50%, 80%, etc.)
+        target: auto

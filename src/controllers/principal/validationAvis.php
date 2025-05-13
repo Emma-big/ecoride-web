@@ -11,7 +11,6 @@ if (!isset($termine) || !is_array($termine)) {
     $termine = [];
 }
 ?>
-<h2 class="text-center mb-4">Mes covoiturages (Chauffeur)</h2>
 
 <section class="my-5">
   <h2 class="h2statut text-center mb-4">À Valider</h2>

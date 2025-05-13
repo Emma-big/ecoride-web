@@ -1,11 +1,6 @@
 <?php
 // src/views/confirmation-avis.php
 
-// 1) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
 // 2) Gérer l'inactivité (10 minutes)
 $inactive_duration = 600;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $inactive_duration) {

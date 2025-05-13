@@ -1,39 +1,28 @@
 <?php
-namespace Adminlocal\EcoRide\Controllers\Principal;
+// src/controllers/principal/mesvoitures.php
 
-// 1) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+// 1) On suppose que public/utilisateur.php a déjà démarré la session,
+//    chargé BASE_PATH, dotenv, $pdo (via src/config.php) et défini $uid.
 
-// 2) Démarrer la session si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-// 3) Récupérer l'ID de l'utilisateur via son pseudo en session
-$stmtId = $pdo->prepare("SELECT utilisateur_id FROM utilisateurs WHERE pseudo = :pseudo");
-$stmtId->execute([':pseudo' => $_SESSION['user']['pseudo']]);
-$proprio = $stmtId->fetch(\PDO::FETCH_ASSOC);
-$proprietaireId = $proprio['utilisateur_id'] ?? null;
-
-if (!$proprietaireId) {
-    echo "<p>Aucune voiture trouvée.</p>";
-    return;
-}
-
-// 4) Récupérer les voitures de cet utilisateur (soft-delete)
-$stmt = $pdo->prepare("SELECT v.voiture_id, v.modele, v.immatriculation,
-         v.couleur, v.date_premiere_immat,
-         m.libelle AS marque, e.libelle AS energie
+// 2) Récupération des voitures de l’utilisateur connecté
+$stmt = $pdo->prepare("
+    SELECT v.voiture_id, v.modele, v.immatriculation,
+           v.couleur, v.date_premiere_immat,
+           m.libelle AS marque, e.libelle AS energie
     FROM voitures v
-    JOIN marques m   ON v.marque_id     = m.marque_id
-    JOIN energies e  ON v.energie       = e.energie_id
-   WHERE v.proprietaire_id = :uid
-     AND v.deleted_at IS NULL
-   ORDER BY v.modele");
-$stmt->execute([':uid' => $proprietaireId]);
+    JOIN marques  m ON v.marque_id   = m.marque_id
+    JOIN energies e ON v.energie      = e.energie_id
+    WHERE v.proprietaire_id = :uid
+      AND v.deleted_at IS NULL
+    ORDER BY v.modele
+");
+$stmt->execute([':uid' => $uid]);
 $mesVoitures = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 ?>
-<?php if (!empty($mesVoitures)): ?>
+
+<?php if (empty($mesVoitures)): ?>
+  <p class="text-center text-muted">Aucune voiture trouvée.</p>
+<?php else: ?>
   <div class="row">
     <?php foreach ($mesVoitures as $vehicule): ?>
       <div class="col-md-6 col-lg-4 mb-4">
@@ -65,23 +54,24 @@ $mesVoitures = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             </ul>
           </div>
           <div class="card-footer text-center">
-            <!-- Bouton Modifier -->
-            <a href="/vehiculeForm?id=<?= (int)$vehicule['voiture_id'] ?>" class="btn btn-secondary btn-sm me-2">Modifier</a>
-            <!-- Bouton Supprimer (soft-delete) -->
-            <form action="/deleteVoiture" method="POST" class="d-inline" onsubmit="return confirm('Supprimer cette voiture ?');">
-                <input type="hidden" name="id" value="<?= (int)$vehicule['voiture_id'] ?>">
-                <button class="btn btn-danger btn-sm">Supprimer</button>
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+            <a href="/vehiculeForm?id=<?= (int)$vehicule['voiture_id'] ?>"
+               class="btn btn-secondary btn-sm me-2">
+              Modifier
+            </a>
+            <form action="/deleteVoiture" method="POST" class="d-inline"
+                  onsubmit="return confirm('Supprimer cette voiture ?');">
+              <input type="hidden" name="id" value="<?= (int)$vehicule['voiture_id'] ?>">
+              <input type="hidden" name="csrf_token"
+                     value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+              <button class="btn btn-danger btn-sm">Supprimer</button>
             </form>
           </div>
         </div>
       </div>
     <?php endforeach; ?>
   </div>
-<?php else: ?>
-  <p class="text-center text-muted">Aucune voiture trouvée.</p>
 <?php endif; ?>
 
-<div class="text-center mt-3">
-  <a class="btn btn-primary" href="/vehiculeForm">Ajouter une voiture</a>
+<div class="text-center mt-4">
+  <a href="/vehiculeForm" class="btn btn-primary">Ajouter une voiture</a>
 </div>

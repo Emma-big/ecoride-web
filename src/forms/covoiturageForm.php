@@ -1,13 +1,24 @@
 <?php
 namespace Adminlocal\EcoRide\Forms;
 
+// Charger l'autoloader Composer
+require_once BASE_PATH . '/vendor/autoload.php';
+
+// En local, charger .env s'il existe
+if (file_exists(BASE_PATH . '/.env')) {
+    $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
+    $dotenv->load();
+} else {
+    error_log('No .env file found, skipping Dotenv load');
+}
+
 // 1) Démarrage de la session si nécessaire
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
 // 2) Charger la config PDO
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 // 2.5) Générer un nouveau CSRF token si besoin
 if (empty($_SESSION['csrf_token'])) {
@@ -43,13 +54,13 @@ $stmt->execute([':pseudo' => $_SESSION["user"]["pseudo"]]);
 $createurIdHidden = (int) $stmt->fetchColumn();
 
 // 7) Vérifier que l’utilisateur a au moins une voiture non supprimée
-$stmt = $pdo->prepare("
-    SELECT v.voiture_id, CONCAT(m.libelle,' ',v.modele) AS display
+$stmt = $pdo->prepare(
+    "SELECT v.voiture_id, CONCAT(m.libelle,' ',v.modele) AS display
       FROM voitures v
       JOIN marques m ON v.marque_id = m.marque_id
      WHERE v.proprietaire_id = :uid
-       AND v.deleted_at IS NULL
-");
+       AND v.deleted_at IS NULL"
+);
 $stmt->execute([':uid' => $createurIdHidden]);
 $voitures = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 if (empty($voitures)) {
@@ -129,6 +140,7 @@ if (empty($voitures)) {
         <div class="mb-3">
             <label for="prix" class="form-label">Prix par personne (crédits)</label>
             <input type="number" id="prix" name="prix" class="form-control" min="2" step="0.01" required value="<?= htmlspecialchars($old['prix'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+        <small class="text-white">La plateforme perçoit 2 crédits par passager.</small>
         </div>
 
         <!-- Nombre de places -->
@@ -163,7 +175,7 @@ if (empty($voitures)) {
 </main>
 <!-- Réintégration de l’API Google Maps pour initAutocomplete -->
 <script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDc3McaygJjPxHuOygMh4CUIUN4ZcKMYyg&libraries=places&callback=initAutocomplete">
+  src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($_ENV['GOOGLE_API_KEY'] ?? '') ?>&libraries=places&callback=initAutocomplete">
 </script>
 <script>
   (function(){
@@ -180,19 +192,12 @@ if (empty($voitures)) {
   function initAutocomplete() {
     ['ville_depart','ville_arrivee'].forEach(id => {
       const inp = document.getElementById(id);
-      const auto = new google.maps.places.Autocomplete(inp, {
-        types: ['address'],
-        componentRestrictions: { country: 'fr' }
-      });
+      const auto = new google.maps.places.Autocomplete(inp, { types: ['address'], componentRestrictions: { country: 'fr' } });
       auto.addListener('place_changed', () => {
         const p = auto.getPlace();
         if (!p.geometry) return;
-        document.getElementById(
-          id==='ville_depart'?'depart_lat':'arrivee_lat'
-        ).value = p.geometry.location.lat().toFixed(7);
-        document.getElementById(
-          id==='ville_depart'?'depart_lng':'arrivee_lng'
-        ).value = p.geometry.location.lng().toFixed(7);
+        document.getElementById(id==='ville_depart'?'depart_lat':'arrivee_lat').value = p.geometry.location.lat().toFixed(7);
+        document.getElementById(id==='ville_depart'?'depart_lng':'arrivee_lng').value = p.geometry.location.lng().toFixed(7);
       });
     });
   }

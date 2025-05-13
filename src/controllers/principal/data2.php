@@ -2,7 +2,7 @@
 // src/controllers/principal/data2.php
 
 header('Content-Type: application/json; charset=UTF-8');
-require_once BASE_PATH . '/config/database.php';
+$pdo = require BASE_PATH . '/src/config.php';
 
 $rawStart = $_GET['start'] ?? '';
 $rawEnd   = $_GET['end']   ?? '';
