@@ -1,11 +1,5 @@
 # EcoRide
 
-\\
-
-EcoRide est une application collaborative de covoiturage écologique via des voitures électriques permettant aux utilisateurs de rechercher, réserver et proposer des trajets facilement. Le front-end est construit en PHP (templates HTML/CSS/JavaScript), et le back-end en PHP-FPM avec une API REST. Les données principales sont stockées dans une base SQL et une base noSQL (MongoDB).
-
----
-
 ## Table des matières
 
 1. [Description du projet](#description-du-projet)
@@ -101,9 +95,9 @@ Tous les guides et chartes sont disponibles au format PDF :
 
 Nous utilisons un workflow Gitflow simplifié :
 
-* **main** : branche stable en production.
-* **develop** : intégration des fonctionnalités validées.
-* **feature/**\*\* : branches de fonctionnalités créées depuis `develop`.
+* main : branche stable en production.
+* develop** : intégration des fonctionnalités validées.
+* feature/** : branches de fonctionnalités créées depuis `develop`.
 
 **Cycle de vie** :
 
