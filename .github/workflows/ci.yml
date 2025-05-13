@@ -27,11 +27,9 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Make PHPUnit executable
-        run: chmod +x vendor/bin/phpunit
-
       - name: Run tests and generate coverage
         run: |
+          chmod +x vendor/bin/phpunit
           ./vendor/bin/phpunit \
             --configuration phpunit.xml \
             --coverage-clover=coverage.xml \
