@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   test-and-coverage:
@@ -24,6 +26,9 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
+
+      - name: Make PHPUnit executable
+        run: chmod +x vendor/bin/phpunit
 
       - name: Run tests and generate coverage
         run: |
