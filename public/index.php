@@ -88,12 +88,6 @@ $_SESSION['last_activity'] = time();
 // === ROUTEUR SIMPLIFIÉ ===
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
-// (optionnel) Log de route
-file_put_contents(__DIR__.'/../logs/route.log',
-    date('c').' → '.$_SERVER['HTTP_HOST'].' '.$_SERVER['REQUEST_URI'].PHP_EOL,
-    FILE_APPEND
-);
-
 switch ($uri) {
     case '/login':
         $mainView    = 'forms/login.php';

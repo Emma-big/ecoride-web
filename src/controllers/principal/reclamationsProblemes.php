@@ -21,7 +21,7 @@ $perPage = 10;
 $offset  = ($page - 1) * $perPage;
 
 // 4) Récupérer UNIQUEMENT les statuts concernés (1,3,4,7,8),  
-//    et cette fois **reclamation_id** (PK int) + **mongo_id**
+//    et cette fois **reclamation_id** + **mongo_id**
 $stmt = $pdo->prepare("
     SELECT reclamation_id,
            mongo_id,
