@@ -22,7 +22,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // 4) Helpers & Middleware
-require_once BASE_PATH . '/src/Helpers/renderError.php';
+require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Adminlocal\EcoRide\Helpers\renderError;
 
 require_once BASE_PATH . '/src/Middleware/requireJwtAuth.php';
