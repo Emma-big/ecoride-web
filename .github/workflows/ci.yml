@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
     branches:
       - main
-      - develop
 
 jobs:
   test-and-coverage:
@@ -29,8 +27,7 @@ jobs:
 
       - name: Run tests and generate coverage
         run: |
-          chmod +x vendor/bin/phpunit
-          ./vendor/bin/phpunit \
+          php vendor/bin/phpunit \
             --configuration phpunit.xml \
             --coverage-clover=coverage.xml \
             --coverage-filter src
