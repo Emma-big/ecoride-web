@@ -13,29 +13,25 @@ if (file_exists(BASE_PATH . '/.env')) {
 }
 
 // 3) Erreurs & session
-// géré par votre .env : APP_DEBUG=true ou false
 $debug = (getenv('APP_DEBUG') === 'true');
-
 ini_set('display_errors', $debug ? '1' : '0');
 ini_set('display_startup_errors', $debug ? '1' : '0');
 error_reporting($debug ? E_ALL : 0);
-error_reporting(E_ALL);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 // 4) Helpers & Middleware
-require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
+require_once BASE_PATH . '/src/Helpers/renderError.php';
 use function Adminlocal\EcoRide\Helpers\renderError;
 
 require_once BASE_PATH . '/src/Middleware/requireJwtAuth.php';
 use function Adminlocal\EcoRide\Middleware\requireJwtAuth;
 
-// 5) CSRF pour les POST
+// 5) CSRF protection pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $submitted    = (string) ($_POST['csrf_token'] ?? '');
     $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
-    error_log("CSRF — sess={$sessionToken} post={$submitted}");
     if ($sessionToken === '' || !hash_equals($sessionToken, $submitted)) {
         header('Location: /login?error=csrf');
         exit;
@@ -49,34 +45,47 @@ if (empty($_SESSION['csrf_token'])) {
 try {
     $pdo = require BASE_PATH . '/src/config.php';
 } catch (Throwable $e) {
-    echo '<h1>Erreur BDD</h1><pre>'.htmlspecialchars($e->getMessage()).'</pre>';
+    echo '<h1>Erreur BDD</h1><pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
     exit;
 }
 
-// 7) Middleware JWT
-require_once BASE_PATH . '/src/Middleware/requireJwtAuth.php';
-
-// 8) Gestion d'inactivité (session still used for CSRF)
+// 7) Inactivité
 $inactive = 600;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive)) {
-    session_unset(); session_destroy();
-    header('Location: /inactivite'); exit;
+if (isset($_SESSION['last_activity']) && time() - $_SESSION['last_activity'] > $inactive) {
+    session_unset();
+    session_destroy();
+    header('Location: /inactivite');
+    exit;
 }
 $_SESSION['last_activity'] = time();
 
-// === ROUTEUR SIMPLIFIÉ ===
-$uri = strtok($_SERVER['REQUEST_URI'], '?');
+// 8) Dispatcher
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$mainContent = '';
+$pageTitle   = 'EcoRide';
+$extraStyles = [];
 
 switch ($uri) {
-    case '/login':
-        $mainView    = 'forms/login.php';
-        $pageTitle   = 'Connexion - EcoRide';
+    // PUBLIC
+    case '/':
+    case '/index':
+    case '/index.php':
+        $pageTitle   = 'Accueil – EcoRide';
         $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleCovoiturage.css',
             '/assets/style/styleIndex.css',
             '/assets/style/styleBarreRecherche.css'
         ];
+        ob_start();
+        require BASE_PATH . '/src/views/accueil.php';
+        $mainContent = ob_get_clean();
+        break;
+
+    case '/login':
+        $pageTitle   = 'Connexion – EcoRide';
+        $extraStyles = ['/assets/style/styleFormLogin.css'];
+        ob_start();
+        require BASE_PATH . '/src/forms/login.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/loginPost':
@@ -87,114 +96,92 @@ switch ($uri) {
         }
         exit;
 
-    case '/employe':
-        // JWT authentication
-        requireJwtAuth();
-        require BASE_PATH . '/src/controllers/principal/employe.php';
-        exit;
-
-    case '/admin':
-        requireJwtAuth();
-        $hideTitle = true;
-        $mainView  = 'views/adminDashboard.php';
-        require BASE_PATH . '/src/layout.php';
-        exit;
-
-    case '/':
-    case '/index':
-    case '/index.php':
-        $barreRecherche= 'views/barreRecherche.php';
-        $mainView      = 'views/accueil.php';
-        $pageTitle     = 'Accueil - EcoRide';
-        $extraStyles   = ['/assets/style/styleIndex.css','/assets/style/styleBarreRecherche.css'];
-        break;
-
-    case '/login':
-        $mainView    = 'forms/login.php';
-        $pageTitle   = 'Connexion - EcoRide';
-        $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleCovoiturage.css',
-            '/assets/style/styleIndex.css',
-            '/assets/style/styleBarreRecherche.css'
-        ];
-        break;
-
-    case '/loginPost':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once BASE_PATH . '/src/controllers/post/loginPost.php';
-        } else {
-            header('Location: /login');
-        }
-        exit;
-
     case '/registerForm':
-        $mainView    = 'views/registerForm.php';
-        $pageTitle   = 'Créer un compte - EcoRide';
+        $pageTitle   = 'Créer un compte – EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/registerForm.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/registerPost':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once BASE_PATH . '/src/controllers/post/registerPost.php';
+            require BASE_PATH . '/src/controllers/post/registerPost.php';
         } else {
             renderError(405);
         }
         exit;
 
-    // --- Routes privées (JWT) ---
+    // PROTECTED
     case '/employe':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/principal/employe.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/employe.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/admin':
         requireJwtAuth();
-        $hideTitle = true;
-        $mainView  = 'views/adminDashboard.php';
+        $hideTitle   = true;
+        $pageTitle   = 'Admin – EcoRide';
         $extraStyles = ['/assets/style/styleIndex.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/adminDashboard.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/notes-a-valider':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/principal/notesAVerifier.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/notesAVerifier.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/detail-covoiturage':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/delete-covoiturage':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/principal/deleteCovoiturage.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/deleteCovoiturage.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/covoiturageForm':
         requireJwtAuth();
-        $mainView    = 'forms/covoiturageForm.php';
-        $pageTitle   = 'Créer un covoiturage - EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css', '/assets/style/styleIndex.css'];
+        $pageTitle   = 'Créer un covoiturage – EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleIndex.css'
+        ];
+        ob_start();
+        require BASE_PATH . '/src/forms/covoiturageForm.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/vehiculeForm':
         requireJwtAuth();
-        $mainView    = 'views/vehiculeForm.php';
-        $pageTitle   = 'Ajouter une voiture - EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css', '/assets/style/styleBigTitle.css', '/assets/style/styleIndex.css'];
+        $pageTitle   = 'Ajouter une voiture – EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleIndex.css'
+        ];
+        ob_start();
+        require BASE_PATH . '/src/views/vehiculeForm.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/covoiturage':
         requireJwtAuth();
-        $barreRecherche = 'views/barreRecherche.php';
-        $mainView       = 'views/covoiturage.php';
-        $pageTitle      = 'Rechercher un covoiturage - EcoRide';
-        $extraStyles    = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleCovoiturage.css',
-            '/assets/style/styleIndex.css',
-            '/assets/style/styleBarreRecherche.css'
-        ];
+        $pageTitle   = 'Rechercher un covoiturage – EcoRide';
+        $extraStyles = ['/assets/style/styleCovoiturage.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/covoiturage.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/covoiturageStatutsSwitch':
@@ -203,73 +190,87 @@ switch ($uri) {
             require BASE_PATH . '/src/controllers/principal/statutsSwitch.php';
             exit;
         }
+        renderError(405);
         break;
 
     case '/stats/data1':
         requireJwtAuth();
         header('Content-Type: application/json');
-        require_once BASE_PATH . '/src/controllers/principal/data1.php';
+        require BASE_PATH . '/src/controllers/principal/data1.php';
         exit;
 
     case '/stats/data2':
         requireJwtAuth();
         header('Content-Type: application/json');
-        require_once BASE_PATH . '/src/controllers/principal/data2.php';
+        require BASE_PATH . '/src/controllers/principal/data2.php';
         exit;
 
     case '/stats':
     case '/stats/':
         requireJwtAuth();
-        $mainView    = 'views/stats.php';
-        $pageTitle   = 'Statistiques - EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css', '/assets/style/styleCovoiturage.css'];
+        $pageTitle   = 'Statistiques – EcoRide';
+        $extraStyles = ['/assets/style/styleIndex.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/stats.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/reclamationForm':
         requireJwtAuth();
-        $mainView    = 'controllers/principal/reclamationForm.php';
-        $pageTitle   = 'Signaler un problème - EcoRide';
+        $pageTitle   = 'Signaler un problème – EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/reclamationForm.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/reclamationPost':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require BASE_PATH . '/src/controllers/post/reclamationPost.php';
-            exit;
         } else {
             renderError(405);
         }
-        break;
+        exit;
 
     case '/reclamations-problemes':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/principal/reclamationsProblemes.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/reclamationsProblemes.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/reclamationTraitee':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/post/reclamationTraitee.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/post/reclamationTraitee.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/reclamationResolue':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/post/reclamationResolue.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/post/reclamationResolue.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/participerCovoiturage':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_start();
             require BASE_PATH . '/src/controllers/principal/participerCovoiturage.php';
-            exit;
+            $mainContent = ob_get_clean();
+        } else {
+            renderError(405);
         }
         break;
 
     case '/updateRolePost':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_start();
             require BASE_PATH . '/src/controllers/post/updateRolePost.php';
-            exit;
+            $mainContent = ob_get_clean();
         } else {
             renderError(405);
         }
@@ -277,25 +278,26 @@ switch ($uri) {
 
     case '/confirmerTrajet':
         requireJwtAuth();
+        ob_start();
         require BASE_PATH . '/src/controllers/post/confirmerTrajet.php';
-        exit;
+        $mainContent = ob_get_clean();
+        break;
 
     case '/noteForm':
         requireJwtAuth();
-        $mainView    = 'views/noteForm.php';
-        $pageTitle   = 'Notez votre covoiturage - EcoRide';
-        $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleCovoiturage.css',
-            '/assets/style/styleIndex.css'
-        ];
+        $pageTitle   = 'Notez votre covoiturage – EcoRide';
+        $extraStyles = ['/assets/style/styleFormLogin.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/noteForm.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/notePost':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once BASE_PATH . '/src/controllers/post/notePost.php';
-            exit;
+            ob_start();
+            require BASE_PATH . '/src/controllers/post/notePost.php';
+            $mainContent = ob_get_clean();
         } else {
             renderError(405);
         }
@@ -304,8 +306,9 @@ switch ($uri) {
     case '/toggleAvisStatut':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_start();
             require BASE_PATH . '/src/controllers/post/toggleAvisStatut.php';
-            exit;
+            $mainContent = ob_get_clean();
         } else {
             renderError(405);
         }
@@ -314,8 +317,9 @@ switch ($uri) {
     case '/covoiturageDemarrer':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_start();
             require BASE_PATH . '/src/controllers/post/covoiturageDemarrer.php';
-            exit;
+            $mainContent = ob_get_clean();
         } else {
             renderError(405);
         }
@@ -324,8 +328,9 @@ switch ($uri) {
     case '/covoiturageTerminer':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_start();
             require BASE_PATH . '/src/controllers/post/covoiturageTerminer.php';
-            exit;
+            $mainContent = ob_get_clean();
         } else {
             renderError(405);
         }
@@ -334,8 +339,9 @@ switch ($uri) {
     case '/covoiturageAnnuler':
         requireJwtAuth();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            ob_start();
             require BASE_PATH . '/src/controllers/post/covoiturageAnnuler.php';
-            exit;
+            $mainContent = ob_get_clean();
         } else {
             renderError(405);
         }
@@ -346,30 +352,40 @@ switch ($uri) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             renderError(405);
         }
-        require_once BASE_PATH . '/src/controllers/principal/deleteVoiture.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/deleteVoiture.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/deconnexion':
         requireJwtAuth();
-        require_once BASE_PATH . '/src/controllers/principal/deconnexion.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/controllers/principal/deconnexion.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/inactivite':
-        $mainView    = 'views/inactivite.php';
-        $pageTitle   = 'Inactivité - EcoRide';
+        $pageTitle   = 'Inactivité – EcoRide';
         $extraStyles = ['/assets/style/styleIndex.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/inactivite.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/suspendu':
-        $mainView    = 'views/suspendu.php';
-        $pageTitle   = 'Compte suspendu - EcoRide';
+        $pageTitle   = 'Compte suspendu – EcoRide';
         $extraStyles = ['/assets/style/styleIndex.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/suspendu.php';
+        $mainContent = ob_get_clean();
         break;
 
     case '/utilisateur':
         requireJwtAuth();
-        require_once __DIR__ . '/utilisateur.php';
-        exit;
+        ob_start();
+        require BASE_PATH . '/src/utilisateur.php';
+        $mainContent = ob_get_clean();
+        break;
 
     case '/modifCompteForm':
         requireJwtAuth();
@@ -377,8 +393,10 @@ switch ($uri) {
             header('Location: /admin');
             exit;
         }
+        ob_start();
         require BASE_PATH . '/src/forms/modifCompteForm.php';
-        exit;
+        $mainContent = ob_get_clean();
+        break;
 
     case '/modifCompteAction':
         requireJwtAuth();
@@ -386,8 +404,10 @@ switch ($uri) {
             header('Location: /admin');
             exit;
         }
+        ob_start();
         require BASE_PATH . '/src/forms/modifCompteAction.php';
-        exit;
+        $mainContent = ob_get_clean();
+        break;
 
     case '/compteur_api.php':
         // exécuter sans layout
@@ -398,10 +418,5 @@ switch ($uri) {
         renderError(404);
 }
 
-// 10) Affichage de la vue ou du layout
-if (PHP_SAPI === 'cli') {
-    require_once BASE_PATH . '/public/' . $mainView;
-} else {
-    require_once BASE_PATH . '/src/layout.php';
-    exit;
-}
+// 9) Affichage générique
+require_once BASE_PATH . '/src/layout.php';
