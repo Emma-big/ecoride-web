@@ -1,29 +1,35 @@
 <?php
 // public/index.php
 
-// 1) Charger la configuration de la base (SQLite en TEST, MySQL sinon)
-$pdo = require __DIR__ . '/../src/config.php';
-
-// 2) Affichage des erreurs si APP_DEBUG=true
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
-// 3) Démarrage de la session (pour CSRF)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 4) Définir BASE_PATH comme la racine du projet
+// 1) Définir BASE_PATH comme la racine du projet
 if (! defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/..'));
 }
 
-// 5) Charger le helper d’erreur
-require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
-use function Helpers\renderError;
+// 2) Autoload + .env
+require_once BASE_PATH . '/vendor/autoload.php';
+if (file_exists(BASE_PATH . '/.env')) {
+    Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
+}
 
-// 6) Protection CSRF pour les POST
+// 3) Erreurs & session
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 4) Import des helpers et middleware
+use function Adminlocal\EcoRide\Helpers\renderError;
+use function Adminlocal\EcoRide\Middleware\requireJwtAuth;
+
+// 4) Démarrage de la session (pour CSRF, inactivité…)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 5) Protection CSRF pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $submitted    = (string) ($_POST['csrf_token'] ?? '');
     $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
@@ -33,55 +39,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+// Génération du token CSRF si nécessaire
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 7) Autoload Composer + Dotenv
-if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
-    require_once BASE_PATH . '/vendor/autoload.php';
-    if (file_exists(BASE_PATH . '/.env')) {
-        Dotenv\Dotenv::createImmutable(BASE_PATH)->safeLoad();
-    }
-}
-
-// 8) Reconnexion PDO & gestion d’inactivité
+// 6) Charger la configuration BDD
 try {
     $pdo = require BASE_PATH . '/src/config.php';
-} catch (\Throwable $e) {
-    echo '<h1>Erreur de connexion à la BDD</h1>';
-    echo '<pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
+} catch (Throwable $e) {
+    echo '<h1>Erreur de connexion à la BDD</h1><pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
     exit;
 }
-$inactive_duration = 600;
-if (isset($_SESSION['last_activity']) && time() - $_SESSION['last_activity'] > $inactive_duration) {
-    session_unset();
-    session_destroy();
-    header('Location: /inactivite');
-    exit;
+
+// 7) Middleware JWT
+require_once BASE_PATH . '/src/Middleware/requireJwtAuth.php';
+
+// 8) Gestion d'inactivité (session still used for CSRF)
+$inactive = 600;
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive)) {
+    session_unset(); session_destroy();
+    header('Location: /inactivite'); exit;
 }
 $_SESSION['last_activity'] = time();
-
-// 9) Import du middleware JWT
-require_once BASE_PATH . '/src/Middleware/requireJwtAuth.php';
-use function Adminlocal\EcoRide\Middleware\requireJwtAuth;
 
 // === ROUTEUR SIMPLIFIÉ ===
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
 switch ($uri) {
-
-    // --- Routes publiques ---
-    case '/':
-    case '/index':
-    case '/index.php':
-        $barreRecherche = 'views/barreRecherche.php';
-        $mainView       = 'views/accueil.php';
-        $pageTitle      = 'Accueil - EcoRide';
-        $extraStyles    = [
+    case '/login':
+        $mainView    = 'forms/login.php';
+        $pageTitle   = 'Connexion - EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleCovoiturage.css',
             '/assets/style/styleIndex.css',
             '/assets/style/styleBarreRecherche.css'
         ];
+        break;
+
+    case '/loginPost':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require BASE_PATH . '/src/controllers/post/loginPost.php';
+        } else {
+            header('Location: /login');
+        }
+        exit;
+
+    case '/employe':
+        // JWT authentication
+        requireJwtAuth();
+        require BASE_PATH . '/src/controllers/principal/employe.php';
+        exit;
+
+    case '/admin':
+        requireJwtAuth();
+        $hideTitle = true;
+        $mainView  = 'views/adminDashboard.php';
+        require BASE_PATH . '/src/layout.php';
+        exit;
+
+    case '/':
+    case '/index':
+    case '/index.php':
+        $barreRecherche= 'views/barreRecherche.php';
+        $mainView      = 'views/accueil.php';
+        $pageTitle     = 'Accueil - EcoRide';
+        $extraStyles   = ['/assets/style/styleIndex.css','/assets/style/styleBarreRecherche.css'];
         break;
 
     case '/login':

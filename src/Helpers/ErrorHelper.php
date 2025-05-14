@@ -1,5 +1,5 @@
 <?php
-namespace Helpers;
+namespace Adminlocal\EcoRide\Helpers;
 
 function renderError(int $code): void {
     http_response_code($code);
