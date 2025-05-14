@@ -13,42 +13,43 @@ if (file_exists(BASE_PATH . '/.env')) {
 }
 
 // 3) Erreurs & session
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
+// géré par votre .env : APP_DEBUG=true ou false
+$debug = (getenv('APP_DEBUG') === 'true');
+
+ini_set('display_errors', $debug ? '1' : '0');
+ini_set('display_startup_errors', $debug ? '1' : '0');
+error_reporting($debug ? E_ALL : 0);
 error_reporting(E_ALL);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 4) Import des helpers et middleware
+// 4) Helpers & Middleware
+require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Adminlocal\EcoRide\Helpers\renderError;
+
+require_once BASE_PATH . '/src/Middleware/requireJwtAuth.php';
 use function Adminlocal\EcoRide\Middleware\requireJwtAuth;
 
-// 4) Démarrage de la session (pour CSRF, inactivité…)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 5) Protection CSRF pour les POST
+// 5) CSRF pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $submitted    = (string) ($_POST['csrf_token'] ?? '');
     $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
-    error_log(sprintf('CSRF DEBUG — session="%s", submitted="%s"', $sessionToken, $submitted));
+    error_log("CSRF — sess={$sessionToken} post={$submitted}");
     if ($sessionToken === '' || !hash_equals($sessionToken, $submitted)) {
         header('Location: /login?error=csrf');
         exit;
     }
 }
-// Génération du token CSRF si nécessaire
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 6) Charger la configuration BDD
+// 6) Connexion BDD
 try {
     $pdo = require BASE_PATH . '/src/config.php';
 } catch (Throwable $e) {
-    echo '<h1>Erreur de connexion à la BDD</h1><pre>' . htmlspecialchars($e->getMessage()) . '</pre>';
+    echo '<h1>Erreur BDD</h1><pre>'.htmlspecialchars($e->getMessage()).'</pre>';
     exit;
 }
 
