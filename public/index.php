@@ -68,7 +68,7 @@ $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
 switch ($uri) {
     case '/login':
-        $mainView    = 'src/forms/login.php';
+        $mainView    = 'forms/login.php';
         $pageTitle   = 'Connexion - EcoRide';
         $extraStyles = [
             '/assets/style/styleFormLogin.css',
