@@ -19,7 +19,6 @@ if (! defined('BASE_PATH')) {
 // 3) Charger l’autoload Composer
 require_once BASE_PATH . '/vendor/autoload.php';
 
-
 // 4) Pour debug : on verra dans les logs quelle URL on utilise
 $jawsUrl = getenv('JAWSDB_URL') ?: getenv('JAWSDB_MAUVE_URL');
 error_log('ENV JAWSDB_URL_USED = ' . ($jawsUrl ?: 'none'));
@@ -66,11 +65,13 @@ try {
     $mongoDB = null;
 }
 
-// 7) Clés Google reCAPTCHA (à définir côté environnement : .env ou variables serveur)
-define('RECAPTCHA_SITE_KEY',   getenv('RECAPTCHA_SITE_KEY')   ?: '');
-define('RECAPTCHA_SECRET_KEY', getenv('RECAPTCHA_SECRET_KEY') ?: '');
-
-return $pdo;
+// 7) Clés reCAPTCHA uniquement si non définies
+if (!defined('RECAPTCHA_SITE_KEY')) {
+    define('RECAPTCHA_SITE_KEY',   getenv('RECAPTCHA_SITE_KEY')   ?: '');
+}
+if (!defined('RECAPTCHA_SECRET_KEY')) {
+    define('RECAPTCHA_SECRET_KEY', getenv('RECAPTCHA_SECRET_KEY') ?: '');
+}
 
 // 8) Retourne l’objet PDO MySQL (ou SQLite en test)
 return $pdo;
