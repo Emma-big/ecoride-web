@@ -2,6 +2,8 @@
 namespace Adminlocal\EcoRide\Tests\Controllers;
 
 use PHPUnit\Framework\TestCase;
+use EcoRide\Helpers\MongoHelper;
+
 
 final class RegisterCovoituragePostTest extends TestCase
 {

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'adminlocal/eco-ride',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => 'a229d8a5bd0a8a6473c6cf06d9bbd46d38dbe06b',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'f7f9f878d16e7b5ecda424999e9f54bece2f1bc1',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'adminlocal/eco-ride' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => 'a229d8a5bd0a8a6473c6cf06d9bbd46d38dbe06b',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'f7f9f878d16e7b5ecda424999e9f54bece2f1bc1',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

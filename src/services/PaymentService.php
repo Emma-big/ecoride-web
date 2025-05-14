@@ -1,7 +1,9 @@
 <?php
-// src/services/PaymentService.php
-namespace Adminlocal\EcoRide\services;
+// src/Services/PaymentService.php
 
+namespace Adminlocal\EcoRide\Services;
+
+use Adminlocal\EcoRide\Database\DatabaseConnectionInterface;
 use PDO;
 use RuntimeException;
 
@@ -9,9 +11,11 @@ class PaymentService
 {
     private PDO $pdo;
 
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
+    public function __construct(
+        DatabaseConnectionInterface $dbConnection
+    ) {
+        // On récupère le PDO via l’interface injectée
+        $this->pdo = $dbConnection->getPdo();
     }
 
     /**
@@ -35,12 +39,12 @@ class PaymentService
         $driverShare = $totalCredits - $commission;
 
         // 2) Récupérer l'ID du compte plateforme (role = 1)
-        $stmt = $this->pdo->query(
-            "SELECT utilisateur_id
-               FROM utilisateurs
-              WHERE role = 1
-              LIMIT 1"
-        );
+        $stmt = $this->pdo->query("
+            SELECT utilisateur_id
+              FROM utilisateurs
+             WHERE role = 1
+             LIMIT 1
+        ");
         $platform = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$platform) {
             throw new RuntimeException("Compte plateforme introuvable (role = 1).");
@@ -48,11 +52,11 @@ class PaymentService
         $platformId = (int) $platform['utilisateur_id'];
 
         // 3) Mise à jour des crédits
-        $upd = $this->pdo->prepare(
-            "UPDATE utilisateurs
+        $upd = $this->pdo->prepare("
+            UPDATE utilisateurs
                SET credit = credit - :amount
-             WHERE utilisateur_id = :uid"
-        );
+             WHERE utilisateur_id = :uid
+        ");
 
         // a) Débiter le passager
         $upd->execute([
@@ -73,12 +77,12 @@ class PaymentService
         ]);
 
         // 4) Insertion dans transactions
-        $ins = $this->pdo->prepare(
-            "INSERT INTO transactions
+        $ins = $this->pdo->prepare("
+            INSERT INTO transactions
                 (covoiturage_id, emetteur_id, recepteur_id, montant, type_transaction)
             VALUES
-                (:ride, :sender, :receiver, :montant, :type)"
-        );
+                (:ride, :sender, :receiver, :montant, :type)
+        ");
 
         // a) Ligne de paiement (passager → conducteur)
         $ins->execute([

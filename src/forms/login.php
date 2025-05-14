@@ -6,12 +6,16 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// 2) Récupérer erreurs et anciennes valeurs
+// 2) Récupération du flag pour afficher le reCAPTCHA
+$requireCaptcha = $_SESSION['requireCaptcha'] ?? false;
+unset($_SESSION['requireCaptcha']);
+
+// 3) Récupérer erreurs et anciennes valeurs
 $errors = $_SESSION['form_errors'] ?? [];
 $old    = $_SESSION['old']         ?? [];
 unset($_SESSION['form_errors'], $_SESSION['old']);
 
-// 3) Messages flash
+// 4) Messages flash
 if (!empty($_SESSION['flash_success'])): ?>
   <div class="alert alert-success text-center">
     <?= htmlspecialchars($_SESSION['flash_success'], ENT_QUOTES) ?>
@@ -35,12 +39,12 @@ if (!empty($_SESSION['flash_success'])): ?>
 <?php endif; ?>
 
 <?php
-// 4) Variables pour le layout
+// 5) Variables pour le layout
 $pageTitle   = 'Connexion - EcoRide';
-$hideTitle   = false;  // on affiche bigTitle
+$hideTitle   = false;
 $extraStyles = ['/assets/style/styleFormLogin.css'];
 
-// 5) Générer le contenu principal
+// 6) Générer le contenu principal
 ob_start();
 ?>
 <h2 class="text-center mb-4">Connexion</h2>
@@ -76,6 +80,15 @@ ob_start();
     </div>
   </div>
 
+  <?php if ($requireCaptcha): ?>
+    <div class="mb-3 text-center" id="captcha-container">
+      <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars(RECAPTCHA_SITE_KEY, ENT_QUOTES) ?>"></div>
+      <?php if (isset($errors['captcha'])): ?>
+        <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['captcha'], ENT_QUOTES) ?></div>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
+
   <div class="mb-3 text-center">
     <button type="submit" class="btn btn-primary">Se connecter</button>
   </div>
@@ -86,8 +99,14 @@ ob_start();
 
   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
 </form>
+
+<?php if ($requireCaptcha): ?>
+  <!-- API reCAPTCHA -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<?php endif; ?>
+
 <?php
 $mainContent = ob_get_clean();
 
-// 6) Appel du layout global
+// 7) Appel du layout global
 require_once BASE_PATH . '/src/layout.php';

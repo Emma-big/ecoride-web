@@ -45,7 +45,13 @@ SQL
 
     public function testProcessRidePaymentUpdatesCreditsAndTransactions(): void
     {
-        $service = new PaymentService($this->pdo);
+        // On injecte un faux DatabaseConnectionInterface qui retourne notre PDO SQLite
+   $dbConnection = new class($this->pdo) implements \Adminlocal\EcoRide\Database\DatabaseConnectionInterface {
+       private \PDO $pdo;
+       public function __construct(\PDO $pdo) { $this->pdo = $pdo; }
+       public function getPdo(): \PDO { return $this->pdo; }
+   };
+   $service = new PaymentService($dbConnection);
 
         // Lorsque le passager (1) paie 50 crédits au trajet 42
         $service->processRidePayment(42, 1, 2, 50);
@@ -83,7 +89,13 @@ SQL
         // Supprime la plateforme
         $this->pdo->exec('DELETE FROM utilisateurs WHERE role = 1');
 
-        $service = new PaymentService($this->pdo);
+       // On injecte un objet anonyme implémentant DatabaseConnectionInterface
+    $dbConnection = new class($this->pdo) implements \Adminlocal\EcoRide\Database\DatabaseConnectionInterface {
+        private \PDO $pdo;
+        public function __construct(\PDO $pdo) { $this->pdo = $pdo; }
+        public function getPdo(): \PDO { return $this->pdo; }
+    };
+    $service = new PaymentService($dbConnection);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Compte plateforme introuvable');

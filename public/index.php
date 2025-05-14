@@ -1,35 +1,29 @@
 <?php
 // public/index.php
 
-try {
-    $pdo = require __DIR__ . '/../src/config.php';
- } catch (\PDOException $e) {
-    // on logue l’exception complète
-    error_log('PDOException dans public/index.php : ' . $e->getMessage());
-    echo "<h1>Erreur de connexion à la base de données :</h1>";
-    echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
-    exit;
-}
-// Affichage des erreurs si APP_DEBUG=true
+// 1) Charger la configuration de la base (SQLite en TEST, MySQL sinon)
+$pdo = require __DIR__ . '/../src/config.php';
+
+// 2) Affichage des erreurs si APP_DEBUG=true
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// 1) Démarrage de la session
+// 3) Démarrage de la session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2) Définir BASE_PATH comme la racine du projet
+// 4) Définir BASE_PATH comme la racine du projet
 if (! defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/..'));
 }
 
-// 3) Charger le helper d’erreur
+// 5) Charger le helper d’erreur
 require_once BASE_PATH . '/src/Helpers/ErrorHelper.php';
 use function Helpers\renderError;
 
-// 3.1) Protection CSRF pour les POST
+// 6) Protection CSRF pour les POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // On récupère proprement les tokens comme chaînes
     $submitted    = (string) ($_POST['csrf_token'] ?? '');
@@ -52,12 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// 3.2) Générer un token si nécessaire
+// 6.2) Générer un token si nécessaire
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 3.3) Autoload Composer + Dotenv
+// 6.3) Autoload Composer + Dotenv
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
     // Ne charger le .env qu’en local / si présent
@@ -66,7 +60,7 @@ if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     }
 }
 
-// 4) Connexions PDO & MongoDB
+// 6.4) Connexions PDO & MongoDB
 try {
     $pdo = require BASE_PATH . '/src/config.php';
    } catch (\Throwable $e) {
@@ -75,7 +69,7 @@ try {
     exit;
 }
 
-// 5) Gestion de l'inactivité
+// 6.5) Gestion de l'inactivité
 $inactive_duration = 600;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $inactive_duration)) {
     session_unset();
@@ -421,6 +415,13 @@ switch ($uri) {
         renderError(404);
 }
 
-// 6) Affichage du layout global (pour toutes les vues “$mainView”)
-require_once BASE_PATH . '/src/layout.php';
-exit;
+// 7) Affichage de la vue en CLI ou du layout complet en Web
+if (PHP_SAPI === 'cli') {
+    // PHPUnit en CLI → charger uniquement la vue ciblée
+    require_once BASE_PATH . '/public/' . $mainView;
+} else {
+    // Web → charger le layout global + exit
+    require_once BASE_PATH . '/src/layout.php';
+    exit;
+}
+
