@@ -9,19 +9,17 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// 2) Charger la BDD, les constantes reCAPTCHA et la clé JWT depuis l’environnement
-$pdo     = require BASE_PATH . '/src/config.php';
-$jwtKey  = getenv('JWT_SECRET');          // à mettre dans votre .env
-// define('RECAPTCHA_SITE_KEY', '...');
-// define('RECAPTCHA_SECRET_KEY', '...');
+// 2) Charger la BDD et la clé JWT depuis l’environnement
+$pdo    = require BASE_PATH . '/src/config.php';
+$jwtKey = getenv('JWT_SECRET'); // Doit être défini dans .env et sur Heroku
 
-// 3) Protection brute-force
+// 3) Paramètres brute-force
 $ip            = $_SERVER['REMOTE_ADDR'];
 $windowMinutes = 15;
 $limitAttempts = 3;
-$since = (new \DateTime())->modify("-{$windowMinutes} minutes")->format('Y-m-d H:i:s');
+$since         = (new \DateTime())->modify("-{$windowMinutes} minutes")->format('Y-m-d H:i:s');
 
-// 4) Vérifier la table utilisateurs
+// 4) Vérifier que la table utilisateurs existe
 try {
     $res = $pdo->query("SHOW TABLES LIKE 'utilisateurs'")->fetchAll();
     if (count($res) === 0) {
@@ -52,10 +50,11 @@ $input = [
     'redirect' => filter_input(INPUT_POST, 'redirect', FILTER_SANITIZE_URL) ?: '',
     'captcha'  => $_POST['g-recaptcha-response'] ?? '',
 ];
+
 $errors = [];
 
 // 8) Validation des champs
-if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+if (! filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
     $errors['email'] = 'Veuillez saisir une adresse e-mail valide.';
 }
 if (empty($input['password'])) {
@@ -80,7 +79,7 @@ if ($requireCaptcha) {
     }
 }
 
-// 10) Si erreurs, on renvoie à la form
+// 10) En cas d’erreurs, on redirige vers le formulaire
 if ($errors) {
     $_SESSION['form_errors'] = $errors;
     $_SESSION['old']         = ['email' => $input['email']];
@@ -89,7 +88,7 @@ if ($errors) {
     exit;
 }
 
-// 11) Authentification utilisateur
+// 11) Authentification de l’utilisateur
 $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = :email");
 $stmt->execute([':email' => $input['email']]);
 $user = $stmt->fetch();
@@ -105,7 +104,9 @@ if ($user && password_verify($input['password'], $user['password_hash'] ?? $user
     $token = [
         'iat' => $now,
         'exp' => $now + 300,                // expiration dans 5 minutes
-        'sub' => (int)$user['utilisateur_id']
+        'sub' => (int)$user['utilisateur_id'],
+        'email' => $user['email'],
+        'role'  => (int)$user['role'],
     ];
     $jwt = JWT::encode($token, $jwtKey, 'HS256');
 
@@ -117,12 +118,12 @@ if ($user && password_verify($input['password'], $user['password_hash'] ?? $user
             'expires'  => $now + 300,
             'path'     => '/',
             'httponly' => true,
-            'secure'   => true,
-            'samesite' => 'Lax'
+            'secure'   => isset($_SERVER['HTTPS']),
+            'samesite' => 'Lax',
         ]
     );
 
-    // d) Optionnel : Stocker l’utilisateur en session si vous avez encore besoin
+    // d) Stocke toujours l’utilisateur en session si besoin de CSRF ancien
     $_SESSION['user'] = [
         'utilisateur_id' => (int)$user['utilisateur_id'],
         'pseudo'         => $user['pseudo'],
@@ -133,9 +134,9 @@ if ($user && password_verify($input['password'], $user['password_hash'] ?? $user
         'credit'         => (float)$user['credit'],
     ];
 
-    // e) Redirection
+    // e) Redirection selon rôle ou paramètre redirect
     if ($input['redirect']) {
-        header('Location: /' . ltrim($input['redirect'], '/'));
+        $loc = '/' . ltrim($input['redirect'], '/');
     } else {
         switch ($_SESSION['user']['role']) {
             case 1: $loc = '/admin';    break;
@@ -144,12 +145,12 @@ if ($user && password_verify($input['password'], $user['password_hash'] ?? $user
             case 4: $loc = '/suspendu'; break;
             default: $loc = '/index';   break;
         }
-        header('Location: ' . $loc);
     }
+    header('Location: ' . $loc);
     exit;
 }
 
-// 12) Échec : enregistrer la tentative et message
+// 12) Échec : enregistrer la tentative + message d’erreur
 $pdo->prepare("
     INSERT INTO login_attempts (ip_address, attempted_at)
     VALUES (:ip, NOW())
