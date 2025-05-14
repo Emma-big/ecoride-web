@@ -38,6 +38,10 @@ class ComposerStaticInit680c693747ba66f0f88a28621af63879
         array (
             'GrahamCampbell\\ResultType\\' => 26,
         ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
+        ),
         'D' => 
         array (
             'Dotenv\\' => 7,
@@ -45,7 +49,7 @@ class ComposerStaticInit680c693747ba66f0f88a28621af63879
         ),
         'A' => 
         array (
-            'Adminlocal\\EcoRide\\' => 19,
+            'Adminlocal\\\\EcoRide\\\\' => 21,
         ),
     );
 
@@ -90,6 +94,10 @@ class ComposerStaticInit680c693747ba66f0f88a28621af63879
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
@@ -98,7 +106,7 @@ class ComposerStaticInit680c693747ba66f0f88a28621af63879
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
-        'Adminlocal\\EcoRide\\' => 
+        'Adminlocal\\\\EcoRide\\\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

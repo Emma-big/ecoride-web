@@ -16,7 +16,8 @@ return array(
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'MongoDB\\' => array($vendorDir . '/mongodb/mongodb/src'),
     'GrahamCampbell\\ResultType\\' => array($vendorDir . '/graham-campbell/result-type/src'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
-    'Adminlocal\\EcoRide\\' => array($baseDir . '/src'),
+    'Adminlocal\\\\EcoRide\\\\' => array($baseDir . '/src'),
 );
