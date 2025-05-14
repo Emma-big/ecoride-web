@@ -1,17 +1,23 @@
 <?php
+// src/layout.php
+
+// 1) Démarrage de la session si nécessaire
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-// === DEBUG SESSION ===
-// Envoie dans les logs Heroku le contenu de la session à chaque requête
+
+// 2) Debug (optionnel)
 error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
-?>
+
+// 3) En-tête HTML
+?><!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'EcoRide'; ?></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title><?= htmlspecialchars($pageTitle ?? 'EcoRide', ENT_QUOTES) ?></title>
 
-  <!-- 1) Bootstrap & Icônes (jamais réordonné) -->
+  <!-- Vos CSS & libs -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
     rel="stylesheet" crossorigin="anonymous"
@@ -20,46 +26,14 @@ error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
     rel="stylesheet"
   >
-
-  <!-- 2) Vos CSS “fonctionnels” -->
   <link rel="stylesheet" href="/assets/style/styleFormLogin.css">
   <link rel="stylesheet" href="/assets/style/styleCovoiturage.css">
   <link rel="stylesheet" href="/assets/style/styleBarreRecherche.css">
-
-  <!-- 3) VOTRE CSS PRINCIPAL (ici navbars, responsive…) -->
   <link rel="stylesheet" href="/assets/style/styleIndex.css">
-
-  <!-- 4) Footer (en dernier, pour n’écraser que le footer) -->
   <link rel="stylesheet" href="/assets/style/styleFooter.css">
-
-  <!-- puis vos éventuels extraStyles et script Maps -->
   <?php if (!empty($extraStyles)): foreach ($extraStyles as $css): ?>
-    <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
+    <link rel="stylesheet" href="<?= htmlspecialchars($css, ENT_QUOTES) ?>">
   <?php endforeach; endif; ?>
-
- <?php if (!empty($barreRecherche)): 
-  $gKey = $_ENV['GOOGLE_API_KEY'] ?? getenv('GOOGLE_API_KEY') ?? '';
-?>
-  <!-- 1) Chargement de l'API Google Maps + Places avec callback -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($gKey) ?>&libraries=places&callback=initSearchAutocomplete">
-  </script>
-
-  <!-- 2) Déclaration de la fonction callback attendue -->
-  <script>
-    window.initSearchAutocomplete = function() {
-      ['depart','arrivee'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        new google.maps.places.Autocomplete(el, {
-          types: ['address'],
-          componentRestrictions: { country: 'fr' }
-        });
-      });
-    };
-  </script>
-<?php endif; ?>
-
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -67,17 +41,17 @@ error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
 <body class="d-flex flex-column min-vh-100">
 
 <?php
-// === Header principal ===
-$headerFile = __DIR__ . '/controllers/principal/scriptHeader.php';
+// 4) Header
+$headerFile = BASE_PATH . '/src/controllers/principal/scriptHeader.php';
 if (file_exists($headerFile)) {
     require_once $headerFile;
 } else {
     echo "<p class='text-danger'>Fichier introuvable : $headerFile</p>";
 }
 
-// === Big Title ===
+// 5) Big Title
 if (empty($hideTitle)) {
-    $titleFile = __DIR__ . '/views/bigTitle.php';
+    $titleFile = BASE_PATH . '/src/views/bigTitle.php';
     if (file_exists($titleFile)) {
         require_once $titleFile;
     } else {
@@ -85,15 +59,12 @@ if (empty($hideTitle)) {
     }
 }
 
-// === Flash messages ===
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (!empty($_SESSION['flash'])) {
+// 6) Flash messages
+if (!empty($_SESSION['flash_success'])) {
     echo '<div class="alert alert-success container mt-3">'
-         . htmlspecialchars($_SESSION['flash'])
+         . htmlspecialchars($_SESSION['flash_success'])
          . '</div>';
-    unset($_SESSION['flash']);
+    unset($_SESSION['flash_success']);
 }
 if (!empty($_SESSION['flash_error'])) {
     echo '<div class="alert alert-danger container mt-3">'
@@ -102,39 +73,46 @@ if (!empty($_SESSION['flash_error'])) {
     unset($_SESSION['flash_error']);
 }
 
-// === Form errors pour noteForm uniquement ===
-if (strpos($_SERVER['REQUEST_URI'], '/noteForm') === 0
-    && !empty($_SESSION['form_errors'])) {
-    echo '<div class="alert alert-danger container mt-3"><ul>';
-    foreach ($_SESSION['form_errors'] as $msg) {
-        echo '<li>' . htmlspecialchars($msg) . '</li>';
-    }
-    echo '</ul></div>';
-    unset($_SESSION['form_errors'], $_SESSION['old']);
-}
-
-// === Contenu principal ===
-echo '<main class="flex-fill">';
+// 7) Contenu principal
+echo '<main class="flex-fill container mt-4">';
 if (!empty($mainContent)) {
+    // Si le controller a généré du contenu via ob_start()
     echo $mainContent;
+
 } elseif (!empty($mainView)) {
-    $viewFile = __DIR__ . '/' . ltrim($mainView, '/');
-    if (file_exists($viewFile)) {
-        require $viewFile;
-        if (!empty($mainContent)) {
-            echo $mainContent;
+    // Recherche du fichier dans src/, essais avec Forms/ et forms/
+    $base = BASE_PATH . '/src/';
+    $candidates = [
+        $base . ltrim($mainView, '/'),
+        $base . str_replace(
+            ['forms/', 'views/'],
+            ['Forms/',  'Views/'],
+            ltrim($mainView, '/')
+        ),
+    ];
+    $found = false;
+    foreach (array_unique($candidates) as $path) {
+        if (file_exists($path)) {
+            require $path;
+            $found = true;
+            break;
         }
-    } else {
-        echo "<p class='text-danger'>Vue introuvable : $viewFile</p>";
     }
+    if (!$found) {
+        echo "<p class='text-danger'>Vue introuvable, j'ai cherché :</p><ul>";
+        foreach ($candidates as $p) {
+            echo "<li>" . htmlspecialchars($p) . "</li>";
+        }
+        echo "</ul>";
+    }
+
 } else {
     echo '<p class="text-muted text-center">Aucun contenu à afficher.</p>';
 }
-// <-- fermeture du main
 echo '</main>';
 
-// === Footer global ===
-$footerFile = __DIR__ . '/views/footer.php';
+// 8) Footer
+$footerFile = BASE_PATH . '/src/views/footer.php';
 if (file_exists($footerFile)) {
     require_once $footerFile;
 } else {
@@ -147,19 +125,18 @@ if (file_exists($footerFile)) {
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js">
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const toggle = document.getElementById('togglePassword');
-  const pwd    = document.getElementById('password');
-  if (!toggle || !pwd) return;
-  toggle.addEventListener('click', () => {
-    pwd.type = pwd.type === 'password' ? 'text' : 'password';
-    toggle.querySelector('i')
-      .classList.toggle('bi-eye');
-    toggle.querySelector('i')
-      .classList.toggle('bi-eye-slash');
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('togglePassword');
+    const pwd    = document.getElementById('password');
+    if (!toggle || !pwd) return;
+    toggle.addEventListener('click', () => {
+      pwd.type = pwd.type === 'password' ? 'text' : 'password';
+      toggle.querySelector('i')
+            .classList.toggle('bi-eye');
+      toggle.querySelector('i')
+            .classList.toggle('bi-eye-slash');
+    });
   });
-});
 </script>
-
 </body>
 </html>
