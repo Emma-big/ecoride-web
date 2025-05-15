@@ -89,6 +89,22 @@ switch ($uri) {
         }
         exit;
 
+    case '/registerPostEmploye':
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        require_once BASE_PATH . '/src/controllers/post/registerPostEmploye.php';
+    } else {
+        renderError(405);
+    }
+    exit;  
+        
+    case '/registerVehiculePost':
+        require_once BASE_PATH . '/src/controllers/post/registerVehiculePost.php';
+        exit;  
+        
+    case '/registerCovoituragePost':
+        require_once BASE_PATH . '/src/controllers/post/registerCovoituragePost.php';
+        exit;    
+
     case '/contact':
     // pas de require(layout) ni exit dans le controller !
     require BASE_PATH . '/src/controllers/principal/contact.php';
@@ -111,7 +127,7 @@ switch ($uri) {
 
     case '/covoiturage':
         // active la barre de recherche et l’API Google Maps
-        $barreRecherche = true;
+        $barreRecherche = 'views/barreRecherche.php';
         $gKey           = $_ENV['GOOGLE_API_KEY'] ?? '';
         $mainView       = 'views/covoiturage.php';
         $pageTitle      = 'Rechercher un covoiturage - EcoRide';
@@ -122,6 +138,14 @@ switch ($uri) {
             '/assets/style/styleBarreRecherche.css'
         ];
         break;
+
+    case '/contactPost':
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        require_once BASE_PATH . '/src/controllers/post/contactPost.php';
+    } else {
+        renderError(405);
+    }
+    exit;    
 
     // PROTECTED
      case '/employe':
