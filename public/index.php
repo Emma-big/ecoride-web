@@ -149,13 +149,10 @@ switch ($uri) {
     exit; 
     
     case '/confirmationContact':
-        $mainView  = 'views/confirmationContact.php';
-        $pageTitle = 'Confirmation Contact - EcoRide';
-        $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleBigTitle.css'
-    ];
-    break;
+        // on inclut directement le view, qui fait ob_start() + require layout
+        require __DIR__ . '/../src/views/confirmationContact.php';
+        // IMPORTANT : ne pas faire `break;` si le view fait déjà le require layout
+        exit;
     
     case '/detail-covoiturage':
         require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
