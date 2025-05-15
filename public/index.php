@@ -90,11 +90,16 @@ switch ($uri) {
         exit;
 
     case '/contact':
-        require_once BASE_PATH . '/src/controllers/principal/contact.php';
+    // au lieu de require_once BASE_PATH.'/src/controllers/principal/contact.php';
+        $mainView  = 'controllers/principal/contact.php';
+        $pageTitle = 'Contact - EcoRide';
+        require BASE_PATH . '/src/layout.php';
         exit;
 
     case '/mentions-legales':
-        require_once BASE_PATH . '/src/views/mentions-legales.php';
+        $mainView  = 'views/mentionsLegales.php';
+        $pageTitle = 'Mentions légales - EcoRide';
+        require BASE_PATH . '/src/layout.php';
         exit;
 
     case '/':
@@ -108,7 +113,11 @@ switch ($uri) {
 
     case '/covoiturage':
         requireJwtAuth();
-        $barreRecherche = 'views/barreRecherche.php';
+
+        // active la barre de recherche et l’API Google Maps
+        $barreRecherche = true;
+        $gKey           = $_ENV['GOOGLE_API_KEY'] ?? '';
+
         $mainView       = 'views/covoiturage.php';
         $pageTitle      = 'Rechercher un covoiturage - EcoRide';
         $extraStyles    = [
@@ -118,6 +127,7 @@ switch ($uri) {
             '/assets/style/styleBarreRecherche.css'
         ];
         break;
+
 
     // PROTECTED
      case '/employe':
@@ -137,10 +147,10 @@ switch ($uri) {
 
     case '/notes-a-valider':
         requireJwtAuth();
-        ob_start();
-        require BASE_PATH . '/src/controllers/principal/notesAVerifier.php';
-        $mainContent = ob_get_clean();
-        break;
+        $mainView  = 'views/notesAVerifier.php';
+        $pageTitle = 'Notes à valider - EcoRide';
+        require BASE_PATH . '/src/layout.php';
+        exit;
 
     case '/detail-covoiturage':
         requireJwtAuth();
