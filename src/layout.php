@@ -75,32 +75,25 @@ if (!empty($_SESSION['flash_error'])) {
 
 // 7) Contenu principal
 echo '<main class="flex-fill container mt-4">';
+
 if (!empty($mainContent)) {
-    // le controller a généré du contenu via ob_start()
     echo $mainContent;
 
 } elseif (!empty($mainView)) {
-    $found = false;
-    $paths = [
-        BASE_PATH . '/src/' . ltrim($mainView, '/'),
-        BASE_PATH . '/src/forms/' . basename($mainView),
-        BASE_PATH . '/src/views/' . basename($mainView),
-    ];
-    foreach ($paths as $path) {
-        if (file_exists($path)) {
-            require $path;
-            $found = true;
-            break;
-        }
-    }
-    if (!$found) {
-        echo "<p class='text-danger'>Vue introuvable : " . htmlspecialchars($mainView) . "</p>";
+    // on ne tente plus dans controllers/, juste forms/ et views/
+    $path = BASE_PATH . '/src/' . ltrim($mainView, '/');
+    if (file_exists($path)) {
+        require $path;
+    } else {
+        echo "<p class='text-danger'>Vue introuvable : $path</p>";
     }
 
 } else {
     echo '<p class="text-muted text-center">Aucun contenu à afficher.</p>';
 }
+
 echo '</main>';
+?>
 
 // 8) Footer
 $footerFile = BASE_PATH . '/src/views/footer.php';

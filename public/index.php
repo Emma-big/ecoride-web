@@ -97,16 +97,13 @@ switch ($uri) {
         exit;
 
     case '/contact':
-        $mainView  = 'views/contact.php';
-        $pageTitle = 'Contact - EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css'];
-        break;
+    // pas de buffer : on exécute directement le controller
+    require BASE_PATH . '/src/controllers/principal/contact.php';
+    exit;
 
     case '/mentions-legales':
-        $mainView  = 'views/mentionsLegales.php';
-        $pageTitle = 'Mentions légales - EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css'];
-        break;
+    require BASE_PATH . '/src/controllers/principal/mentionsLegales.php';
+    exit;
 
     case '/':
     case '/index':
