@@ -90,11 +90,9 @@ switch ($uri) {
         exit;
 
     case '/contact':
-        // Affiche la vue contact dans le layout
-        $mainView    = 'controllers/principal/contact.php';
-        $pageTitle   = 'Contact – EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css'];
-        break;
+    // pas de require(layout) ni exit dans le controller !
+    require BASE_PATH . '/src/controllers/principal/contact.php';
+    break;
 
     case '/mentions-legales':
         $mainView  = 'views/mentions-legales.php';
@@ -398,7 +396,7 @@ switch ($uri) {
     case '/utilisateur':
         requireJwtAuth();
         ob_start();
-        require BASE_PATH . '/src/utilisateur.php';
+        require BASE_PATH . '/public/utilisateur.php';
         $mainContent = ob_get_clean();
         break;
 
