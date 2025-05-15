@@ -64,15 +64,8 @@ $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
 switch ($uri) {
     case '/login':
-        $mainView    = 'forms/login.php';
-        $pageTitle   = 'Connexion - EcoRide';
-        $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleCovoiturage.css',
-            '/assets/style/styleIndex.css',
-            '/assets/style/styleBarreRecherche.css'
-        ];
-        break;
+    require_once BASE_PATH . '/src/forms/login.php';
+    exit;
 
     case '/loginPost':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -97,14 +90,12 @@ switch ($uri) {
         exit;
 
     case '/contact':
-        $mainView  = 'views/contact.php';
-        $pageTitle = 'Contact - EcoRide';
-        break;
+        require_once BASE_PATH . '/src/controllers/principal/contact.php';
+        exit;
 
     case '/mentions-legales':
-        $mainView  = 'views/mentions-legales.php';
-        $pageTitle = 'Mentions légales - EcoRide';
-        break;
+        require_once BASE_PATH . '/src/views/mentions-legales.php';
+        exit;
 
     case '/':
     case '/index':
