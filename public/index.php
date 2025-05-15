@@ -90,11 +90,11 @@ switch ($uri) {
         exit;
 
     case '/contact':
-    // au lieu de require_once BASE_PATH.'/src/controllers/principal/contact.php';
-        $mainView  = 'controllers/principal/contact.php';
-        $pageTitle = 'Contact - EcoRide';
-        require BASE_PATH . '/src/layout.php';
-        exit;
+        // Affiche la vue contact dans le layout
+        $mainView    = 'controllers/principal/contact.php';
+        $pageTitle   = 'Contact – EcoRide';
+        $extraStyles = ['/assets/style/styleIndex.css'];
+        break;
 
     case '/mentions-legales':
         $mainView  = 'views/mentions-legales.php';
