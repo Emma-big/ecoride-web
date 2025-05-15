@@ -40,6 +40,3 @@ ob_start();
 <?php
 $mainContent = ob_get_clean();
 
-// 5) Appel du layout global
-require_once BASE_PATH . '/src/layout.php';
-?>
