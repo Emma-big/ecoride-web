@@ -1,6 +1,6 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Post;
-
+require_once BASE_PATH . '/src/Helpers/MongoHelper.php';
 use Adminlocal\EcoRide\Helpers\MongoHelper;
 use MongoDB\BSON\ObjectId;
 
