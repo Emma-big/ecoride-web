@@ -151,9 +151,9 @@ switch ($uri) {
         exit;
 
     case '/detail-covoiturage':
-        requireJwtAuth();
-        require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
-        exit;
+    requireJwtAuth();
+    require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
+    exit;
 
     case '/delete-covoiturage':
         requireJwtAuth();
@@ -176,7 +176,7 @@ switch ($uri) {
 
     case '/vehiculeForm':
         requireJwtAuth();
-        require BASE_PATH . '/src/controllers/principal/vehiculeForm.php';
+        require BASE_PATH . '/src/views/vehiculeForm.php';
         exit;
 
     case '/covoiturage':
