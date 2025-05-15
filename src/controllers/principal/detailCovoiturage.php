@@ -1,10 +1,10 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
-// 1) Charger la config PDO
+// 1) Charger la configuration PDO
 $pdo = require BASE_PATH . '/src/config.php';
 
-// 2) Cas liste issue de la recherche
+// 2) Si on vient de la recherche, on affiche la liste
 if (isset($_GET['depart'], $_GET['arrivee'], $_GET['date'])) {
     $depart  = $_GET['depart'];
     $arrivee = $_GET['arrivee'];
@@ -46,14 +46,16 @@ if (isset($_GET['depart'], $_GET['arrivee'], $_GET['date'])) {
     ]);
     $rides = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-    $mainView    = 'views/list-covoiturage.php';
+    // Préparer la vue liste
     $pageTitle   = "Propositions de covoiturage";
     $extraStyles = ['/assets/style/styleCovoiturage.css'];
-    require_once BASE_PATH . '/src/layout.php';
-    exit;
+    ob_start();
+    require BASE_PATH . '/src/views/list-covoiturage.php';
+    $mainContent = ob_get_clean();
+    return;
 }
 
-// 3) Cas détail unique
+// 3) Sinon on affiche le détail d’un covoiturage
 $id = $_GET['id'] ?? null;
 if (!$id) {
     http_response_code(404);
@@ -99,14 +101,14 @@ if (!$covoiturage) {
     exit('Covoiturage introuvable');
 }
 
-// Durée du trajet
+// 4) Calcul de la durée du trajet
 $dep      = new \DateTime("{$covoiturage['date_depart']} {$covoiturage['heure_depart']}");
 $arr      = new \DateTime("{$covoiturage['date_arrive']} {$covoiturage['heure_arrive']}");
 $interval = $dep->diff($arr);
 $heures   = $interval->h + ($interval->days * 24);
 $minutes  = $interval->i;
 
-// 4) Avis des passagers
+// 5) Récupérer les avis des passagers
 $driverId = (int)$covoiturage['utilisateur'];
 $avisStmt = $pdo->prepare(<<<SQL
   SELECT n.note,
@@ -122,7 +124,7 @@ SQL
 $avisStmt->execute([$driverId]);
 $avis = $avisStmt->fetchAll(\PDO::FETCH_ASSOC);
 
-// 5) Préférences dynamiques
+// 6) Récupérer les préférences dynamiques
 $stmtP = $pdo->prepare(<<<SQL
   SELECT libelle
     FROM covoiturage_preferences
@@ -132,7 +134,9 @@ SQL
 $stmtP->execute([':cid' => $covoiturage['covoiturage_id']]);
 $dynamicPrefs = $stmtP->fetchAll(\PDO::FETCH_COLUMN);
 
-// 6) Passage à la vue
-$mainView    = 'views/detail-covoiturage.php';
+// 7) Préparer la vue détail
 $pageTitle   = "Détail du covoiturage #{$id}";
 $extraStyles = ['/assets/style/styleCovoiturage.css'];
+ob_start();
+require BASE_PATH . '/src/views/detail-covoiturage.php';
+$mainContent = ob_get_clean();
