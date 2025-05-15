@@ -1,18 +1,10 @@
 <?php
 // src/views/confirm-participation.php
 
-// 2) Variables pour le layout
-$pageTitle   = "Confirmation de participation - EcoRide";
-$withTitle   = false;  // pas de bigTitle ici
-$extraStyles = [
-    "/assets/style/styleFormLogin.css",
-    "/assets/style/styleIndex.css"
-];
+// (Ne définissez ici QUE le HTML à injecter dans <main>)
 
-// 3) Contenu principal
-ob_start();
+// Variables passées par le controller : $price et $covoitId
 ?>
-
 <div class="container py-5">
   <h3>Vous allez dépenser <?= htmlspecialchars($price, ENT_QUOTES) ?> crédits.</h3>
   <form id="confirmForm" method="POST" action="/participerCovoiturage">
@@ -26,17 +18,9 @@ ob_start();
 </div>
 
 <script>
-// On intercepte la soumission du formulaire pour ajouter une 2ᵉ confirmation
 document.getElementById('confirmForm').addEventListener('submit', function(e) {
   if (! window.confirm('Êtes-vous sûr de vouloir valider votre participation ?')) {
-    // si l’utilisateur clique sur “Annuler”, on bloque l’envoi
     e.preventDefault();
   }
 });
 </script>
-
-<?php
-// 4) Appel du layout global
-$mainContent = ob_get_clean();
-require_once BASE_PATH . '/src/layout.php';
-?>
