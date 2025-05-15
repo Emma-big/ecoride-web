@@ -1,5 +1,5 @@
 <?php
-namespace Adminlocal\EcoRide\Forms;
+namespace Adminlocal\EcoRide\forms;
 
 // 1) Démarrage de la session
 if (session_status() !== PHP_SESSION_ACTIVE) {

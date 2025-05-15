@@ -80,30 +80,13 @@ if (!empty($mainContent)) {
     echo $mainContent;
 
 } elseif (!empty($mainView)) {
-    // Recherche du fichier dans src/, essais avec Forms/ et forms/
-    $base = BASE_PATH . '/src/';
-    $candidates = [
-        $base . ltrim($mainView, '/'),
-        $base . str_replace(
-            ['forms/', 'views/'],
-            ['Forms/',  'Views/'],
-            ltrim($mainView, '/')
-        ),
-    ];
-    $found = false;
-    foreach (array_unique($candidates) as $path) {
-        if (file_exists($path)) {
-            require $path;
-            $found = true;
-            break;
-        }
-    }
-    if (!$found) {
-        echo "<p class='text-danger'>Vue introuvable, j'ai cherché :</p><ul>";
-        foreach ($candidates as $p) {
-            echo "<li>" . htmlspecialchars($p) . "</li>";
-        }
-        echo "</ul>";
+    // On suppose que $mainView est déjà en lowercase et relatif à src/
+    $path = BASE_PATH . '/src/' . ltrim($mainView, '/');
+    if (file_exists($path)) {
+        require $path;
+    } else {
+        // Affichage d’une erreur en cas de vue introuvable
+        echo "<p class='text-danger'>Vue introuvable : $path</p>";
     }
 
 } else {

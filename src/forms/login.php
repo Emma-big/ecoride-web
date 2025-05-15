@@ -1,5 +1,5 @@
 <?php
-namespace Adminlocal\EcoRide\Forms;
+namespace Adminlocal\EcoRide\forms;
 
 // 1) Démarrage de la session si nécessaire
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -47,7 +47,14 @@ $extraStyles = ['/assets/style/styleFormLogin.css'];
 // 6) Générer le contenu principal
 ob_start();
 ?>
+
 <h2 class="text-center mb-4">Connexion</h2>
+
+<?php if (isset($_GET['error']) && $_GET['error'] === 'csrf'): ?>
+  <div class="alert alert-danger text-center">
+    <strong>Erreur de sécurité :</strong> jeton CSRF invalide, veuillez recharger la page.
+  </div>
+<?php endif; ?>
 
 <form class="formLogin mx-auto" action="/loginPost" method="POST">
   <?php if (!empty($_GET['redirect'])): ?>

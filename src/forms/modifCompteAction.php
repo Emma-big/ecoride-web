@@ -1,5 +1,5 @@
 <?php
-namespace Adminlocal\EcoRide\Forms;
+namespace Adminlocal\EcoRide\forms;
 
  
 

@@ -1,5 +1,5 @@
 <?php
-namespace Adminlocal\EcoRide\Forms;
+namespace Adminlocal\EcoRide\forms;
 
 // Charger l'autoloader Composer
 require_once BASE_PATH . '/vendor/autoload.php';
