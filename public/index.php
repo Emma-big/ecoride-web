@@ -60,32 +60,18 @@ if (isset($_SESSION['last_activity']) && time() - $_SESSION['last_activity'] > $
 $_SESSION['last_activity'] = time();
 
 // 8) Dispatcher
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$mainContent = '';
-$pageTitle   = 'EcoRide';
-$extraStyles = [];
+$uri = strtok($_SERVER['REQUEST_URI'], '?');
 
 switch ($uri) {
-    // PUBLIC
-    case '/':
-    case '/index':
-    case '/index.php':
-        $pageTitle   = 'Accueil – EcoRide';
+    case '/login':
+        $mainView    = 'forms/login.php';
+        $pageTitle   = 'Connexion - EcoRide';
         $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleCovoiturage.css',
             '/assets/style/styleIndex.css',
             '/assets/style/styleBarreRecherche.css'
         ];
-        ob_start();
-        require BASE_PATH . '/src/views/accueil.php';
-        $mainContent = ob_get_clean();
-        break;
-
-    case '/login':
-        $pageTitle   = 'Connexion – EcoRide';
-        $extraStyles = ['/assets/style/styleFormLogin.css'];
-        ob_start();
-        require BASE_PATH . '/src/forms/login.php';
-        $mainContent = ob_get_clean();
         break;
 
     case '/loginPost':
@@ -97,28 +83,58 @@ switch ($uri) {
         exit;
 
     case '/registerForm':
-        $pageTitle   = 'Créer un compte – EcoRide';
+        $mainView    = 'views/registerForm.php';
+        $pageTitle   = 'Créer un compte - EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
-        ob_start();
-        require BASE_PATH . '/src/views/registerForm.php';
-        $mainContent = ob_get_clean();
         break;
 
     case '/registerPost':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require BASE_PATH . '/src/controllers/post/registerPost.php';
+            require_once BASE_PATH . '/src/controllers/post/registerPost.php';
         } else {
             renderError(405);
         }
         exit;
 
-    // PROTECTED
-    case '/employe':
-        requireJwtAuth();
-        ob_start();
-        require BASE_PATH . '/src/controllers/principal/employe.php';
-        $mainContent = ob_get_clean();
+    case '/contact':
+        $mainView  = 'views/contact.php';
+        $pageTitle = 'Contact - EcoRide';
+        $extraStyles = ['/assets/style/styleIndex.css'];
         break;
+
+    case '/mentions-legales':
+        $mainView  = 'views/mentionsLegales.php';
+        $pageTitle = 'Mentions légales - EcoRide';
+        $extraStyles = ['/assets/style/styleIndex.css'];
+        break;
+
+    case '/':
+    case '/index':
+    case '/index.php':
+        $barreRecherche= 'views/barreRecherche.php';
+        $mainView      = 'views/accueil.php';
+        $pageTitle     = 'Accueil - EcoRide';
+        $extraStyles   = ['/assets/style/styleIndex.css','/assets/style/styleBarreRecherche.css'];
+        break;
+
+    case '/covoiturage':
+        requireJwtAuth();
+        $barreRecherche = 'views/barreRecherche.php';
+        $mainView       = 'views/covoiturage.php';
+        $pageTitle      = 'Rechercher un covoiturage - EcoRide';
+        $extraStyles    = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleCovoiturage.css',
+            '/assets/style/styleIndex.css',
+            '/assets/style/styleBarreRecherche.css'
+        ];
+        break;
+
+    // PROTECTED
+     case '/employe':
+        requireJwtAuth();
+        require BASE_PATH . '/src/controllers/principal/employe.php';
+        exit;
 
     case '/admin':
         requireJwtAuth();
