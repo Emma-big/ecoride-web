@@ -19,5 +19,6 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
-    'Adminlocal\\\\EcoRide\\\\' => array($baseDir . '/src'),
+    'Adminlocal\\EcoRide\\Tests\\' => array($baseDir . '/tests'),
+    'Adminlocal\\EcoRide\\' => array($baseDir . '/src'),
 );

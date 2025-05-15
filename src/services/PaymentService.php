@@ -1,7 +1,7 @@
 <?php
-// src/services/PaymentService.php
+// src/Services/PaymentService.php
 
-namespace Adminlocal\EcoRide\services;
+namespace Adminlocal\EcoRide\Services;
 
 use PDO;
 use RuntimeException;

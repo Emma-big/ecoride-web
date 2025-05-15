@@ -1,5 +1,5 @@
 <?php
-namespace Adminlocal\EcoRide\Tests\services;
+namespace Adminlocal\EcoRide\Services;
 
 use PHPUnit\Framework\TestCase;
 

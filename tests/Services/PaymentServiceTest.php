@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Adminlocal\EcoRide\Tests\services;
+namespace Adminlocal\EcoRide\Tests\Services;
 
-use Adminlocal\EcoRide\services\PaymentService;
+use Adminlocal\EcoRide\Services\PaymentService;
 use PDO;
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
