@@ -39,5 +39,5 @@ ob_start();
 </div>
 <?php
 $mainContent = ob_get_clean();
-require BASE_PATH . '/layout.php';
+require BASE_PATH . '/src/layout.php';
 exit;
