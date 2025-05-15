@@ -178,18 +178,10 @@ switch ($uri) {
 
     case '/vehiculeForm':
         requireJwtAuth();
-        $pageTitle   = 'Ajouter une voiture – EcoRide';
-        $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleIndex.css'
-        ];
-        ob_start();
-        require BASE_PATH . '/src/views/vehiculeForm.php';
-        $mainContent = ob_get_clean();
-        break;
+        require BASE_PATH . '/src/controllers/principal/vehiculeForm.php';
+        exit;
 
     case '/covoiturage':
-        requireJwtAuth();
         $pageTitle   = 'Rechercher un covoiturage – EcoRide';
         $extraStyles = ['/assets/style/styleCovoiturage.css'];
         ob_start();
