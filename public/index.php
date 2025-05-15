@@ -110,12 +110,9 @@ switch ($uri) {
         break;
 
     case '/covoiturage':
-        requireJwtAuth();
-
         // active la barre de recherche et l’API Google Maps
         $barreRecherche = true;
         $gKey           = $_ENV['GOOGLE_API_KEY'] ?? '';
-
         $mainView       = 'views/covoiturage.php';
         $pageTitle      = 'Rechercher un covoiturage - EcoRide';
         $extraStyles    = [
@@ -125,7 +122,6 @@ switch ($uri) {
             '/assets/style/styleBarreRecherche.css'
         ];
         break;
-
 
     // PROTECTED
      case '/employe':
@@ -153,8 +149,7 @@ switch ($uri) {
     case '/detail-covoiturage':
     requireJwtAuth();
     require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
-    exit;
-
+    
     case '/delete-covoiturage':
         requireJwtAuth();
         ob_start();

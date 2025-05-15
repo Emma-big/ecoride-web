@@ -140,3 +140,5 @@ $extraStyles = ['/assets/style/styleCovoiturage.css'];
 ob_start();
 require BASE_PATH . '/src/views/detail-covoiturage.php';
 $mainContent = ob_get_clean();
+// 6) Affiche via le layout
+require_once BASE_PATH . '/src/layout.php';
