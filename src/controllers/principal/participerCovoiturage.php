@@ -1,7 +1,7 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
-use Adminlocal\EcoRide\Services\PaymentService; // <- import du service
+use Adminlocal\EcoRide\services\PaymentService; // <- import du service
 use \DateTime;
 
 // 1) Session + gestion de l'inactivité

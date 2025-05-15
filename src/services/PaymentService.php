@@ -1,7 +1,7 @@
 <?php
-// src/Services/PaymentService.php
+// src/services/PaymentService.php
 
-namespace Adminlocal\EcoRide\Services;
+namespace Adminlocal\EcoRide\services;
 
 use Adminlocal\EcoRide\Database\DatabaseConnectionInterface;
 use PDO;
