@@ -39,7 +39,6 @@ $hideTitle   = true;
 $extraStyles = ['/assets/style/styleFormLogin.css'];
   
 // 8) Générer le contenu principal
-ob_start();
 ?>
 <h2 class="text-center mb-4">Modifier le rôle du compte</h2>
 <h3 class="text-center">Compte : <strong><?= htmlspecialchars($compte['pseudo'], ENT_QUOTES) ?></strong></h3>
@@ -84,6 +83,3 @@ ob_start();
 </form>
 <?php
 $mainContent = ob_get_clean();
-
-// 9) Appel du layout global
-require_once BASE_PATH . '/src/layout.php';
