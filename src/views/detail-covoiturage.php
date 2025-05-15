@@ -137,7 +137,4 @@ ob_start();
     <?php endif; ?>
   </div>
 </section>
-<?php
-$mainContent = ob_get_clean();
-require_once BASE_PATH . '/src/layout.php';
-?>
+
