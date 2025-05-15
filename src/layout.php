@@ -76,17 +76,25 @@ if (!empty($_SESSION['flash_error'])) {
 // 7) Contenu principal
 echo '<main class="flex-fill container mt-4">';
 if (!empty($mainContent)) {
-    // Si le controller a généré du contenu via ob_start()
+    // le controller a généré du contenu via ob_start()
     echo $mainContent;
 
 } elseif (!empty($mainView)) {
-    // On suppose que $mainView est déjà en lowercase et relatif à src/
-    $path = BASE_PATH . '/src/' . ltrim($mainView, '/');
-    if (file_exists($path)) {
-        require $path;
-    } else {
-        // Affichage d’une erreur en cas de vue introuvable
-        echo "<p class='text-danger'>Vue introuvable : $path</p>";
+    $found = false;
+    $paths = [
+        BASE_PATH . '/src/' . ltrim($mainView, '/'),
+        BASE_PATH . '/src/forms/' . basename($mainView),
+        BASE_PATH . '/src/views/' . basename($mainView),
+    ];
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            require $path;
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        echo "<p class='text-danger'>Vue introuvable : " . htmlspecialchars($mainView) . "</p>";
     }
 
 } else {
