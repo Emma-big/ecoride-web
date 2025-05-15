@@ -126,15 +126,19 @@ unset($_SESSION['old'], $_SESSION['flash'], $_SESSION['form_errors']);
                            value="<?= htmlspecialchars($old['naissance'] ?? '', ENT_QUOTES) ?>">
                 </div>
                 <div class="mb-3">
-                    <label for="choix" class="form-label">Sexe :</label>
-                    <select name="choix"
-                            id="choix"
-                            class="form-select"
-                            required>
-                        <option value="">-- Sélectionnez --</option>
-                        <option value="H" <?= isset($old['choix']) && $old['choix']==='Homme' ? 'selected' : '' ?>>Homme</option>
-                        <option value="F" <?= isset($old['choix']) && $old['choix']==='Femme' ? 'selected' : '' ?>>Femme</option>
+                    <label for="sexe" class="form-label">Sexe :</label>
+                    <select name="sexe"
+                        id="sexe"
+                        class="form-select<?= isset($errors['sexe']) ? ' is-invalid' : '' ?>"
+                        required>
+                    <option value="">-- Sélectionnez --</option>
+                    <option value="H" <?= (isset($old['sexe']) && $old['sexe']==='H') ? 'selected' : '' ?>>Homme</option>
+                    <option value="F" <?= (isset($old['sexe']) && $old['sexe']==='F') ? 'selected' : '' ?>>Femme</option>
                     </select>
+                <?php if (isset($errors['sexe'])): ?>
+                    <div class="invalid-feedback"><?= htmlspecialchars($errors['sexe'], ENT_QUOTES) ?></div>
+                <?php endif; ?>
+
                 </div>
                 <div class="mb-3">
                     <label for="phone" class="form-label">Téléphone :</label>
