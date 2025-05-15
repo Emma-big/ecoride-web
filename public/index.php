@@ -438,18 +438,18 @@ switch ($uri) {
         break;
 
     case '/modifCompteForm':
-    requireJwtAuth();                       
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        requireJwtAuth();
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         header('Location: /admin');
         exit;
-    }
-    // Bufferisation du form
-    ob_start();
-    require BASE_PATH . '/src/forms/modifCompteForm.php';
-    $mainContent = ob_get_clean();
-    $pageTitle   = 'Modifier mon compte – EcoRide';
-    $extraStyles = ['/assets/style/styleFormLogin.css'];
-    break;
+        }
+        ob_start();
+        require BASE_PATH . '/src/forms/modifCompteForm.php';
+        $mainContent = ob_get_clean();
+        $pageTitle   = 'Modifier mon compte – EcoRide';
+        $extraStyles = ['/assets/style/styleFormLogin.css'];
+        break;
+
 
     case '/modifCompteAction':
         requireJwtAuth();
