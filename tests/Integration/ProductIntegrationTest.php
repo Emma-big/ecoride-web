@@ -1,13 +1,14 @@
 <?php
+declare(strict_types=1);
 
-namespace Tests\Integration;
+namespace Adminlocal\EcoRide\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Adminlocal\EcoRide\Helpers\ValidationHelper;
 
-class ProductIntegrationTest extends TestCase
+final class ProductIntegrationTest extends TestCase
 {
-    public function testProductValidationAndSave()
+    public function testProductValidationAndSave(): void
     {
         $model = "Coupe"; // Valide
         $color = "Green"; // Valide

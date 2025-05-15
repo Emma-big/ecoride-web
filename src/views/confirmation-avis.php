@@ -1,26 +1,7 @@
 <?php
 // src/views/confirmation-avis.php
 
-// 2) Gérer l'inactivité (10 minutes)
-$inactive_duration = 600;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $inactive_duration) {
-    session_unset();
-    session_destroy();
-    header('Location: /inactivite');
-    exit;
-}
-$_SESSION['last_activity'] = time();
-
-// 3) Variables pour le layout
-$pageTitle   = "Confirmation de l'avis - EcoRide";
-$extraStyles = [
-    "/assets/style/styleFormLogin.css",
-    "/assets/style/styleBigTitle.css"
-];
-$withTitle = false;
-
-// 4) Contenu principal
-ob_start();
+// Fragment d’affichage pour confirmation d’avis
 ?>
 <div class="formLogin container mt-5">
     <div class="text-center text-white">
@@ -31,9 +12,3 @@ ob_start();
         <a href="/utilisateur" class="btn btn-primary">Retour à mon espace</a>
     </div>
 </div>
-<?php
-$mainContent = ob_get_clean();
-
-// 5) Inclusion du layout global
-require_once BASE_PATH . '/src/layout.php';
-?>

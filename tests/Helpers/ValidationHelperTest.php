@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Helpers;
+namespace Adminlocal\EcoRide\Tests\Helpers;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Adminlocal\EcoRide\Helpers\ValidationHelper;
 
-class ValidationHelperTest extends TestCase
+final class ValidationHelperTest extends TestCase
 {
     #[DataProvider('modelProvider')]
     public function testValidateModel(string $model, bool $expected): void

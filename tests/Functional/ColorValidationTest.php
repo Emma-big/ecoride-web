@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Functional;
+namespace Adminlocal\EcoRide\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
 use Adminlocal\EcoRide\Helpers\ValidationHelper;
