@@ -28,7 +28,7 @@ $input = [
     'surname'   => trim(filter_input(INPUT_POST, 'surname', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? ''),
     'naissance' => trim(filter_input(INPUT_POST, 'naissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? ''),
     'phone'     => trim(filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? ''),
-    'choix'     => trim(filter_input(INPUT_POST, 'choix', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? ''),
+    'sexe'     => trim(filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? ''),
 ];
 
 $errors = [];
@@ -53,8 +53,8 @@ $dt = \DateTime::createFromFormat('Y-m-d', $input['naissance']);
 if (!($dt && $dt->format('Y-m-d') === $input['naissance'])) {
     $errors['naissance'] = 'Date de naissance invalide.';
 }
-if (!in_array($input['choix'], ['Homme','Femme'], true)) {
-    $errors['choix'] = 'Choix de sexe invalide.';
+if (!in_array($input['sexe'], ['H','F'], true)) {
+    $errors['sexe'] = 'Sexe invalide.';
 }
 if (!preg_match('/^\+?[0-9]{6,15}$/', $input['phone'])) {
     $errors['phone'] = 'Téléphone invalide (6–15 chiffres).';
@@ -77,7 +77,7 @@ if ($errors) {
 
 // 8) Hash & defaults
 $hashed  = password_hash($input['password'], PASSWORD_DEFAULT);
-$photo   = $input['choix'] === 'Femme' ? 'employeF.png' : 'employe.png';
+$photo   = $input['sexe'] === 'F' ? 'employeF.png' : 'employe.png';
 $role    = 2;   // employé
 $credit  = 0;
 
