@@ -136,4 +136,3 @@ $dynamicPrefs = $stmtP->fetchAll(\PDO::FETCH_COLUMN);
 $mainView    = 'views/detail-covoiturage.php';
 $pageTitle   = "Détail du covoiturage #{$id}";
 $extraStyles = ['/assets/style/styleCovoiturage.css'];
-require_once BASE_PATH . '/src/layout.php';
