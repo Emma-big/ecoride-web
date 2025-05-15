@@ -146,7 +146,16 @@ switch ($uri) {
     } else {
         renderError(405);
     }
-    exit;  
+    exit; 
+    
+    case '/confirmationContact':
+        $mainView  = 'views/confirmationContact.php';
+        $pageTitle = 'Confirmation Contact - EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleBigTitle.css'
+    ];
+    break;
     
     case '/detail-covoiturage':
         require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
