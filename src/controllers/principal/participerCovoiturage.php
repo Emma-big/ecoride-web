@@ -1,8 +1,6 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
- 
-
 // 1) Session + gestion de l'inactivité
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -64,9 +62,21 @@ if ($userCredit < $price) {
 
 // 9) Afficher la confirmation si nécessaire
 if (empty($_POST['confirm'])) {
+    // 9.1 préparer les variables pour la vue
+    $pageTitle   = 'Confirmer ma participation';
+    $extraStyles = [
+        '/assets/style/styleCovoiturage.css',
+        '/assets/style/styleIndex.css'
+    ];
     $GLOBALS['price']    = $price;
     $GLOBALS['covoitId'] = $covoitId;
-    $mainView            = 'views/confirm-participation.php';
+
+    // 9.2 bufferiser la vue de confirmation
+    ob_start();
+    require BASE_PATH . '/src/views/confirm-participation.php';
+    $mainContent = ob_get_clean();
+
+    // 9.3 afficher avec le layout
     require_once BASE_PATH . '/src/layout.php';
     exit;
 }
