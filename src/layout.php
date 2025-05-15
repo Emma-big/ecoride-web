@@ -10,7 +10,8 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 error_log('DEBUG SESSION: ' . print_r($_SESSION, true));
 
 // 3) En-tête HTML
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -92,7 +93,6 @@ if (!empty($mainContent)) {
 }
 echo '</main>';
 
-
 // 8) Footer
 $footerFile = BASE_PATH . '/src/views/footer.php';
 if (file_exists($footerFile)) {
@@ -102,6 +102,7 @@ if (file_exists($footerFile)) {
 }
 ?>
 
+<!-- JS globaux -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script
   src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js">
@@ -113,12 +114,41 @@ if (file_exists($footerFile)) {
     if (!toggle || !pwd) return;
     toggle.addEventListener('click', () => {
       pwd.type = pwd.type === 'password' ? 'text' : 'password';
-      toggle.querySelector('i')
-            .classList.toggle('bi-eye');
-      toggle.querySelector('i')
-            .classList.toggle('bi-eye-slash');
+      toggle.querySelector('i').classList.toggle('bi-eye');
+      toggle.querySelector('i').classList.toggle('bi-eye-slash');
     });
   });
 </script>
+
+<?php if (!empty($barreRecherche) && is_string($barreRecherche)): ?>
+  <!-- Barre de recherche Google Maps Autocomplete -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=<?= rawurlencode($gKey ?? '') ?>&libraries=places&callback=initAutocomplete">
+  </script>
+  <script>
+    function initAutocomplete() {
+      ['depart','arrivee'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const auto = new google.maps.places.Autocomplete(el, {
+          types: ['address'],
+          componentRestrictions: { country: 'fr' }
+        });
+        auto.addListener('place_changed', () => {
+          const place = auto.getPlace();
+          if (!place.geometry) return;
+          // Remplissage lat/lng si champs cachés présents
+          const latField = document.getElementById(id + '_lat');
+          const lngField = document.getElementById(id + '_lng');
+          if (latField && lngField) {
+            latField.value = place.geometry.location.lat().toFixed(7);
+            lngField.value = place.geometry.location.lng().toFixed(7);
+          }
+        });
+      });
+    }
+  </script>
+<?php endif; ?>
+
 </body>
 </html>
