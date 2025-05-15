@@ -152,10 +152,8 @@ switch ($uri) {
 
     case '/detail-covoiturage':
         requireJwtAuth();
-        ob_start();
         require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
-        $mainContent = ob_get_clean();
-        break;
+        exit;
 
     case '/delete-covoiturage':
         requireJwtAuth();
