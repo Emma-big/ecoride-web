@@ -97,7 +97,7 @@ switch ($uri) {
         exit;
 
     case '/mentions-legales':
-        $mainView  = 'views/mentionsLegales.php';
+        $mainView  = 'views/mentions-legales.php';
         $pageTitle = 'Mentions légales - EcoRide';
         require BASE_PATH . '/src/layout.php';
         exit;
