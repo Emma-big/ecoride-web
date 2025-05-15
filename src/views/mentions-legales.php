@@ -26,7 +26,7 @@
         <section class="mb-4">
             <h2>Informations générales</h2>
             <p><strong>Nom de la société :</strong> EcoRide</p>
-            <p><strong>Adresse :</strong> 123 Rue Exemple, Ville, Pays</p>
+            <p><strong>Adresse :</strong> 123 Rue des fleurs, Paris, FRANCE</p>
             <p><strong>Téléphone :</strong> 01 23 45 67 89</p>
             <p><strong>Email :</strong> contact@ecoride.com</p>
         </section>
@@ -36,8 +36,8 @@
         </section>
         <section class="mb-4">
             <h2>Hébergement</h2>
-            <p>Le site est hébergé par : XXX</p>
-            <p>Adresse de l'hébergeur : XXX</p>
+            <p>Le site est hébergé par : Heroku Inc.</p>
+            <p>Adresse de l'hébergeur : 650 7th Street, San Francisco, CA 94103, États-Unis.</p>
         </section>
         <section>
             <h2>Responsabilité</h2>
