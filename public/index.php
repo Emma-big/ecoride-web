@@ -198,6 +198,16 @@ switch ($uri) {
         require BASE_PATH . '/src/views/suspendu.php';
         $mainContent = ob_get_clean();
         break;  
+
+    case '/modifCompteAction':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /admin');
+            exit;
+        }
+        ob_start();
+        require BASE_PATH . '/src/forms/modifCompteAction.php';
+        $mainContent = ob_get_clean();
+        break;
         
     case '/compteur_api.php':
         require BASE_PATH . '/public/compteur_api.php';
@@ -449,19 +459,7 @@ switch ($uri) {
         $pageTitle   = 'Modifier mon compte – EcoRide';
         $extraStyles = ['/assets/style/styleFormLogin.css'];
         break;
-
-
-    case '/modifCompteAction':
-        requireJwtAuth();
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /admin');
-            exit;
-        }
-        ob_start();
-        require BASE_PATH . '/src/forms/modifCompteAction.php';
-        $mainContent = ob_get_clean();
-        break;
-  
+      
     default:
         renderError(404);
 }

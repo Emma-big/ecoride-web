@@ -81,5 +81,3 @@ $extraStyles = ['/assets/style/styleFormLogin.css'];
   <input type="hidden" name="csrf_token"
          value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
 </form>
-<?php
-$mainContent = ob_get_clean();
