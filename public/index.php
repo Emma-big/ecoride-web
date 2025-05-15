@@ -192,6 +192,11 @@ switch ($uri) {
         break;
 
     case '/suspendu':
+        // Si l’utilisateur n’est pas suspendu (role !== 4), on le redirige vers l’accueil
+        if (($_SESSION['user']['role'] ?? null) !== 4) {
+        header('Location: /index');
+        exit;
+        }
         $pageTitle   = 'Compte suspendu – EcoRide';
         $extraStyles = ['/assets/style/styleIndex.css'];
         ob_start();

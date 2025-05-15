@@ -1,28 +1,11 @@
 <?php
 // src/views/suspendu.php
-
-// Variables pour le layout
-$pageTitle   = "Compte suspendu - EcoRide";
-$withTitle   = true;
-$extraStyles = [
-    "/assets/style/styleIndex.css",
-    "/assets/style/styleFormLogin.css"
-];
-
-// Cacher le bigTitle si nécessaire
-global $hideTitle;
-$hideTitle = true;
-
-// Contenu principal
-ob_start();
 ?>
-<div class="container text-center py-5">
-  <h1>Compte suspendu</h1>
-  <p>Votre compte a été suspendu. Pour toute question, contactez-nous à <a href="mailto:contact@ecoride.com">contact@ecoride.com</a>.</p>
+<div class="container my-4 text-center">
+  <h2 class="mb-4">Accès refusé</h2>
+  <p>Désolé, votre compte a été suspendu par un administrateur. Veuillez nous contacter pour plus d'informations à <a href="mailto:contact@ecoride.com">contact@ecoride.com</a>.</p>
+  <div class="d-flex justify-content-center gap-3 mt-3">
+    <a href="/contact" class="btn btn-primary">Nous contacter</a>
+    <a href="/deconnexion" class="btn btn-secondary">Se déconnecter</a>
+  </div>
 </div>
-<?php
-$mainContent = ob_get_clean();
-
-// Inclusion du layout global
-require_once BASE_PATH . '/src/layout.php';
-?>
