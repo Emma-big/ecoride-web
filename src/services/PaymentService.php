@@ -3,7 +3,6 @@
 
 namespace Adminlocal\EcoRide\services;
 
-use Adminlocal\EcoRide\Database\DatabaseConnectionInterface;
 use PDO;
 use RuntimeException;
 
@@ -11,11 +10,9 @@ class PaymentService
 {
     private PDO $pdo;
 
-    public function __construct(
-        DatabaseConnectionInterface $dbConnection
-    ) {
-        // On récupère le PDO via l’interface injectée
-        $this->pdo = $dbConnection->getPdo();
+   public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
     }
 
     /**
