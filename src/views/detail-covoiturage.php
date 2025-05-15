@@ -3,7 +3,6 @@
 
 // 2) Variables pour le layout
 $pageTitle   = "Détail du covoiturage";
-$hideTitle   = true; // masque le big title
 $extraStyles = ['/assets/style/styleCovoiturage.css'];
 
 // 3) Charger la BDD + récupérer les préférences dynamiques
