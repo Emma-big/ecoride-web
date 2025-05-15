@@ -120,6 +120,7 @@ switch ($uri) {
     case '/index':
     case '/index.php':
         $barreRecherche= 'views/barreRecherche.php';
+        $gKey           = $_ENV['GOOGLE_API_KEY'] ?? '';
         $mainView      = 'views/accueil.php';
         $pageTitle     = 'Accueil - EcoRide';
         $extraStyles   = ['/assets/style/styleIndex.css','/assets/style/styleBarreRecherche.css'];
@@ -298,6 +299,24 @@ switch ($uri) {
         }
         break;
 
+    case '/updateVehiculePost':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once BASE_PATH . '/src/controllers/post/updateVehiculePost.php';
+            exit;
+        } else {
+            renderError(405);
+        }
+        break; 
+        
+    case '/confirmation-avis':
+        $mainView    = 'views/confirmation-avis.php';
+        $pageTitle   = 'Confirmation de l\'avis - EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleBigTitle.css'
+        ];
+        break;    
+
     case '/confirmerTrajet':
         requireJwtAuth();
         ob_start();
@@ -410,15 +429,18 @@ switch ($uri) {
         break;
 
     case '/modifCompteForm':
-        requireJwtAuth();
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            header('Location: /admin');
-            exit;
-        }
-        ob_start();
-        require BASE_PATH . '/src/forms/modifCompteForm.php';
-        $mainContent = ob_get_clean();
-        break;
+    requireJwtAuth();                       
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        header('Location: /admin');
+        exit;
+    }
+    // Bufferisation du form
+    ob_start();
+    require BASE_PATH . '/src/forms/modifCompteForm.php';
+    $mainContent = ob_get_clean();
+    $pageTitle   = 'Modifier mon compte – EcoRide';
+    $extraStyles = ['/assets/style/styleFormLogin.css'];
+    break;
 
     case '/modifCompteAction':
         requireJwtAuth();
