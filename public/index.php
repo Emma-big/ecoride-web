@@ -146,7 +146,56 @@ switch ($uri) {
     } else {
         renderError(405);
     }
-    exit;    
+    exit;  
+    
+    case '/detail-covoiturage':
+        require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
+
+    case '/covoiturage':
+        $pageTitle   = 'Rechercher un covoiturage – EcoRide';
+        $extraStyles = ['/assets/style/styleCovoiturage.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/covoiturage.php';
+        $mainContent = ob_get_clean();
+        break;  
+        
+    case '/updateVehiculePost':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            require_once BASE_PATH . '/src/controllers/post/updateVehiculePost.php';
+            exit;
+        } else {
+            renderError(405);
+        }
+        break; 
+        
+    case '/confirmation-avis':
+        $mainView    = 'views/confirmation-avis.php';
+        $pageTitle   = 'Confirmation de l\'avis - EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleBigTitle.css'
+        ];
+        break;  
+        
+    case '/inactivite':
+        $pageTitle   = 'Inactivité – EcoRide';
+        $extraStyles = ['/assets/style/styleIndex.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/inactivite.php';
+        $mainContent = ob_get_clean();
+        break;
+
+    case '/suspendu':
+        $pageTitle   = 'Compte suspendu – EcoRide';
+        $extraStyles = ['/assets/style/styleIndex.css'];
+        ob_start();
+        require BASE_PATH . '/src/views/suspendu.php';
+        $mainContent = ob_get_clean();
+        break;  
+        
+    case '/compteur_api.php':
+        require BASE_PATH . '/public/compteur_api.php';
+        exit;    
 
     // PROTECTED
      case '/employe':
@@ -170,11 +219,7 @@ switch ($uri) {
         $pageTitle = 'Notes à valider - EcoRide';
         require BASE_PATH . '/src/layout.php';
         exit;
-
-    case '/detail-covoiturage':
-    requireJwtAuth();
-    require BASE_PATH . '/src/controllers/principal/detailCovoiturage.php';
-    
+  
     case '/delete-covoiturage':
         requireJwtAuth();
         ob_start();
@@ -198,14 +243,6 @@ switch ($uri) {
         requireJwtAuth();
         require BASE_PATH . '/src/views/vehiculeForm.php';
         exit;
-
-    case '/covoiturage':
-        $pageTitle   = 'Rechercher un covoiturage – EcoRide';
-        $extraStyles = ['/assets/style/styleCovoiturage.css'];
-        ob_start();
-        require BASE_PATH . '/src/views/covoiturage.php';
-        $mainContent = ob_get_clean();
-        break;
 
     case '/covoiturageStatutsSwitch':
         requireJwtAuth();
@@ -298,25 +335,7 @@ switch ($uri) {
             renderError(405);
         }
         break;
-
-    case '/updateVehiculePost':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            require_once BASE_PATH . '/src/controllers/post/updateVehiculePost.php';
-            exit;
-        } else {
-            renderError(405);
-        }
-        break; 
-        
-    case '/confirmation-avis':
-        $mainView    = 'views/confirmation-avis.php';
-        $pageTitle   = 'Confirmation de l\'avis - EcoRide';
-        $extraStyles = [
-            '/assets/style/styleFormLogin.css',
-            '/assets/style/styleBigTitle.css'
-        ];
-        break;    
-
+     
     case '/confirmerTrajet':
         requireJwtAuth();
         ob_start();
@@ -405,22 +424,6 @@ switch ($uri) {
         $mainContent = ob_get_clean();
         break;
 
-    case '/inactivite':
-        $pageTitle   = 'Inactivité – EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css'];
-        ob_start();
-        require BASE_PATH . '/src/views/inactivite.php';
-        $mainContent = ob_get_clean();
-        break;
-
-    case '/suspendu':
-        $pageTitle   = 'Compte suspendu – EcoRide';
-        $extraStyles = ['/assets/style/styleIndex.css'];
-        ob_start();
-        require BASE_PATH . '/src/views/suspendu.php';
-        $mainContent = ob_get_clean();
-        break;
-
     case '/utilisateur':
         requireJwtAuth();
         ob_start();
@@ -452,12 +455,7 @@ switch ($uri) {
         require BASE_PATH . '/src/forms/modifCompteAction.php';
         $mainContent = ob_get_clean();
         break;
-
-    case '/compteur_api.php':
-        // exécuter sans layout
-        require BASE_PATH . '/public/compteur_api.php';
-        exit;
-
+  
     default:
         renderError(404);
 }
