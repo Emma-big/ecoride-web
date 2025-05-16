@@ -62,6 +62,7 @@ if (empty($input['password'])) {
 }
 
 // 9) Vérifier le reCAPTCHA si requis
+$requireCaptcha = true;  // <— pour tester, on force l’affichage
 if ($requireCaptcha) {
     if (empty($input['captcha'])) {
         $errors['captcha'] = 'Veuillez valider le captcha.';
