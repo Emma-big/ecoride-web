@@ -63,6 +63,10 @@ $_SESSION['last_activity'] = time();
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 
 switch ($uri) {
+    case '/login.php':
+        header('Location: /login', true, 302);
+        exit;
+
     case '/login':
     require_once BASE_PATH . '/src/forms/login.php';
     exit;
