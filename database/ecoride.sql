@@ -430,6 +430,15 @@ INSERT INTO `voitures` VALUES (7,'Partner','AB-123-CV','Vert','2015-01-01',NULL,
 UNLOCK TABLES;
 
 --
+-- Table pour stocker les tentatives de login (brute-force)
+--
+CREATE TABLE IF NOT EXISTS `login_attempts` (
+  `attempt_id`   INT AUTO_INCREMENT PRIMARY KEY,
+  `ip_address`   VARCHAR(45) NOT NULL,
+  `attempted_at` DATETIME    NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
 -- Dumping routines for database 'ecoride'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
