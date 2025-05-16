@@ -78,5 +78,5 @@ $ins->execute([
 
 // 10) Confirmation et redirection
 $_SESSION['flash'] = 'Réclamation enregistrée.';
-header('Location: /utilisateur');
+header('Location: /confirmation-reclamations');
 exit;

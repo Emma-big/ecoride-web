@@ -115,7 +115,7 @@ $stmt->execute([
 ]);
 
     // ➔ Après signalement ➔ rediriger vers confirmation
-    header('Location: /confirmation-avis');
+    header('Location: /confirmation-reclamations');
     exit;
 }
 

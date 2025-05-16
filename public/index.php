@@ -174,6 +174,15 @@ switch ($uri) {
         }
         break; 
         
+    case '/confirmation-reclamations':
+        $mainView    = 'views/confirmation-reclamations.php';
+        $pageTitle   = 'Confirmation de la reclamtion - EcoRide';
+        $extraStyles = [
+            '/assets/style/styleFormLogin.css',
+            '/assets/style/styleBigTitle.css'
+        ];
+        break;  
+
     case '/confirmation-avis':
         $mainView    = 'views/confirmation-avis.php';
         $pageTitle   = 'Confirmation de l\'avis - EcoRide';
@@ -181,7 +190,7 @@ switch ($uri) {
             '/assets/style/styleFormLogin.css',
             '/assets/style/styleBigTitle.css'
         ];
-        break;  
+        break; 
         
     case '/inactivite':
         $pageTitle   = 'Inactivité – EcoRide';

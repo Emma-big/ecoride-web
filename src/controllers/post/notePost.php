@@ -127,7 +127,7 @@ try {
         ':passager_id'    => $input['passager_id'],
     ]);
 
-    header('Location: /confirmation-avis');
+    header('Location: /confirmation-reclamations');
     exit;
 } catch (\PDOException $e) {
     http_response_code(500);
