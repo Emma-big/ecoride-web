@@ -88,14 +88,18 @@ ob_start();
   </div>
 
   <?php if ($requireCaptcha): ?>
-     <div class="mb-3 text-center" id="captcha-container">
+    <div class="mb-3 text-center" id="captcha-container">
       <div class="g-recaptcha"
            data-sitekey="<?= htmlspecialchars(getenv('RECAPTCHA_SITE_KEY') ?: '', ENT_QUOTES) ?>">
       </div>
       <?php if (isset($errors['captcha'])): ?>
-        <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['captcha'], ENT_QUOTES) ?></div>
+        <div class="invalid-feedback d-block">
+          <?= htmlspecialchars($errors['captcha'], ENT_QUOTES) ?>
+        </div>
       <?php endif; ?>
     </div>
+    <!-- API reCAPTCHA (chargée uniquement si nécessaire) -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <?php endif; ?>
 
   <div class="mb-3 text-center">
@@ -108,11 +112,6 @@ ob_start();
 
   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
 </form>
-
-<?php if ($requireCaptcha): ?>
-  <!-- API reCAPTCHA -->
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<?php endif; ?>
 
 <?php
 $mainContent = ob_get_clean();
