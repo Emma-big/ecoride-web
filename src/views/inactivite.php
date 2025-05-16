@@ -1,17 +1,7 @@
 <?php
 // src/views/inactivite.php
 
-// 1) Variables pour le layout
-$pageTitle   = "Inactivité - EcoRide";
-$withTitle   = true;
-$extraStyles = [
-    "/assets/style/styleFormLogin.css",
-    "/assets/style/styleBigTitle.css",
-    "/assets/style/styleIndex.css",
-];
-
-// 2) Contenu principal à injecter
-ob_start();
+// Contenu principal uniquement
 ?>
 <div class="formLogin mx-auto text-center mt-5">
     <h2 class="mb-4">Inactivité</h2>
@@ -23,8 +13,3 @@ ob_start();
         <a href="/index" class="btn btn-outline-dark">Retour à l'accueil</a>
     </div>
 </div>
-<?php
-$mainContent = ob_get_clean();
-// 3) Inclusion du layout global
-require_once BASE_PATH . '/src/layout.php';
-?>
