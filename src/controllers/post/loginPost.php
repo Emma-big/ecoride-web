@@ -64,13 +64,17 @@ if (empty($input['password'])) {
 // 9) Vérifier le reCAPTCHA si requis
 if ($requireCaptcha) {
     if (empty($input['captcha'])) {
-        $errors['captcha'] = 'Veuillez passer le captcha.';
+        $errors['captcha'] = 'Veuillez valider le captcha.';
     } else {
+        // Utiliser la clé secrète depuis l’env
+        $secret = getenv('RECAPTCHA_SECRET_KEY') ?: '';
         $resp = file_get_contents(
-            'https://www.google.com/recaptcha/api/siteverify?secret='
-            . urlencode(RECAPTCHA_SECRET_KEY)
-            . '&response=' . urlencode($input['captcha'])
-            . '&remoteip=' . urlencode($ip)
+            'https://www.google.com/recaptcha/api/siteverify?' .
+            http_build_query([
+                'secret'   => $secret,
+                'response' => $input['captcha'],
+                'remoteip' => $ip,
+            ])
         );
         $json = json_decode($resp, true);
         if (empty($json['success'])) {

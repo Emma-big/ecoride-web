@@ -88,8 +88,10 @@ ob_start();
   </div>
 
   <?php if ($requireCaptcha): ?>
-    <div class="mb-3 text-center" id="captcha-container">
-      <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars(RECAPTCHA_SITE_KEY, ENT_QUOTES) ?>"></div>
+     <div class="mb-3 text-center" id="captcha-container">
+      <div class="g-recaptcha"
+           data-sitekey="<?= htmlspecialchars(getenv('RECAPTCHA_SITE_KEY') ?: '', ENT_QUOTES) ?>">
+      </div>
       <?php if (isset($errors['captcha'])): ?>
         <div class="invalid-feedback d-block"><?= htmlspecialchars($errors['captcha'], ENT_QUOTES) ?></div>
       <?php endif; ?>
