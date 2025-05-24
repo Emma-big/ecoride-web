@@ -2,85 +2,76 @@
 
 ## Table des matières
 
-1. [Description du projet](#description-du-projet)
-2. [Prérequis](#prérequis)
-3. [Installation](#installation)
-4. [Usage en local](#usage-en-local)
-5. [Documentation](#documentation)
-6. [Stratégie de branches Git](#stratégie-de-branches-git)
-7. [CI/CD](#cicd)
-8. [Déploiement](#déploiement)
+1. [Description du projet](#description-du-projet)  
+2. [Prérequis](#prérequis)  
+3. [Installation](#installation)  
+4. [Usage en local](#usage-en-local)  
+5. [Documentation](#documentation)  
+6. [Stratégie de branches Git](#stratégie-de-branches-git)  
+7. [CI/CD](#cicd)  
+8. [Déploiement](#déploiement)  
 
 ---
 
 ## Description du projet
 
-EcoRide offre une plateforme intuitive pour gérer les trajets en covoiturage avec des voitures électriques. L’interface utilisateur repose sur des templates PHP générant du HTML/CSS/JavaScript, et le back-end en PHP-FPM expose une API REST.
-L'environnement local est réalisé avec une instance MongoDB locale et une base MySQL locale (accessible via phpMyAdmin).
-L'environnement de développement et production est réalisé avec une base MySQL gérée et cluster MongoDB Atlas.
+EcoRide offre une plateforme intuitive pour gérer les trajets en covoiturage avec des voitures électriques.  
+L’interface utilisateur repose sur des templates PHP générant du HTML/CSS/JavaScript, et le back-end en PHP-FPM expose une API REST.
+
+Localement, tout tourne dans des conteneurs Docker (PHP-Apache, MySQL, MongoDB).  
+En dev/prod, on utilise MySQL géré et un cluster MongoDB Atlas.
+
+---
 
 ## Prérequis
 
-* **PHP >= 8.2** avec l’extension MongoDB et PDO MySQL
-* **Composer** pour gérer les dépendances PHP
-* **Git** pour cloner le dépôt
-* **Environnement local** :
-  * **MongoDB** (instance locale)
-  * **phpMyAdmin** (pour accéder à la base SQL locale)
+- **Docker** (version 20+)  
+- **Docker Compose** (version 1.27+)  
 
-* **Environnement de développement/production** :
-  * **MySQL** (base SQL gérée)
-  * **MongoDB Atlas** (cluster configuré)
+---
 
 ## Installation
 
-1. Clonez le dépôt :
-
+1. **Cloner le dépôt**  
    ```bash
    git clone https://github.com/Emma-big/ecoride-web.git
    cd ecoride-web
-   ```
-2. Installez les dépendances PHP :
 
-   ```bash
-   composer install
-   ```
-3. Préparez vos variables d'environnement :
+2. **Préparer les variables d’environnement**
 
-   ```bash
    cp .env.example .env
-   ```
 
-   Puis éditez `.env` :
+3. **Construire et démarrer les conteneurs**
 
-   ```dotenv
-   # MongoDB Atlas (prod / dev)
-   MONGODB_URI="mongodb+srv://<user>:<pass>@cluster0.mongodb.net/ecoride?retryWrites=true&w=majority"
-   MONGODB_DB_NAME="ecoride"
+   docker-compose build --no-cache
+   docker-compose up -d
 
-   # SQL local (phpMyAdmin)
-   DB_HOST="127.0.0.1"
-   DB_PORT="3306"
-   DB_NAME="ecoride"
-   DB_USER="root"
-   DB_PASS="root"
-   ```
+4. **Vérifier que tout est “Up”**
+
+   docker-compose ps
 
 ## Usage en local
 
-1. **Démarrer MongoDB** (instance locale sur le port 27017)
-2. **Accéder à phpMyAdmin** : ouvrez `http://localhost:8080` et connectez-vous avec `root/root` sur la base `ecoride`.
-3. **Lancer l’API PHP** :
+Application :
+Ouvrez http://localhost:8080 dans votre navigateur.
 
-   ```bash
-   php -S localhost:8000 -t public
-   ```
-4. **Ouvrir l’application** : accédez à `http://localhost:8000` dans votre navigateur.
-5. **Exécuter les tests unitaires** (sur la base SQL locale) :
+MySQL :
 
-   ```bash
-   composer test
-   ```
+Hôte : 127.0.0.1
+
+Port : celui défini dans DB_PORT (3306 par défaut)
+
+Utilisateur : celui défini dans DB_USER (root par défaut)
+
+Mot de passe : vide (si MYSQL_ALLOW_EMPTY_PASSWORD=yes)
+
+MongoDB :
+
+Hôte : 127.0.0.1
+
+Port : 27017
+
+Arrêter et nettoyer : docker-compose down --volumes
 
 ## Documentation
 
