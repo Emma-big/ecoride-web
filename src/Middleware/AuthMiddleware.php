@@ -13,13 +13,17 @@ function requireJwtAuth(): void
     }
 
     $token  = $_COOKIE['eco_jwt'];
-    $secret = getenv('JWT_SECRET') ?: 'votre_clé_très_secrète';
+    $secret = getenv('JWT_SECRET') ?: ''; // nulle fallback, on doit toujours le définir en .env
 
     try {
         $decoded = JWT::decode($token, new Key($secret, 'HS256'));
         $_SERVER['auth_user_id'] = $decoded->sub;
+        if (isset($decoded->email)) {
+            $_SERVER['auth_email'] = $decoded->email;
+        }
     } catch (\Exception $e) {
-        setcookie('eco_jwt', '', time() - 3600, '/');
+        // suppression du cookie de façon sécurisée
+        setcookie('eco_jwt', '', time() - 3600, '/', '', true, true);
         header('Location: /login?expired=1');
         exit;
     }

@@ -1,11 +1,35 @@
 <?php
 namespace Adminlocal\EcoRide\Controllers\Principal;
 
- 
-
 // 1) Démarrer la session si nécessaire
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+// 1. Vérifier la présence du cookie
+if (empty($_COOKIE['eco_jwt'])) {
+    header('Location: /login');
+    exit;
+}
+
+// 2. Décoder et valider la signature
+try {
+    $decoded = JWT::decode(
+        $_COOKIE['eco_jwt'],
+        new Key($_ENV['JWT_SECRET'], 'HS256')
+    );
+    // 3. Réinjecter l’utilisateur en session
+    $_SESSION['user'] = [
+        'utilisateur_id' => $decoded->sub,
+        'role'           => $decoded->role,
+    ];
+} catch (Exception $e) {
+    header('Location: /login');
+    exit;
 }
 
 // 2) Déterminer le rôle de l'utilisateur (0 par défaut)
